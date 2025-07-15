@@ -1,0 +1,22 @@
+
+
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+
+node_modules/
+dist/
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Others
+.DS_Store
+.vscode/
+".env" 
