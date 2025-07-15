@@ -91,7 +91,7 @@ const Pagination: React.FC<PaginationProps> = ({
               variant={pageNum === currentPage ? 'default' : 'outline'}
               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                 pageNum === currentPage
-                  ? 'bg-primary text-white'
+                  ? 'bg-black text-white'
                   : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
               }`}
               onClick={() => handlePageClick(pageNum)}

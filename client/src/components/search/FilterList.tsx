@@ -135,7 +135,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
                 key={c}
                 variant="ghost"
                 className={`w-full justify-start text-left ${
-                  city === c ? 'bg-primary/10 text-primary' : ''
+                  city === c ? 'bg-gray-100 text-black' : ''
                 }`}
                 onClick={() => {
                   console.log('FilterList - Setting city:', c);
@@ -167,7 +167,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
                 key={num}
                 variant="ghost"
                 className={`w-full justify-start text-left ${
-                  guests === num ? 'bg-primary/10 text-primary' : ''
+                  guests === num ? 'bg-gray-100 text-black' : ''
                 }`}
                 onClick={() => {
                   console.log('FilterList - Setting guests:', num);
@@ -199,7 +199,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
                 key={num}
                 variant="ghost"
                 className={`w-full justify-start text-left ${
-                  bedrooms === num ? 'bg-primary/10 text-primary' : ''
+                  bedrooms === num ? 'bg-gray-100 text-black' : ''
                 }`}
                 onClick={() => {
                   console.log('FilterList - Setting bedrooms:', num);
@@ -231,7 +231,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
                 key={num.toString()}
                 variant="ghost"
                 className={`w-full justify-start text-left ${
-                  bathrooms === num ? 'bg-primary/10 text-primary' : ''
+                  bathrooms === num ? 'bg-gray-100 text-black' : ''
                 }`}
                 onClick={() => {
                   console.log('FilterList - Setting bathrooms:', num);
@@ -357,7 +357,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
                 key={type}
                 variant="ghost"
                 className={`w-full justify-start text-left ${
-                  propertyType === type ? 'bg-primary/10 text-primary' : ''
+                  propertyType === type ? 'bg-gray-100 text-black' : ''
                 }`}
                 onClick={() => {
                   console.log('FilterList - Setting property type:', type);
@@ -376,7 +376,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       {Object.keys(currentFilters).length > 0 && (
         <Button 
           variant="ghost" 
-          className="text-primary hover:text-primary/80"
+          className="text-black hover:text-gray-700"
           onClick={clearFilters}
         >
           Clear Filters

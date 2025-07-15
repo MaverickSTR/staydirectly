@@ -22,7 +22,7 @@ const TravelGuideCard: React.FC<TravelGuideCardProps> = ({ guide }) => {
   // Map category color to Tailwind classes
   const getCategoryColorClasses = (color: string) => {
     const colorMap: Record<string, string> = {
-      'blue': 'bg-blue-100 text-primary',
+      'blue': 'bg-gray-100 text-black',
       'green': 'bg-green-100 text-secondary',
       'amber': 'bg-amber-100 text-amber-600',
       'red': 'bg-red-100 text-red-600',
@@ -49,7 +49,7 @@ const TravelGuideCard: React.FC<TravelGuideCardProps> = ({ guide }) => {
           )}>
             {category}
           </span>
-          <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">{title}</h3>
+          <h3 className="font-semibold text-lg mb-2 group-hover:text-black transition-colors">{title}</h3>
           <p className="text-gray-600 text-sm line-clamp-2">{excerpt}</p>
         </CardContent>
       </Card>

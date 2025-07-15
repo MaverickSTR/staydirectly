@@ -162,7 +162,7 @@ function MapMarkers({
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg transition-all duration-200 ${
                     isSelected 
                       ? 'bg-red-600 scale-110 ring-4 ring-red-200' 
-                      : 'bg-primary hover:bg-primary-dark hover:scale-105'
+                      : 'bg-black hover:bg-gray-800 hover:scale-105'
                   }`}>
                     ${property.price ? Math.round(property.price) : '?'}
                   </div>
@@ -188,7 +188,7 @@ function MapMarkers({
                       </div>
                     )}
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-lg font-bold text-primary">
+                      <span className="text-lg font-bold text-black">
                         ${property.price}/night
                       </span>
                       {property.rating && (
@@ -253,7 +253,7 @@ export default function GoogleMapView({
       return (
         <div style={{ width: "100%", height }} className="flex items-center justify-center bg-gray-100 border border-gray-200 rounded-lg">
           <div className="text-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
             <p className="text-gray-500 text-sm">Loading map...</p>
           </div>
         </div>

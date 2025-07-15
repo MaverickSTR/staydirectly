@@ -68,7 +68,7 @@ export default function HospitablePropertiesList() {
                         <p className="text-muted-foreground">No image available</p>
                       </div>
                     )}
-                    <Badge className="absolute top-2 right-2 bg-primary/90">Hospitable API</Badge>
+                    <Badge className="absolute top-2 right-2 bg-black/90">Hospitable API</Badge>
                   </div>
                   <CardContent className="p-6">
                     <h3 className="text-xl font-semibold line-clamp-1">{property.name}</h3>

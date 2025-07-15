@@ -23,7 +23,7 @@ export default function HospitableIntegration() {
         </div>
         <div className="flex gap-4">
           <Link href="/connect">
-            <a className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2 shadow-sm">
+            <a className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-black text-white hover:bg-gray-800 h-10 px-4 py-2 shadow-sm">
               Connect Hospitable Account
             </a>
           </Link>
@@ -63,7 +63,7 @@ export default function HospitableIntegration() {
                   <CardContent className="p-4">
                     <h3 className="text-lg font-semibold mb-1">
                       <Link href={`/property/${property.slug}`}>
-                        <a className="hover:text-blue-600">{property.name}</a>
+                        <a className="hover:text-black">{property.name}</a>
                       </Link>
                     </h3>
                     <p className="text-sm text-gray-500 mb-2">

@@ -362,7 +362,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
     return (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] md:h-[500px] bg-gray-100 rounded-lg flex items-center justify-center">
         <div className="md:col-span-4 text-center flex flex-col items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+          <Loader2 className="h-8 w-8 animate-spin text-black mb-2" />
           <p className="text-gray-600">Loading property images...</p>
         </div>
       </div>

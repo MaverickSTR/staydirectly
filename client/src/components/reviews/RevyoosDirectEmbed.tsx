@@ -127,7 +127,7 @@ const RevyoosDirectEmbed: React.FC<RevyoosDirectEmbedProps> = ({
     <div ref={containerRef} className={className + " relative"}>
       {loadingState === 'loading' && (
         <div className="w-full flex flex-col items-center justify-center py-12">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin mb-4"></div>
           <p className="text-gray-500">Loading guest reviews...</p>
           <p className="text-xs text-gray-400 mt-2">This may take a few moments</p>
         </div>

@@ -107,7 +107,7 @@ const BookingWidget: React.FC<BookingWidgetProps> = ({
             {/* Loading State */}
             {loadingState === 'loading' && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-90 z-10">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                    <Loader2 className="h-8 w-8 animate-spin text-black mb-4" />
                     <p className="text-gray-600">Loading booking widget...</p>
                     <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
                 </div>

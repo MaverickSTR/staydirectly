@@ -51,8 +51,8 @@ const HospitableSearch: React.FC = () => {
       */}
       <div className="bg-white shadow-sm p-4">
         <div className="container mx-auto flex items-center">
-          <a href="/" className="text-primary text-xl font-bold mr-8">StayDirectly</a>
-          <a href="/search" className="text-gray-600 hover:text-primary mr-4">All Properties</a>
+          <a href="/" className="text-black text-xl font-bold mr-8">StayDirectly</a>
+          <a href="/search" className="text-gray-600 hover:text-black mr-4">All Properties</a>
         </div>
       </div>
 

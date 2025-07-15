@@ -48,7 +48,7 @@ const CustomerListings: React.FC = () => {
           <div className="space-y-2">
             <p>{`Successfully marked ${Object.keys(selectedListings).filter(id => selectedListings[id]).length} properties for publishing.`}</p>
             <div className="pt-1">
-              <Link to="/published-properties" className="text-primary underline hover:text-primary/80">
+              <Link to="/published-properties" className="text-black underline hover:text-gray-700">
                 View published properties
               </Link>
             </div>
@@ -160,7 +160,7 @@ const CustomerListings: React.FC = () => {
 
       {isLoading ? (
         <div className="flex justify-center items-center h-40">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-black" />
         </div>
       ) : isError ? (
         <Card className="bg-destructive/10 border-destructive">
@@ -226,7 +226,7 @@ const CustomerListings: React.FC = () => {
                       </div>
                       {selectedListings[listing.id] && (
                         <div className="absolute top-2 left-2 z-10">
-                          <Badge variant="default" className="bg-primary">
+                          <Badge variant="default" className="bg-black">
                             <Star className="h-3.5 w-3.5 mr-1" /> Selected
                           </Badge>
                         </div>
@@ -264,7 +264,7 @@ const CustomerListings: React.FC = () => {
                                 </Badge>
                               </div>
                               
-                              <h4 className="font-semibold text-primary">
+                              <h4 className="font-semibold text-black">
                                 Public Title: {listing.public_name || 'Not Set'}
                               </h4>
                               
@@ -359,7 +359,7 @@ const CustomerListings: React.FC = () => {
             )}
           </div>
           
-          <div className="mt-8 p-6 bg-primary/5 rounded-lg border border-primary/20 text-center">
+          <div className="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
             <h3 className="text-xl font-medium mb-2">View Your Published Properties</h3>
             <p className="text-muted-foreground mb-4">
               Once you've marked properties for publishing, you can view and manage them in the Published Properties page.

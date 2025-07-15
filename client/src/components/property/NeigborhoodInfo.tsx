@@ -18,7 +18,7 @@ export default function NeighborhoodInfo({ walkScore, transitScore, bikeScore, s
           <span className="text-sm">Walk Score: {walkScore}/100</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-black rounded-full mr-2"></div>
           <span className="text-sm">Transit Score: {transitScore}/100</span>
         </div>
         <div className="flex items-center">

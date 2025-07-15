@@ -22,7 +22,7 @@ const FilterButton: React.FC<FilterButtonProps> = ({
       variant="outline"
       className={cn(
         "rounded-full flex items-center gap-2 hover:shadow-sm transition",
-        active && "bg-primary/10 border-primary",
+        active && "bg-gray-100 border-gray-400",
         className
       )}
     >

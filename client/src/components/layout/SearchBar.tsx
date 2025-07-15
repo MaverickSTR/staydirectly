@@ -29,7 +29,7 @@ const SearchBar: React.FC = () => {
           type="submit" 
           variant="ghost" 
           size="icon" 
-          className="absolute right-0 top-0 h-full px-4 text-primary"
+          className="absolute right-0 top-0 h-full px-4 text-black"
         >
           <Search className="h-4 w-4" />
         </Button>

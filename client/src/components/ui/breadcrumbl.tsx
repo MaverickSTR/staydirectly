@@ -24,7 +24,7 @@ const Breadcrumb: React.FC<BreadcrumbsProps> = ({ items, className }) => {
             )}
             
             {item.href && index !== items.length - 1 ? (
-              <Link href={item.href} className="text-primary hover:underline">
+              <Link href={item.href} className="text-black hover:underline">
                 {item.label}
               </Link>
             ) : (

@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -25,16 +25,23 @@ import { useEffect } from "react";
 
 function Router() {
   const { prefetchFeaturedData } = usePrefetchCommonData();
+  const [location] = useLocation();
 
   // Prefetch commonly needed data when app loads
   useEffect(() => {
     prefetchFeaturedData();
   }, [prefetchFeaturedData]);
 
+  // Home page should be full width, others should be constrained
+  const isHomePage = location === "/";
+  const mainClasses = isHomePage 
+    ? "flex-grow" 
+    : "flex-grow w-[90%] mx-auto";
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-grow w-[90%] mx-auto">
+      <main className={mainClasses}>
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/property/:slug" component={PropertyDetail} />

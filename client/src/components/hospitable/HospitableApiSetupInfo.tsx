@@ -26,7 +26,7 @@ export default function HospitableApiSetupInfo() {
           <div>
             <h3 className="text-lg font-medium">How to set up Hospitable API access:</h3>
             <ol className="list-decimal ml-5 mt-2 space-y-2">
-              <li>Log in to your <a href="https://www.hospitable.com/" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Hospitable account</a></li>
+              <li>Log in to your <a href="https://www.hospitable.com/" className="text-black hover:underline" target="_blank" rel="noopener noreferrer">Hospitable account</a></li>
               <li>Navigate to <strong>Settings &gt; API & Integrations</strong></li>
               <li>Generate a new platform token with at least "read" permissions</li>
               <li>Copy the generated token and add it to your environment variables</li>

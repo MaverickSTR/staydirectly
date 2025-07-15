@@ -303,7 +303,7 @@ const PublishedProperties: React.FC = () => {
     return (
       <div className="container mx-auto p-6">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
         </div>
       </div>
     );
@@ -513,7 +513,7 @@ const PublishedProperties: React.FC = () => {
                               className={`
                                 border rounded-md p-3 flex items-center space-x-2 cursor-pointer
                                 ${propertyToEdit.featuredAmenities?.includes(amenity.id) 
-                                  ? 'border-primary bg-primary/5' 
+                                  ? 'border-gray-400 bg-gray-50' 
                                   : 'border-gray-200 hover:border-gray-300'
                                 }
                               `}
@@ -533,19 +533,19 @@ const PublishedProperties: React.FC = () => {
                             >
                               <div className="flex-shrink-0">
                                 {/* Placeholder for icon - in a real app we'd have actual icons */}
-                                <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-xs">
+                                <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-xs">
                                   {amenity.icon.charAt(0).toUpperCase()}
                                 </div>
                               </div>
                               <div className="flex-1 text-sm">{amenity.label}</div>
                               {propertyToEdit.featuredAmenities?.includes(amenity.id) && (
-                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                                <CheckCircle2 className="h-4 w-4 text-black" />
                               )}
                             </div>
                           ))}
                         </div>
                         
-                        <p className="text-xs text-primary mt-3">
+                        <p className="text-xs text-black mt-3">
                           {propertyToEdit.featuredAmenities?.length || 0} of 6 amenities selected
                         </p>
                       </div>
@@ -837,7 +837,7 @@ const PublishedProperties: React.FC = () => {
                             <td className="px-6 py-4">
                               <div className="flex gap-2">
                                 {property.bookingWidgetUrl ? (
-                                  <Badge variant="outline" className="bg-blue-50 border-blue-100">
+                                  <Badge variant="outline" className="bg-gray-50 border-gray-200">
                                     <Calendar className="h-3 w-3 mr-1" />
                                     Booking
                                   </Badge>

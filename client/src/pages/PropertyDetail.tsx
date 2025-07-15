@@ -50,7 +50,9 @@ import {
   Tv, 
   UserCircle2,
   Utensils, 
-  Wifi
+  Wifi,
+  ExternalLink,
+  Share2
 } from 'lucide-react';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/button';
@@ -119,6 +121,7 @@ const PropertyDetail: React.FC = () => {
   const [guests, setGuests] = useState('1 guest');
   
   const { data: property, isLoading: isLoadingProperty } = useProperty(propertyId);
+  console.log('Property data:', property);
   
   // Debug log after data is loaded
   React.useEffect(() => {
@@ -339,7 +342,7 @@ const PropertyDetail: React.FC = () => {
         address={property.location}
       />
       
-      <div className="container mx-auto px-4 pt-6">
+      <div className="container mx-auto px-4 pt-6  w-[90%] ">
         {/* Breadcrumbs */}
         <nav>
           <Breadcrumb items={breadcrumbItems} />
@@ -364,14 +367,21 @@ const PropertyDetail: React.FC = () => {
             <div className="flex">
               <button 
                 onClick={toggleHeart}
-                className="flex items-center text-gray-600 hover:text-primary transition-colors hover-scale"
+                className="flex items-center text-gray-600 hover:text-black transition-colors hover-scale"
               >
                 <Heart className={`h-4 w-4 mr-1 ${isHeartFilled ? 'fill-current text-red-500 heart-beat active' : 'heart-beat'}`} />
                 <span>Save</span>
               </button>
-              <button className="flex items-center text-gray-600 hover:text-primary transition-colors ml-4 hover-scale">
-                <Share className="h-4 w-4 mr-1 icon-bounce" />
-                <span>Share</span>
+              <button 
+                onClick={() => window.open(property.airbnbUrl, '_blank')}
+                className="flex items-center text-gray-600 hover:text-black transition-colors hover-scale"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View on Airbnb
+              </button>
+              <button className="flex items-center text-gray-600 hover:text-black transition-colors ml-4 hover-scale">
+                <Share2 className="h-4 w-4 mr-2" />
+                Share Property
               </button>
             </div>
           </div>
@@ -498,7 +508,7 @@ const PropertyDetail: React.FC = () => {
               {property.description && property.description.length > 500 && (
                 <Accordion type="single" collapsible className="w-full mt-4 border-t pt-4">
                   <AccordionItem value="description" className="border-none">
-                    <AccordionTrigger className="py-2 font-medium text-primary">
+                    <AccordionTrigger className="py-2 font-medium text-black">
                       Read full description
                     </AccordionTrigger>
                     <AccordionContent className="text-gray-600">
@@ -639,13 +649,7 @@ const PropertyDetail: React.FC = () => {
                   className="w-full min-h-[600px]" 
                 />
               </div>
-              
-
-          
-
             </div>
-
-            
             {/* Location Map - With Map and Neighborhood Details */}
             <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
               <h3 className="text-xl font-bold mb-4">Location</h3>
@@ -706,11 +710,11 @@ const PropertyDetail: React.FC = () => {
                   <h4 className="font-semibold mb-2">Neighborhood info:</h4>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                      <div className="w-3 h-3 bg-black rounded-full mr-2"></div>
                       <span className="text-sm">Walk Score: 92/100</span>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                      <div className="w-3 h-3 bg-black rounded-full mr-2"></div>
                       <span className="text-sm">Transit Score: 78/100</span>
                     </div>
                     <div className="flex items-center">
@@ -825,8 +829,8 @@ const PropertyDetail: React.FC = () => {
                           <p>📞 Phone: (555) 123-4567</p>
                           <p>💬 WhatsApp: Available 24/7</p>
                         </div>
-                        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                          <p className="text-xs text-blue-700">
+                        <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <p className="text-xs text-gray-700">
                             <strong>Note:</strong> Admin can configure the booking widget in the 
                             <a href="/admin" target="_blank" className="underline ml-1">Admin Dashboard</a>
                           </p>

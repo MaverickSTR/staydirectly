@@ -113,10 +113,10 @@ const AdminPage = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Published</CardTitle>
-                <TrendingUp className="h-4 w-4 text-blue-500" />
+                <TrendingUp className="h-4 w-4 text-black" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{stats.published}</div>
+                <div className="text-2xl font-bold text-black">{stats.published}</div>
                 <p className="text-xs text-muted-foreground">Live properties</p>
               </CardContent>
             </Card>
@@ -227,7 +227,7 @@ const AdminPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                   <Card className="p-4">
                     <h4 className="font-medium mb-2">Total Properties</h4>
-                    <p className="text-2xl font-bold text-blue-600">{stats.totalProperties}</p>
+                    <p className="text-2xl font-bold text-black">{stats.totalProperties}</p>
                     <p className="text-sm text-gray-500">Active listings</p>
                   </Card>
                   <Card className="p-4">

@@ -182,7 +182,7 @@ const PropertyEmbedsManager = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-black" />
       </div>
     );
   }
@@ -360,7 +360,7 @@ const PropertyEmbedCard = ({ property, onSave, isSaving, testResults, onTest, on
               
               {getTestResult('booking') && (
                 <Alert className={`mt-2 ${getTestResult('booking')?.status === 'success' ? 'border-green-200 bg-green-50' : 
-                  getTestResult('booking')?.status === 'error' ? 'border-red-200 bg-red-50' : 'border-blue-200 bg-blue-50'}`}>
+                  getTestResult('booking')?.status === 'error' ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
                   <AlertDescription className="flex items-center gap-2">
                     {getTestResult('booking')?.status === 'testing' && <Loader2 className="h-4 w-4 animate-spin" />}
                     {getTestResult('booking')?.status === 'success' && <CheckCircle className="h-4 w-4 text-green-600" />}
@@ -409,7 +409,7 @@ const PropertyEmbedCard = ({ property, onSave, isSaving, testResults, onTest, on
               
               {getTestResult('review') && (
                 <Alert className={`mt-2 ${getTestResult('review')?.status === 'success' ? 'border-green-200 bg-green-50' : 
-                  getTestResult('review')?.status === 'error' ? 'border-red-200 bg-red-50' : 'border-blue-200 bg-blue-50'}`}>
+                  getTestResult('review')?.status === 'error' ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
                   <AlertDescription className="flex items-center gap-2">
                     {getTestResult('review')?.status === 'testing' && <Loader2 className="h-4 w-4 animate-spin" />}
                     {getTestResult('review')?.status === 'success' && <CheckCircle className="h-4 w-4 text-green-600" />}

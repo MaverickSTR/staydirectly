@@ -15,7 +15,6 @@ import {
   SheetContent, 
   SheetTrigger 
 } from '@/components/ui/sheet';
-import HospitableSearchBar from '@/components/HospitableSearchBar';
 import { 
   Menu, 
   User, 
@@ -42,7 +41,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-primary text-2xl font-bold">StayDirectly</span>
+            <span className="text-black text-2xl font-bold">StayDirectly</span>
           </Link>
 
           {/* Spacer for centering links and dropdown */}
@@ -50,14 +49,14 @@ const Navbar: React.FC = () => {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/search" className="text-gray-800 hover:text-primary transition-colors">
+            <Link to="/search" className="text-gray-800 hover:text-black transition-colors">
               Book Your Stay
             </Link>
             
             {/* Markets Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center text-gray-800 hover:text-primary transition-colors">
+                <button className="flex items-center text-gray-800 hover:text-black transition-colors">
                   <Building className="mr-1 h-4 w-4" />
                   <span>Markets</span>
                   <ChevronDown className="ml-1 h-4 w-4" />
@@ -146,19 +145,19 @@ const Navbar: React.FC = () => {
                       Markets
                     </div>
                     <div className="ml-4 space-y-2">
-                      <Link to="/city/shenandoah" className="flex items-center py-1 hover:text-primary transition-colors">
+                      <Link to="/city/shenandoah" className="flex items-center py-1 hover:text-black transition-colors">
                         <MapPin className="mr-2 h-4 w-4" />
                         Shenandoah, VA
                       </Link>
-                      <Link to="/city/annapolis" className="flex items-center py-1 hover:text-primary transition-colors">
+                      <Link to="/city/annapolis" className="flex items-center py-1 hover:text-black transition-colors">
                         <MapPin className="mr-2 h-4 w-4" />
                         Annapolis, MD
                       </Link>
-                      <Link to="/city/nashville" className="flex items-center py-1 hover:text-primary transition-colors">
+                      <Link to="/city/nashville" className="flex items-center py-1 hover:text-black transition-colors">
                         <MapPin className="mr-2 h-4 w-4" />
                         Nashville, TN
                       </Link>
-                      <Link to="/city/blue-ridge" className="flex items-center py-1 hover:text-primary transition-colors">
+                      <Link to="/city/blue-ridge" className="flex items-center py-1 hover:text-black transition-colors">
                         <MapPin className="mr-2 h-4 w-4" />
                         Blue Ridge, GA
                       </Link>

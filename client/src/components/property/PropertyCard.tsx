@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { Property } from '@shared/schema';
-import { Star } from 'lucide-react';
+import { Star, Bed, Bath, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import HeartButton from '@/components/ui/HeartButton';
@@ -38,9 +38,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   const { prefetchPropertyDetails } = usePrefetchCommonData();
 
-  // Calculate room features text
-  const featureText = `${bedrooms} ${bedrooms === 1 ? 'bedroom' : 'bedrooms'} · ${bathrooms} ${bathrooms === 1 ? 'bath' : 'baths'} · ${maxGuests} ${maxGuests === 1 ? 'guest' : 'guests'}`;
-
   // Prefetch property details on hover
   const handleMouseEnter = () => {
     prefetchPropertyDetails(id);
@@ -50,7 +47,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     <div id={`property-${id}`} className="property-card-container p-1">
       <Link href={getPropertyUrl(id, title || name)}>
         <Card 
-          className="bg-white rounded-xl overflow-hidden shadow-[0_6px_16px_rgba(0,0,0,0.12)] hover-lift h-full fade-in"
+          className="relative bg-white rounded-xl overflow-hidden hover-lift h-full fade-in  border border-gray-700"
           onMouseEnter={handleMouseEnter}
         >
           <div className="relative aspect-[4/3] overflow-hidden img-zoom-container">
@@ -60,7 +57,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               className="w-full h-full object-cover img-zoom"
             />
             <div className="absolute top-3 right-3">
-              <HeartButton propertyId={id} className="pulse" />
+              <HeartButton propertyId={id} className="" />
             </div>
             <div className="absolute bottom-3 left-3">
               <Badge variant="secondary" className="bg-white/80 hover:bg-white/90 text-black font-medium shadow-sm hover-scale transition-all">
@@ -68,7 +65,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               </Badge>
             </div>
           </div>
-          <CardContent className="p-4">
+          <div className="pt-4 px-4 h-full flex flex-col">
             <div className="flex justify-between items-start mb-2">
               <h3 className="font-semibold text-lg line-clamp-1">{title || name}</h3>
               <div className="flex items-center">
@@ -77,8 +74,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               </div>
             </div>
             {showLocation && <p className="text-gray-600 text-sm mb-2">{location}</p>}
-            <p className="text-gray-600 text-sm mb-3">{featureText}</p>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-3">
               <p>
                 <span className="font-bold">{formatPrice(price)}</span> 
                 <span className="text-gray-600"> night</span>
@@ -87,7 +83,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 <p className="text-sm text-gray-500">{formatPrice(price * 6)} total</p>
               )}
             </div>
-          </CardContent>
+            <div className="flex items-center gap-4 text-gray-600 text-sm mt-3 pt-3 border-t border-gray-100">
+              <div className="flex items-center gap-1">
+                <Bed className="h-4 w-4" />
+                <span>{bedrooms}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Bath className="h-4 w-4" />
+                <span>{bathrooms}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span>{maxGuests}</span>
+              </div>
+            </div>
+          </div>
         </Card>
       </Link>
     </div>

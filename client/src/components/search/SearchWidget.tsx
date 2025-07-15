@@ -43,7 +43,7 @@ const SearchWidget: React.FC<SearchWidgetProps> = ({
               placeholder="Destination"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
             />
           </div>
           
@@ -54,7 +54,7 @@ const SearchWidget: React.FC<SearchWidgetProps> = ({
               placeholder="Add dates"
               value={dates}
               onChange={(e) => setDates(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
             />
           </div>
           
@@ -77,7 +77,7 @@ const SearchWidget: React.FC<SearchWidgetProps> = ({
         <div className="mt-4 flex justify-center">
           <Button
             type="submit"
-            className={`${isHero ? 'bg-primary hover:bg-blue-600 text-white' : 'bg-primary'} font-medium px-6 py-2 rounded-full transition-colors w-full md:w-auto`}
+            className={`${isHero ? 'bg-black hover:bg-gray-800 text-white' : 'bg-black'} font-medium px-6 py-2 rounded-full transition-colors w-full md:w-auto`}
           >
             <Search className="mr-2 h-4 w-4" /> Search
           </Button>

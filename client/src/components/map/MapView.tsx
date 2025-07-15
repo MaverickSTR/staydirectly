@@ -84,7 +84,7 @@ const MapView: React.FC<MapViewProps> = ({
             <p className="mt-1">${property.price} / night</p>
             <div className="mt-2">
               <button 
-                className="text-primary hover:underline text-xs"
+                className="text-black hover:underline text-xs"
                 onClick={() => onMarkerClick && onMarkerClick(property)}
               >
                 View details

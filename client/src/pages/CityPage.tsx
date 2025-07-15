@@ -137,19 +137,19 @@ const CityPage: React.FC = () => {
           <p className="text-gray-600 mb-4">{city.longDescription}</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{city.propertyCount}</div>
+              <div className="text-2xl font-bold text-black">{city.propertyCount}</div>
               <div className="text-sm text-gray-500">Properties</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{neighborhoods?.length || 0}</div>
+              <div className="text-2xl font-bold text-black">{neighborhoods?.length || 0}</div>
               <div className="text-sm text-gray-500">Neighborhoods</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">4.8</div>
+              <div className="text-2xl font-bold text-black">4.8</div>
               <div className="text-sm text-gray-500">Avg. Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">$210</div>
+              <div className="text-2xl font-bold text-black">$210</div>
               <div className="text-sm text-gray-500">Avg. Price/Night</div>
             </div>
           </div>
@@ -205,7 +205,7 @@ const CityPage: React.FC = () => {
           </div>
           <div className="mt-8 text-center">
             <Link href={`/search?q=${cityName}`}>
-              <Button variant="outline" className="inline-block bg-white hover:bg-gray-100 text-primary font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-colors">
+              <Button variant="outline" className="inline-block bg-white hover:bg-gray-100 text-black font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-colors">
                 View All Properties <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>

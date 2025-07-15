@@ -217,7 +217,7 @@ const HospitableListingImporter: React.FC<HospitableListingImporterProps> = ({
         <div className="mb-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-24">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Loader2 className="h-8 w-8 animate-spin text-black" />
             </div>
           ) : properties && Array.isArray(properties) && properties.length > 0 ? (
             <div>

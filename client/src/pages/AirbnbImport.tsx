@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { AirbnbListingsImporter } from '@/components/AirbnbListingsImporter';
+import { AirbnbListingsImporter } from '@/components/hospitable/AirbnbListingsImporter';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
@@ -133,7 +133,7 @@ const AirbnbImport = () => {
               </div>
             ) : isLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-spin text-black" />
               </div>
             ) : isError ? (
               <div className="text-center py-8 bg-red-50 rounded-lg">

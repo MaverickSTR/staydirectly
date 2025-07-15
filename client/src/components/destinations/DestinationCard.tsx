@@ -11,7 +11,7 @@ const DestinationCard: React.FC<DestinationCardProps> = ({ destination }) => {
   const { name, imageUrl, propertyCount } = destination;
   
   return (
-    <Link href={`/city/${name}`} className="group">
+    <Link href={`/city/${name}`} className="group border-2 border-gray-700 rounded-lg overflow-hidden">
       <div className="relative h-64 rounded-lg overflow-hidden">
         <img 
           src={imageUrl} 

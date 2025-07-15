@@ -182,7 +182,7 @@ export default function NearbyPlaces({
       <div className="space-y-3">
         {places.map((place) => (
           <div key={place.id} className="flex items-start space-x-3">
-            <div className="w-4 h-4 mt-1 bg-blue-500 rounded-full flex-shrink-0"></div>
+            <div className="w-4 h-4 mt-1 bg-black rounded-full flex-shrink-0"></div>
             <div>
               <p className="font-medium text-gray-900">{place.displayName.text}</p>
               <p className="text-sm text-gray-600">{place.formattedAddress}</p>

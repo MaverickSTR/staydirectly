@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, ExternalLink, Link } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function HospitableConnect() {
@@ -165,7 +165,7 @@ export default function HospitableConnect() {
   };
 
   return (
-    <div className="container max-w-2xl py-10">
+    <div className="container max-w-2xl py-10 mx-auto">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Connect with Hospitable</CardTitle>
@@ -194,9 +194,9 @@ export default function HospitableConnect() {
               </Alert>
               <Button 
                 onClick={handleConnect} 
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                className="text-white text-lg py-2 w-full bg-black hover:bg-gray-800"
               >
-                Connect with Hospitable
+                Connect with Hospitable <Link className="w-4 h-4 ml-2" />
               </Button>
             </div>
           ) : (

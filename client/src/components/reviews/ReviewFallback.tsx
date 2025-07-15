@@ -43,7 +43,7 @@ const ReviewFallback: React.FC<ReviewFallbackProps> = ({ className = "" }) => {
 
   return (
     <div className={`space-y-6 ${className}`}>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div className="flex items-center gap-2">
           <div className="text-3xl font-bold">4.9</div>
           <div className="flex">
@@ -54,7 +54,7 @@ const ReviewFallback: React.FC<ReviewFallbackProps> = ({ className = "" }) => {
           <span className="text-gray-600 ml-2">· 84 reviews</span>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 ">
           <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover-scale transition-all">
             Most recent
           </button>
@@ -85,7 +85,7 @@ const ReviewFallback: React.FC<ReviewFallbackProps> = ({ className = "" }) => {
               </div>
             </div>
             <p className="text-gray-600 text-sm line-clamp-4">{review.comment}</p>
-            <button className="text-primary text-sm font-medium mt-2">Read more</button>
+            <button className="text-black text-sm font-medium mt-2">Read more</button>
           </div>
         ))}
       </div>
