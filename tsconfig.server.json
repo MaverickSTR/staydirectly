@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2020",
+    "lib": ["es2020"],
+    "types": ["node"],
+    "moduleResolution": "bundler",
+    "allowJs": false,
+    "noEmit": true,
+    "paths": {
+      // Server-specific paths
+      "@server/*": ["./server/*"],
+      "@server/config/*": ["./server/config/*"],
+      "@server/middleware/*": ["./server/middleware/*"],
+      "@server/routes/*": ["./server/routes/*"],
+      "@server/utils/*": ["./server/utils/*"],
+      
+      // Shared (accessible from server)
+      "@shared/*": ["./shared/*"],
+      "@shared/schema": ["./shared/schema"],
+      "@shared/relations": ["./shared/relations"]
+    }
+  },
+  "include": [
+    "server/**/*",
+    "shared/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "client/**/*",
+    "**/*.test.ts"
+  ]
+} 

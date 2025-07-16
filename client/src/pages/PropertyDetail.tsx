@@ -342,7 +342,7 @@ const PropertyDetail: React.FC = () => {
         address={property.location}
       />
       
-      <div className="container mx-auto px-4 pt-6  w-[90%] ">
+      <div className="container mx-auto px-4 pt-6 ">
         {/* Breadcrumbs */}
         <nav>
           <Breadcrumb items={breadcrumbItems} />

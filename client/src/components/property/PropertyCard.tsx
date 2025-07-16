@@ -44,57 +44,61 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   return (
-    <div id={`property-${id}`} className="property-card-container p-1">
-      <Link href={getPropertyUrl(id, title || name)}>
+    <div id={`property-${id}`} className="property-card-container p-1 h-full">
+      <Link href={getPropertyUrl(id, title || name)} className="block h-full">
         <Card 
-          className="relative bg-white rounded-xl overflow-hidden hover-lift h-full fade-in border border-gray-700"
+          className="relative bg-white rounded-xl overflow-hidden hover-lift h-full fade-in border border-gray-700 flex flex-col"
           onMouseEnter={handleMouseEnter}
         >
-          <div className="relative aspect-[4/3] overflow-hidden img-zoom-container">
+          <div className="relative aspect-[3/2] overflow-hidden img-zoom-container flex-shrink-0">
             <img 
               src={imageUrl} 
               alt={title || name} 
               className="w-full h-full object-cover img-zoom"
             />
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-2 right-2">
               <HeartButton propertyId={id} className="" />
             </div>
-            <div className="absolute bottom-3 left-3">
-              <Badge variant="secondary" className="bg-white/80 hover:bg-white/90 text-black font-medium shadow-sm hover-scale transition-all">
+            <div className="absolute bottom-2 left-2">
+              <Badge variant="secondary" className="bg-white/80 hover:bg-white/90 text-black font-medium shadow-sm hover-scale transition-all text-xs">
                 {type}
               </Badge>
             </div>
           </div>
-          <div className="pt-4 px-4 h-full flex flex-col">
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="font-semibold text-lg line-clamp-1">{title || name}</h3>
-              <div className="flex items-center">
-                <Star className="h-4 w-4 text-amber-500 fill-current" />
-                <span className="ml-1 text-sm font-medium">{rating?.toFixed(2)}</span>
+          <div className="p-3 flex flex-col justify-between flex-grow">
+            <div>
+              <div className="flex justify-between items-start mb-1">
+                <h3 className="font-semibold text-base line-clamp-1">{title || name}</h3>
+                <div className="flex items-center">
+                  <Star className="h-3 w-3 text-amber-500 fill-current" />
+                  <span className="ml-1 text-xs font-medium">{rating?.toFixed(2)}</span>
+                </div>
+              </div>
+              {showLocation && <p className="text-gray-600 text-xs mb-2">{location}</p>}
+              <div className="flex justify-between items-center mb-2">
+                <p>
+                  <span className="font-bold text-sm">{formatPrice(price)}</span> 
+                  <span className="text-gray-600 text-xs"> night</span>
+                </p>
+                {totalPrice && (
+                  <p className="text-xs text-gray-500">{formatPrice(price * 6)} total</p>
+                )}
               </div>
             </div>
-            {showLocation && <p className="text-gray-600 text-sm mb-2">{location}</p>}
-            <div className="flex justify-between items-center mb-3">
-              <p>
-                <span className="font-bold">{formatPrice(price)}</span> 
-                <span className="text-gray-600"> night</span>
-              </p>
-              {totalPrice && (
-                <p className="text-sm text-gray-500">{formatPrice(price * 6)} total</p>
-              )}
-            </div>
-            <div className="flex items-center gap-4 text-gray-600 text-sm mt-3 pt-3 border-t border-gray-100 w-full">
+            <div className="flex items-center justify-between text-gray-600 text-xs border-t-2 border-gray-600 ">
               <div className="flex items-center gap-1">
-                <Bed className="h-4 w-4" />
-                <span>{bedrooms}</span>
+                <Bed className="h-6 w-6" />
+                <span className="text-lg font-bold">{bedrooms}</span>
               </div>
+              <div className="w-px h-6 bg-gray-400"></div>
               <div className="flex items-center gap-1">
-                <Bath className="h-4 w-4" />
-                <span>{bathrooms}</span>
+                <Bath className="h-6 w-6" />
+                <span className="text-lg font-bold">{bathrooms}</span>
               </div>
+              <div className="w-px h-6 bg-gray-400"></div>
               <div className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                <span>{maxGuests}</span>
+                <Users className="h-6 w-6" />
+                <span className="text-lg font-bold">{maxGuests}</span>
               </div>
             </div>
           </div>

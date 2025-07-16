@@ -1,0 +1,37 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "es6"],
+    "types": ["vite/client", "node"],
+    "allowJs": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "paths": {
+      // Client-specific paths (more specific than base)
+      "@/*": ["./client/src/*"],
+      "@/components/*": ["./client/src/components/*"],
+      "@/pages/*": ["./client/src/pages/*"],
+      "@/hooks/*": ["./client/src/hooks/*"],
+      "@/lib/*": ["./client/src/lib/*"],
+      "@/types": ["./client/src/types"],
+      "@/ui/*": ["./client/src/components/ui/*"],
+      
+      // Shared (still accessible from client)
+      "@shared/*": ["./shared/*"],
+      "@shared/schema": ["./shared/schema"],
+      "@shared/relations": ["./shared/relations"]
+    }
+  },
+  "include": [
+    "client/src/**/*",
+    "shared/**/*",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "server/**/*",
+    "**/*.test.ts"
+  ]
+} 

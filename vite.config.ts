@@ -23,8 +23,45 @@ export default defineConfig(async ({ mode }) => {
     ],
     resolve: {
       alias: {
+        // Client paths - matching TypeScript paths
         "@": path.resolve(import.meta.dirname, "client", "src"),
+        "@/components": path.resolve(
+          import.meta.dirname,
+          "client",
+          "src",
+          "components"
+        ),
+        "@/pages": path.resolve(import.meta.dirname, "client", "src", "pages"),
+        "@/hooks": path.resolve(import.meta.dirname, "client", "src", "hooks"),
+        "@/lib": path.resolve(import.meta.dirname, "client", "src", "lib"),
+        "@/types": path.resolve(
+          import.meta.dirname,
+          "client",
+          "src",
+          "types.ts"
+        ),
+        "@/ui": path.resolve(
+          import.meta.dirname,
+          "client",
+          "src",
+          "components",
+          "ui"
+        ),
+
+        // Shared paths
         "@shared": path.resolve(import.meta.dirname, "shared"),
+        "@shared/schema": path.resolve(
+          import.meta.dirname,
+          "shared",
+          "schema.ts"
+        ),
+        "@shared/relations": path.resolve(
+          import.meta.dirname,
+          "shared",
+          "relations.ts"
+        ),
+
+        // Assets
         "@assets": path.resolve(import.meta.dirname, "attached_assets"),
       },
     },

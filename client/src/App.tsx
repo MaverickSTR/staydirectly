@@ -22,6 +22,7 @@ import Footer from "@/components/layout/Footer";
 import { APIProvider } from "@vis.gl/react-google-maps"; 
 import { usePrefetchCommonData } from "@/lib/api";
 import { useEffect } from "react";
+import { Layout } from "./components/layout";
 
 function Router() {
   const { prefetchFeaturedData } = usePrefetchCommonData();
@@ -32,15 +33,20 @@ function Router() {
     prefetchFeaturedData();
   }, [prefetchFeaturedData]);
 
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   // Home page should be full width, others should be constrained
   const isHomePage = location === "/";
   const mainClasses = isHomePage 
     ? "flex-grow" 
-    : "flex-grow w-[90%] mx-auto";
+    : "flex-grow w-full md:w-[90%] mx-auto py-20";
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <Layout>
       <main className={mainClasses}>
         <Switch>
           <Route path="/" component={Home} />
@@ -59,7 +65,7 @@ function Router() {
           <Route component={NotFound} />
         </Switch>
       </main>
-      <Footer />
+      </Layout>
     </div>
   );
 }

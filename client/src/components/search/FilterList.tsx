@@ -7,10 +7,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { Slider } from '@/components/ui/slider';
 import { formatPrice } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Filter, X } from 'lucide-react';
 
 interface FilterListProps {
   onFilterChange: (filters: any) => void;
@@ -19,6 +27,7 @@ interface FilterListProps {
 
 const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters }) => {
   const [location, setLocation] = useLocation();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   
   // Add console log to see current filters
   console.log('FilterList - Current filters:', currentFilters);
@@ -81,6 +90,9 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
     const newLocation = location.split('?')[0] + (params.toString() ? `?${params.toString()}` : '');
     console.log('FilterList - New location:', newLocation);
     setLocation(newLocation);
+    
+    // Close mobile sheet on filter apply (slight delay for better UX)
+    setTimeout(() => setIsSheetOpen(false), 300);
   };
 
   // Toggle amenity selection
@@ -99,7 +111,6 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
 
   // Clear all filters
   const clearFilters = () => {
-    console.log('FilterList - Clearing all filters');
     setPriceRange([0, 1000]);
     setCity('');
     setPropertyType('');
@@ -110,14 +121,17 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
     
     // Clear ALL parameters including the search query
     const newLocation = location.split('?')[0]; // Remove all query parameters
-    console.log('FilterList - Clearing filters, new location:', newLocation);
     setLocation(newLocation);
     
     onFilterChange({});
+    
+    // Close mobile sheet when clearing filters
+    setIsSheetOpen(false);
   };
 
-  return (
-    <div className="flex flex-wrap gap-4">
+  // Filter content component to be reused
+  const FilterContent = ({ isMobile = false }) => (
+    <div className={`${isMobile ? 'flex flex-col gap-4' : 'flex flex-wrap gap-4'}`}>
       {/* City Filter */}
       <Popover>
         <PopoverTrigger asChild>
@@ -125,6 +139,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
             <FilterButton 
               label={city || "City"}
               active={!!currentFilters.city}
+              className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
@@ -157,6 +172,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
             <FilterButton 
               label={guests > 0 ? `${guests} Guests` : "Guests"}
               active={currentFilters.guests !== undefined && currentFilters.guests > 0}
+              className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
@@ -189,6 +205,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
             <FilterButton 
               label={bedrooms > 0 ? `${bedrooms}+ Bedrooms` : "Bedrooms"}
               active={currentFilters.bedrooms !== undefined && currentFilters.bedrooms > 0}
+              className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
@@ -221,6 +238,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
             <FilterButton 
               label={bathrooms > 0 ? `${bathrooms}+ Bathrooms` : "Bathrooms"}
               active={currentFilters.bathrooms !== undefined && currentFilters.bathrooms > 0}
+              className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
@@ -257,6 +275,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
                   : `${formatPrice(priceRange[0])} - ${formatPrice(priceRange[1])}`
               }
               active={currentFilters.minPrice !== undefined || currentFilters.maxPrice !== undefined}
+              className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
@@ -312,6 +331,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
             <FilterButton 
               label={selectedAmenities.length > 0 ? `Amenities (${selectedAmenities.length})` : "Amenities"}
               active={selectedAmenities.length > 0}
+              className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
@@ -347,6 +367,7 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
             <FilterButton 
               label={propertyType || "Property Type"}
               active={!!currentFilters.propertyType}
+              className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
@@ -376,12 +397,49 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       {Object.keys(currentFilters).length > 0 && (
         <Button 
           variant="ghost" 
-          className="text-black hover:text-gray-700"
+          className={`text-black hover:text-gray-700 ${isMobile ? 'w-full' : ''}`}
           onClick={clearFilters}
         >
           Clear Filters
         </Button>
       )}
+    </div>
+  );
+
+  return (
+    <div>
+      {/* Mobile Filters - Sheet */}
+      <div className="lg:hidden">
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="w-full mb-4 flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+              {Object.keys(currentFilters).length > 0 && (
+                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full ml-2">
+                  {Object.keys(currentFilters).length}
+                </span>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[80vh] overflow-y-auto rounded-t-3xl">
+            <SheetHeader>
+              <SheetTitle className="text-2xl font-bold">Filters <span className="text-sm text-gray-500">({Object.keys(currentFilters).length})</span></SheetTitle>
+            </SheetHeader>
+            <div className="mt-6">
+              <FilterContent isMobile={true} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Filters - Inline */}
+      <div className="hidden lg:block">
+        <FilterContent isMobile={false} />
+      </div>
     </div>
   );
 };

@@ -202,7 +202,7 @@ export function useSearchProperties(query: string, filters?: any) {
   return useQuery({
     queryKey: ["/api/properties/search", query, filters],
     queryFn: () => searchProperties(query, filters),
-    enabled: !!query,
+    enabled: !!query || (filters && Object.keys(filters).length > 0),
     ...getCacheConfig.dynamic,
   });
 }
@@ -351,7 +351,12 @@ export async function searchProperties(
   console.log("API - query:", query);
   console.log("API - filters:", filters);
 
-  const params = new URLSearchParams({ q: query });
+  const params = new URLSearchParams();
+
+  // Only add query parameter if there's actually a query
+  if (query && query.trim()) {
+    params.append("q", query);
+  }
 
   if (filters && Object.keys(filters).length > 0) {
     console.log("API - Adding filters to params:", JSON.stringify(filters));

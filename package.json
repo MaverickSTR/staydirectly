@@ -10,11 +10,14 @@
     "dev:server-only": "tsx server/index.ts",
     "dev:client-only": "vite --port 5173",
     "dev:full": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "build:client": "vite build",
-    "build:server": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "npm run type-check && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build:client": "npm run type-check:client && vite build",
+    "build:server": "npm run type-check:server && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "check": "tsc",
+    "type-check": "concurrently \"npm run type-check:client\" \"npm run type-check:server\"",
+    "type-check:client": "tsc --project tsconfig.client.json",
+    "type-check:server": "tsc --project tsconfig.server.json",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {

@@ -8,7 +8,7 @@ const FeaturedProperties: React.FC = () => {
   const { data: featuredProperties, isLoading: isLoadingProperties, error: propertiesError } = useFeaturedProperties();
 
   return (
-    <div className="container px-4 py-12 w-[90%] mx-auto">
+    <div className="container px-4 py-12  mx-auto">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl md:text-3xl font-bold">Featured Properties</h2>
         <Link href="/search" className="py-2 px-4 border border-black text-black rounded-lg hover:scale-105 font-medium flex items-center">

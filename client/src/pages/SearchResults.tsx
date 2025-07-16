@@ -112,12 +112,20 @@ function getLocationLabel(properties: Property[]): string {
 
   // Handle filter change
   const handleFilterChange = (newFilters: any) => {
-    console.log('SearchResults - handleFilterChange called with:', newFilters);
-    console.log('SearchResults - Current filters before merge:', filters);
-    const mergedFilters = { ...filters, ...newFilters };
-    console.log('SearchResults - Merged filters:', mergedFilters);
-    setFilters(mergedFilters);
+    
+    
+    // If newFilters is empty (clearing filters), replace instead of merge
+    const isClearing = Object.keys(newFilters).length === 0;
+    const updatedFilters = isClearing ? {} : { ...filters, ...newFilters };
+    
+    setFilters(updatedFilters);
     setCurrentPage(1);
+    
+    // If clearing filters, also clear the search query to go to "All Properties"
+    if (isClearing && query.trim()) {
+      console.log('SearchResults - Clearing query to go to All Properties');
+      setQuery('');
+    }
   };
 
   // Build breadcrumb items
@@ -246,7 +254,7 @@ function getLocationLabel(properties: Property[]): string {
           
           {/* Map view - either hidden, full width on mobile or right side on desktop */}
           {viewMode === 'map' && (
-            <div className="order-1 lg:order-2 lg:w-2/5 h-[400px] lg:h-[calc(100vh-240px)] lg:min-h-[600px] sticky top-6 bg-gray-100 rounded-lg shadow-sm overflow-hidden">
+            <div className="order-1 lg:order-2 lg:w-2/5 h-[400px] lg:h-[calc(100vh-240px)] lg:min-h-[600px] lg:sticky lg:top-6 bg-gray-100 rounded-lg shadow-sm overflow-hidden">
               {isLoading ? (
                 <div className="flex items-center justify-center h-full bg-gray-100">
                   <div className="text-center">

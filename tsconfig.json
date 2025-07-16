@@ -1,10 +1,7 @@
 {
-  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
     "incremental": true,
     "resolveJsonModule": true,
-
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
     "noEmit": true,
     "module": "ESNext",
@@ -12,7 +9,6 @@
     "strict": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
@@ -20,8 +16,31 @@
     "baseUrl": ".",
     "types": ["node", "vite/client"],
     "paths": {
+      // Client paths
       "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
+      "@/components/*": ["./client/src/components/*"],
+      "@/pages/*": ["./client/src/pages/*"],
+      "@/hooks/*": ["./client/src/hooks/*"],
+      "@/lib/*": ["./client/src/lib/*"],
+      "@/types": ["./client/src/types"],
+      "@/ui/*": ["./client/src/components/ui/*"],
+      
+      // Server paths  
+      "@server/*": ["./server/*"],
+      "@server/config/*": ["./server/config/*"],
+      "@server/middleware/*": ["./server/middleware/*"],
+      "@server/routes/*": ["./server/routes/*"],
+      "@server/utils/*": ["./server/utils/*"],
+      
+      // Shared paths
+      "@shared/*": ["./shared/*"],
+      "@shared/schema": ["./shared/schema"],
+      "@shared/relations": ["./shared/relations"],
+      
+      // Assets
+      "@assets/*": ["./attached_assets/*"]
     }
-  }
+  },
+  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"]
 }
