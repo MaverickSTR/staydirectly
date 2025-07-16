@@ -28,8 +28,8 @@ const TestimonialsSection: React.FC = () => {
   ];
 
   return (
-    <div className="container px-4 py-16 w-[90%] mx-auto">
-      <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">What Our Guests Say</h2>
+    <div className="container px-4 py-16  mx-auto md:w-[90%]">
+      <h2 className="text-display text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter text-center mb-12">What Our Guests Say</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {testimonials.map((testimonial, index) => (

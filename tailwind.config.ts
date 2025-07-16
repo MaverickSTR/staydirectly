@@ -5,6 +5,29 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        inter: ["Inter", "system-ui", "sans-serif"],
+      },
+      fontSize: {
+        "hero-xl": ["4rem", { lineHeight: "4.5rem", letterSpacing: "-0.02em" }],
+        "hero-2xl": [
+          "5rem",
+          { lineHeight: "5.5rem", letterSpacing: "-0.02em" },
+        ],
+        "hero-3xl": [
+          "6rem",
+          { lineHeight: "6.5rem", letterSpacing: "-0.02em" },
+        ],
+        "hero-4xl": [
+          "7rem",
+          { lineHeight: "7.5rem", letterSpacing: "-0.03em" },
+        ],
+      },
+      letterSpacing: {
+        tighter: "-0.02em",
+        tight: "-0.01em",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

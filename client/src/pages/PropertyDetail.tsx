@@ -372,13 +372,7 @@ const PropertyDetail: React.FC = () => {
                 <Heart className={`h-4 w-4 mr-1 ${isHeartFilled ? 'fill-current text-red-500 heart-beat active' : 'heart-beat'}`} />
                 <span>Save</span>
               </button>
-              <button 
-                onClick={() => window.open(property.airbnbUrl, '_blank')}
-                className="flex items-center text-gray-600 hover:text-black transition-colors hover-scale"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View on Airbnb
-              </button>
+              
               <button className="flex items-center text-gray-600 hover:text-black transition-colors ml-4 hover-scale">
                 <Share2 className="h-4 w-4 mr-2" />
                 Share Property

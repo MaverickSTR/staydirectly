@@ -85,18 +85,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 )}
               </div>
             </div>
-            <div className="flex items-center justify-between text-gray-600 text-xs border-t-2 border-gray-600 ">
-              <div className="flex items-center gap-1">
+            <div className="flex items-center justify-between text-gray-600 text-xs border-t-2 border-gray-400 ">
+              <div className="flex items-center gap-2 pt-2 px-2">
                 <Bed className="h-6 w-6" />
                 <span className="text-lg font-bold">{bedrooms}</span>
               </div>
               <div className="w-px h-6 bg-gray-400"></div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2 pt-2 px-2">
                 <Bath className="h-6 w-6" />
                 <span className="text-lg font-bold">{bathrooms}</span>
               </div>
               <div className="w-px h-6 bg-gray-400"></div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2 pt-2 px-2">
                 <Users className="h-6 w-6" />
                 <span className="text-lg font-bold">{maxGuests}</span>
               </div>

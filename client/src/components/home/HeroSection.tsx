@@ -10,8 +10,12 @@ const HeroSection: React.FC = () => {
       {/* Main content container */}
       <div className="relative z-10 flex flex-col justify-center items-center text-white px-4 flex-grow mt-6">
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-7xl font-bold mb-6">Find your next perfect stay</h1>
-          <p className="text-xl md:text-3xl max-w-[80%] md:max-w-2xl mx-auto">Book directly with hosts worldwide and save on booking fees</p>
+          <h1 className="hero-text text-4xl sm:text-5xl md:text-hero-3xl lg:text-hero-4xl font-black mb-6 tracking-tighter">
+            Find your next perfect stay
+          </h1>
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium max-w-[85%] md:max-w-3xl mx-auto tracking-tight leading-relaxed">
+            Book directly with hosts worldwide and save on booking fees
+          </p>
         </div>
         
         {/* Search bar container */}

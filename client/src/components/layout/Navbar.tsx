@@ -41,24 +41,24 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-black text-2xl font-bold">StayDirectly</span>
+            <span className="text-black text-2xl font-black tracking-tight">StayDirectly</span>
           </Link>
 
           {/* Center Navigation Links */}
           <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center max-w-2xl mx-8 text-lg">
-            <Link to="/featured" className="text-gray-800 hover:text-black transition-colors relative group">
+            <Link to="/featured" className="text-gray-800 hover:text-black transition-colors relative group font-medium">
               <span className="relative">
                 Featured
                 <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
               </span>
             </Link>
-            <Link to="/destinations" className="text-gray-800 hover:text-black transition-colors relative group">
+            <Link to="/destinations" className="text-gray-800 hover:text-black transition-colors relative group font-medium">
               <span className="relative">
                 Destinations
                 <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
               </span>
             </Link>
-            <Link to="/search" className="text-gray-800 hover:text-black transition-colors relative group">
+            <Link to="/search" className="text-gray-800 hover:text-black transition-colors relative group font-medium">
               <span className="relative">
                 Properties
                 <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>

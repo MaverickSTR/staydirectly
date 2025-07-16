@@ -8,13 +8,44 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-inter antialiased bg-background text-foreground;
     overscroll-behavior: contain;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variant-numeric: oldstyle-nums;
   }
   
   /* Disable Chrome's pull-to-refresh on mobile */
   html {
     overscroll-behavior-y: contain;
+  }
+
+  /* Enhanced typography for Inter */
+  h1, h2, h3, h4, h5, h6 {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Hero text optimizations */
+  .hero-text {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Typography utilities */
+  .text-display {
+    @apply font-bold tracking-tighter;
+  }
+  
+  .text-heading {
+    @apply font-semibold tracking-tight;
+  }
+  
+  .text-body {
+    @apply font-normal tracking-normal;
   }
 }
 
