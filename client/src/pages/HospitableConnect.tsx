@@ -54,15 +54,20 @@ export default function HospitableConnect() {
       // Use detected timezone or fallback to America/New_York
       const userTimezone = timezone || 'America/New_York';
       
-      const response = await apiRequest('POST', '/api/hospitable/connect?action=customer', {
-        
+      const payload = {
         id: uniqueId, // Required by Hospitable API
         email,
         name,
         phone: formattedPhone, // Include +1 country code
         timezone: userTimezone, // Add timezone to request
         redirect_url: window.location.origin + '/auth/callback'
-      });
+      };
+      
+      console.log('🚀 Frontend sending payload:', JSON.stringify(payload, null, 2));
+      console.log('📞 Phone value:', phone, '→', formattedPhone);
+      console.log('🌍 Timezone value:', timezone, '→', userTimezone);
+      
+      const response = await apiRequest('POST', '/api/hospitable/connect?action=customer', payload);
       return response.json();
     },
     onSuccess: (data) => {

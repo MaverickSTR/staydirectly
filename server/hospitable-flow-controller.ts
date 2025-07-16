@@ -145,42 +145,20 @@ export async function importCustomerListings(
   req: Request,
   res: Response
 ): Promise<void> {
-  console.log(
-    `\n📥 ==================== IMPORT CUSTOMER LISTINGS API CALLED ====================`
-  );
-  console.log(`📅 Timestamp: ${new Date().toISOString()}`);
-  console.log(`🌐 Request URL: ${req.method} ${req.originalUrl}`);
-  console.log(`📦 Request Body:`, JSON.stringify(req.body, null, 2));
-
   try {
     const { customerId, shouldAvoidUpdateForCustomer } = req.body;
 
-    console.log(`👤 Customer ID: ${customerId}`);
-    console.log(`🔄 Should Avoid Update: ${shouldAvoidUpdateForCustomer}`);
-
     if (!customerId) {
-      console.error(`❌ MISSING CUSTOMER ID!`);
       res.status(400).json({
         message: "Customer ID is required",
         details: "Please provide a valid customerId in the request body",
       });
-      console.log(`❌ BAD REQUEST RESPONSE SENT - Missing Customer ID`);
       return;
     }
-
-    console.log(
-      `🔍 Checking for existing properties for customer: ${customerId}`
-    );
 
     // Check if we already have properties for this customer
     const allCustomerListings = await storage.getPropertiesByCustomerId(
       customerId
-    );
-
-    console.log(
-      `📊 Found ${
-        allCustomerListings?.length || 0
-      } existing properties for customer ${customerId}`
     );
 
     const allCustomerListingsTyped: Property[] | undefined =
@@ -195,12 +173,6 @@ export async function importCustomerListings(
       ? new Date(firstProperty.updatedAt)
       : null;
 
-    console.log(
-      `📅 Most recent property updated: ${
-        firstPropertyUpdatedAt?.toISOString() || "Never"
-      }`
-    );
-
     if (
       (allCustomerListings && firstPropertyUpdatedAt) ||
       shouldAvoidUpdateForCustomer
@@ -213,63 +185,29 @@ export async function importCustomerListings(
         daysDiff = timeDiff / (1000 * 3600 * 24);
       }
 
-      console.log(`⏰ Days since last update: ${daysDiff.toFixed(1)} days`);
-
       // If images were updated within the last 7 days, use cached version
       if (daysDiff < 7 || shouldAvoidUpdateForCustomer) {
-        console.log(
-          `♻️ USING CACHED DATA - Skipping property updates/import for customer ${customerId}`
-        );
-        console.log(
-          `📋 Returning ${allCustomerListings.length} cached properties`
-        );
-
         res.status(200).json(allCustomerListings);
-        console.log(`✨ CACHED PROPERTIES RESPONSE SENT SUCCESSFULLY`);
         return;
       }
     }
 
-    console.log(`🆕 FETCHING FRESH DATA FROM HOSPITABLE API`);
-
     // Create API client
     const client = createServerApiClient();
-    console.log(`🔗 Hospitable API client created`);
-
-    // Log request information
-    console.log(
-      `📡 Calling Hospitable API to fetch listings for customer: ${customerId}`
-    );
 
     // Fetch customer listings with rate limiting
     const rateLimitKey = `customer_listings_${customerId}`;
-    console.log(`🚦 Using rate limit key: ${rateLimitKey}`);
 
     const response = await enqueueRequest(rateLimitKey, () =>
       client.getCustomerListings(customerId)
     );
 
-    console.log(`✅ Hospitable API Response received!`);
-    console.log(
-      `📊 Retrieved ${
-        response?.length || 0
-      } listings for customer ${customerId}`
-    );
-
     if (!response?.length) {
-      console.warn(
-        `⚠️ NO PROPERTIES FOUND in Hospitable for customer ${customerId}`
-      );
       res
         .status(404)
         .json({ message: "No properties found in Hospitable account" });
-      console.log(`❌ NOT FOUND RESPONSE SENT`);
       return;
     }
-
-    console.log(
-      `🔄 PROCESSING ${response.length} PROPERTIES FOR DATABASE IMPORT`
-    );
 
     // Import each property into database
     let importedCount = 0;
@@ -277,17 +215,8 @@ export async function importCustomerListings(
 
     for (const prop of response) {
       try {
-        console.log(
-          `\n🏠 Processing property: ${prop.id} - ${
-            prop.public_name || prop.private_name
-          }`
-        );
-
         // Check if property already exists
         let existingProperty = await storage.getPropertyByExternalId(prop.id);
-        console.log(
-          `🔍 Property ${prop.id} exists in database: ${!!existingProperty}`
-        );
 
         const propertyData = {
           name: prop.private_name || prop.public_name || "Unnamed Property",
@@ -391,72 +320,32 @@ export async function importCustomerListings(
               ?.slice(1)
               .map((p: any) => p.url.replace(/\/im(?=\/)/g, "")) || [];
 
-        console.log(`💾 Transformed property data for ${prop.id}`);
-        console.log(`   - Name: ${propertyData.name}`);
-        console.log(`   - City: ${propertyData.city}`);
-        console.log(`   - Price: $${propertyData.price}`);
-        console.log(`   - Bedrooms: ${propertyData.bedrooms}`);
-        console.log(`   - Platform ID: ${propertyData.platformId}`);
-
         if (existingProperty) {
-          console.log(
-            `🔄 UPDATING existing property ${existingProperty.id} for listing ${prop.id}`
-          );
-
           // Update existing property
           const updatedProperty = await storage.updatePropertyByExternalId(
             prop.id,
             propertyData
           );
           if (updatedProperty) {
-            console.log(
-              `✅ Updated existing property ${updatedProperty.id} for listing ${prop.id}`
-            );
             importedProperties.push(updatedProperty);
           }
         } else {
-          console.log(`🆕 CREATING new property for listing ${prop.id}`);
-
           // Create new property
           const newProperty = await storage.createProperty(propertyData);
-          console.log(
-            `✅ Created new property ${newProperty.id} for listing ${prop.id}`
-          );
           importedProperties.push(newProperty);
         }
         importedCount++;
       } catch (error) {
-        console.error(`❌ Error importing property ${prop.id}:`, error);
+        // Silent error handling - property import failed
       }
     }
 
-    console.log(`\n🎉 IMPORT COMPLETE!`);
-    console.log(`📊 Successfully imported/updated ${importedCount} properties`);
-    console.log(
-      `📋 Returning ${importedProperties.length} properties in response`
-    );
-
     res.status(200).json(importedProperties);
-    console.log(`✨ IMPORT LISTINGS RESPONSE SENT SUCCESSFULLY`);
   } catch (error) {
-    console.error(`\n💥 ERROR IN IMPORT CUSTOMER LISTINGS:`);
-    console.error(
-      `❌ Error Message: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
-    console.error(`📚 Full Error:`, error);
-
     res.status(500).json({
       message: "Error importing properties from Hospitable",
       error: error instanceof Error ? error.message : String(error),
     });
-
-    console.log(`❌ ERROR RESPONSE SENT`);
-  } finally {
-    console.log(
-      `🏁 ==================== IMPORT CUSTOMER LISTINGS API END ====================\n`
-    );
   }
 }
 
@@ -483,10 +372,6 @@ export async function fetchPropertyImages(
       return;
     }
 
-    console.log(
-      `[API Route] Fetching images for customer ${customerId}, listing ${listingId}, position ${position}`
-    );
-
     // Check if we already have this image
     const property = await storage.getPropertyByPlatformId(
       `${customerId}:${listingId}`
@@ -505,12 +390,6 @@ export async function fetchPropertyImages(
 
       // If images were updated within the last 7 days, use cached version
       if (daysDiff < 7 && property.imageUrl && hasAdditionalImages) {
-        console.log(
-          `[API Route] Using cached images for listing ${listingId} (updated ${daysDiff.toFixed(
-            1
-          )} days ago)`
-        );
-
         // Return image data
         res.status(200).json({
           customerId,
@@ -532,12 +411,6 @@ export async function fetchPropertyImages(
 
       const images = await enqueueRequest(rateLimitKey, () =>
         client.getListingImages(customerId, listingId)
-      );
-
-      console.log(
-        `[API Route] Retrieved ${
-          images?.length || 0
-        } images for listing ${listingId}`
       );
 
       if (!images || images.length === 0) {
@@ -573,17 +446,8 @@ export async function fetchPropertyImages(
         fromCache: false,
       });
     } catch (error) {
-      console.error(
-        `[API Route] Error fetching images for listing ${listingId}:`,
-        error
-      );
-
       // If we have a property with existing images, return those as fallback
       if (property && property.imageUrl) {
-        console.log(
-          `[API Route] Falling back to existing images for listing ${listingId}`
-        );
-
         res.status(200).json({
           customerId,
           listingId,
@@ -598,7 +462,6 @@ export async function fetchPropertyImages(
       throw error; // Re-throw to be caught by outer catch
     }
   } catch (error) {
-    console.error("Error fetching property images:", error);
     res.status(500).json({
       message: "Error fetching property images",
       error: error instanceof Error ? error.message : String(error),
@@ -639,9 +502,6 @@ export async function markPropertiesForPublishing(
         );
 
         if (!property) {
-          console.warn(
-            `Property not found for platformId ${customerId}:${listingId}`
-          );
           continue;
         }
 
@@ -654,16 +514,12 @@ export async function markPropertiesForPublishing(
 
         updatedProperties.push(updated);
       } catch (error) {
-        console.error(`Error publishing property ${listingId}:`, error);
+        // Silent error handling - property publish failed
       }
     }
 
-    console.log(
-      `Successfully marked ${updatedProperties.length} properties for publishing`
-    );
     res.status(200).json(updatedProperties);
   } catch (error) {
-    console.error("Error marking properties for publishing:", error);
     res.status(500).json({
       message: "Error marking properties for publishing",
       error: error instanceof Error ? error.message : String(error),
@@ -678,190 +534,102 @@ export async function connectHospitable(
   req: Request,
   res: Response
 ): Promise<void> {
-  console.log(
-    `\n🔗 ==================== HOSPITABLE CONNECT API CALLED ====================`
-  );
-  console.log(`📅 Timestamp: ${new Date().toISOString()}`);
-  console.log(`🌐 Request URL: ${req.method} ${req.originalUrl}`);
-  console.log(`📨 Request Headers:`, JSON.stringify(req.headers, null, 2));
-
   try {
     const { customerId, code } = req.body;
     const action = (req.query.action as string) || req.body.action;
 
-    console.log(`🎯 Action: ${action}`);
-    console.log(`👤 Customer ID: ${customerId}`);
-    console.log(
-      `🔑 Auth Code: ${code ? `${code.substring(0, 10)}...` : "null"}`
-    );
-    console.log(`📦 Full Request Body:`, JSON.stringify(req.body, null, 2));
-
     // Generate auth link for a customer
     if (action === "auth-link" && customerId) {
-      console.log(`\n🔗 GENERATING AUTH LINK FOR CUSTOMER: ${customerId}`);
-
-      // Create URL for Hospitable Connect OAuth flow
-      const redirectUri =
+      // Create URL for Hospitable Connect flow
+      const redirectUrl =
         process.env.NEXT_PUBLIC_HOSPITABLE_REDIRECT_URI ||
         "http://localhost:5000/auth/callback";
-      const clientId = process.env.NEXT_PUBLIC_HOSPITABLE_CLIENT_ID;
+      const token = process.env.HOSPITABLE_CONNECT_TOKEN;
 
-      console.log(`🔧 Redirect URI: ${redirectUri}`);
-      console.log(
-        `🆔 Client ID: ${
-          clientId ? `${clientId.substring(0, 10)}...` : "MISSING"
-        }`
-      );
-
-      if (!clientId) {
-        console.error(`❌ MISSING CLIENT ID!`);
+      if (!token) {
         throw new Error(
-          "NEXT_PUBLIC_HOSPITABLE_CLIENT_ID environment variable is not set"
+          "HOSPITABLE_CONNECT_TOKEN environment variable is not set"
         );
       }
 
-      const authUrl = `https://connect.hospitable.com/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-        redirectUri
-      )}&response_type=code&state=${customerId}`;
-
-      console.log(`✅ Generated Auth URL: ${authUrl}`);
-      console.log(`📤 Sending Response: {"authUrl": "${authUrl}"}`);
+      const authUrl = `https://connect.hospitable.com/?token=${token}&redirect_url=${encodeURIComponent(
+        redirectUrl
+      )}`;
 
       res.status(200).json({ authUrl });
-      console.log(`✨ AUTH LINK RESPONSE SENT SUCCESSFULLY`);
       return;
     }
 
     // Create a new customer
     if (action === "customer") {
-      console.log(`\n👤 CREATING NEW CUSTOMER IN HOSPITABLE`);
-      console.log(`📋 Customer Data:`, JSON.stringify(req.body, null, 2));
-
       const client = createServerApiClient();
-      console.log(`🔗 Hospitable API client created`);
 
-      console.log(`📡 Calling Hospitable API to create customer...`);
       const customerResponse = await client.createCustomer(req.body);
-      console.log(
-        `✅ Customer created successfully:`,
-        JSON.stringify(customerResponse, null, 2)
-      );
 
       // Extract customer data - handle the actual nested structure from Hospitable
       let customer;
       let customerId;
 
-      if (customerResponse.customer && customerResponse.customer.data) {
+      const customerData = customerResponse as any; // Type assertion for flexible response handling
+
+      if (customerData.customer && customerData.customer.data) {
         // Structure: { customer: { data: { id: "...", ... } } }
-        customer = customerResponse.customer.data;
-        customerId = customerResponse.customer.data.id;
-        console.log(`🔍 Found customer ID in customer.data.id: ${customerId}`);
-      } else if (customerResponse.data) {
+        customer = customerData.customer.data;
+        customerId = customerData.customer.data.id;
+      } else if (customerData.data) {
         // Structure: { data: { id: "...", ... } }
-        customer = customerResponse.data;
-        customerId = customerResponse.data.id;
-        console.log(`🔍 Found customer ID in data.id: ${customerId}`);
+        customer = customerData.data;
+        customerId = customerData.data.id;
       } else {
         // Structure: { id: "...", ... }
-        customer = customerResponse;
-        customerId = customerResponse.id;
-        console.log(`🔍 Found customer ID in root: ${customerId}`);
+        customer = customerData;
+        customerId = customerData.id;
       }
 
-      console.log(`🆔 Final Extracted Customer ID: ${customerId}`);
-
       // Also generate auth URL for the newly created customer
-      const redirectUri =
+      const redirectUrl =
         process.env.NEXT_PUBLIC_HOSPITABLE_REDIRECT_URI ||
         "http://localhost:5000/auth/callback";
-      const clientId = process.env.NEXT_PUBLIC_HOSPITABLE_CLIENT_ID;
+      const token = process.env.HOSPITABLE_CONNECT_TOKEN;
 
-      if (!clientId) {
-        console.error(`❌ MISSING CLIENT ID FOR NEW CUSTOMER!`);
+      if (!token) {
         throw new Error(
-          "NEXT_PUBLIC_HOSPITABLE_CLIENT_ID environment variable is not set"
+          "HOSPITABLE_CONNECT_TOKEN environment variable is not set"
         );
       }
 
-      const authUrl = `https://connect.hospitable.com/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-        redirectUri
-      )}&response_type=code&state=${customerId}`;
+      const authUrl = `https://connect.hospitable.com/?token=${token}&redirect_url=${encodeURIComponent(
+        redirectUrl
+      )}`;
 
-      console.log(`🔗 Generated Auth URL for new customer: ${authUrl}`);
-
-      const response = {
+      const apiResponse = {
         customer: customer,
         customerId: customerId, // Also include at top level for easy access
         authUrl,
       };
-      console.log(`📤 Sending Response:`, JSON.stringify(response, null, 2));
 
-      res.status(201).json(response);
-      console.log(`✨ CUSTOMER CREATION RESPONSE SENT SUCCESSFULLY`);
+      res.status(201).json(apiResponse);
       return;
     }
 
     // Exchange auth code for token
     if (action === "token" && code) {
-      console.log(`\n🔑 EXCHANGING AUTH CODE FOR TOKEN`);
-      console.log(`🔒 Auth Code: ${code.substring(0, 20)}...`);
-
       const client = createServerApiClient();
-      console.log(`📡 Calling Hospitable API to exchange token...`);
 
       const tokenResponse = await client.exchangeCodeForToken(code);
-      console.log(`✅ Token exchange successful!`);
-      console.log(
-        `🎫 Access Token: ${
-          tokenResponse.access_token
-            ? `${tokenResponse.access_token.substring(0, 20)}...`
-            : "null"
-        }`
-      );
-      console.log(
-        `🔄 Refresh Token: ${
-          tokenResponse.refresh_token
-            ? `${tokenResponse.refresh_token.substring(0, 20)}...`
-            : "null"
-        }`
-      );
-      console.log(`⏰ Expires In: ${tokenResponse.expires_in} seconds`);
 
-      console.log(`📤 Sending Token Response`);
       res.status(200).json(tokenResponse);
-      console.log(`✨ TOKEN EXCHANGE RESPONSE SENT SUCCESSFULLY`);
       return;
     }
-
-    console.warn(`⚠️ INVALID ACTION OR MISSING PARAMETERS`);
-    console.warn(`🎯 Action: ${action}`);
-    console.warn(`👤 Customer ID: ${customerId}`);
-    console.warn(`🔑 Code: ${code ? "present" : "missing"}`);
 
     res
       .status(400)
       .json({ message: "Invalid action or missing required parameters" });
-
-    console.log(`❌ BAD REQUEST RESPONSE SENT`);
   } catch (error) {
-    console.error(`\n💥 ERROR IN HOSPITABLE CONNECT:`);
-    console.error(
-      `❌ Error Message: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
-    console.error(`📚 Full Error:`, error);
-
     res.status(500).json({
       message: "Error connecting to Hospitable",
       error: error instanceof Error ? error.message : String(error),
     });
-
-    console.log(`❌ ERROR RESPONSE SENT`);
-  } finally {
-    console.log(
-      `🏁 ==================== HOSPITABLE CONNECT API END ====================\n`
-    );
   }
 }
 

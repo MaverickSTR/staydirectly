@@ -171,13 +171,19 @@ export function createServerApiClient() {
       let hospitableCustomerData = {
         name: customerData.name,
         email: customerData.email,
+        ...(customerData.phone && { phone: customerData.phone }),
+        ...(customerData.timezone && { timezone: customerData.timezone }),
       };
 
       console.log(
         `[Hospitable Client] Attempting to create customer WITHOUT ID first...`
       );
       console.log(
-        `[Hospitable Client] Request data:`,
+        `[Hospitable Client] Raw customerData received:`,
+        JSON.stringify(customerData, null, 2)
+      );
+      console.log(
+        `[Hospitable Client] Prepared hospitableCustomerData:`,
         JSON.stringify(hospitableCustomerData, null, 2)
       );
 
@@ -208,18 +214,31 @@ export function createServerApiClient() {
         );
 
         // If that fails, try WITH a generated ID
-        const customerId =
-          customerData.id ||
-          `customer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const generateSixDigitId = () => {
+          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+          let result = "";
+          for (let i = 0; i < 6; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return result;
+        };
+
+        const customerId = customerData.id || generateSixDigitId();
 
         hospitableCustomerData = {
           id: customerId,
           name: customerData.name,
           email: customerData.email,
+          ...(customerData.phone && { phone: customerData.phone }),
+          ...(customerData.timezone && { timezone: customerData.timezone }),
         } as any;
 
         console.log(
-          `[Hospitable Client] Attempting with generated ID:`,
+          `[Hospitable Client] Raw customerData for fallback:`,
+          JSON.stringify(customerData, null, 2)
+        );
+        console.log(
+          `[Hospitable Client] Prepared hospitableCustomerData with ID:`,
           JSON.stringify(hospitableCustomerData, null, 2)
         );
 
