@@ -153,11 +153,20 @@ export function createServerApiClient() {
 
   /**
    * Create a new customer in Hospitable
+   * Follows API specification: https://connect.hospitable.com/api/v1/customers
    */
   async function createCustomer(
     customerData: any
   ): Promise<HospitableCustomer> {
     try {
+      // Validate required fields
+      if (!customerData.name) {
+        throw new Error("Customer name is required");
+      }
+      if (!customerData.email) {
+        throw new Error("Customer email is required");
+      }
+
       // Hospitable platform token is required for this operation
       const platformToken = process.env.HOSPITABLE_PLATFORM_TOKEN;
 
@@ -167,104 +176,82 @@ export function createServerApiClient() {
         );
       }
 
-      // First, try WITHOUT providing an ID - let Hospitable generate it
-      let hospitableCustomerData = {
-        name: customerData.name,
-        email: customerData.email,
-        ...(customerData.phone && { phone: customerData.phone }),
-        ...(customerData.timezone && { timezone: customerData.timezone }),
+      // Generate a valid ID if not provided (alphanumeric, dots, underscores, hyphens only)
+      const generateValidId = () => {
+        const chars =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+        for (let i = 0; i < 8; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
       };
 
+      // Validate and clean the ID (must match pattern: ^[a-zA-Z0-9._-]+)
+      let customerId = customerData.id;
+      if (!customerId) {
+        customerId = generateValidId();
+      } else {
+        // Clean the ID to match the required pattern
+        customerId = customerId.replace(/[^a-zA-Z0-9._-]/g, "");
+        if (!customerId || customerId.length === 0) {
+          customerId = generateValidId();
+        }
+      }
+
+      // Prepare customer data according to API specification
+      const hospitableCustomerData: any = {
+        id: customerId,
+        name: customerData.name,
+        email: customerData.email,
+      };
+
+      // Add optional fields if provided and valid
+      if (customerData.phone) {
+        // Validate E.164 format (starts with + followed by digits, max 15 digits total)
+        const e164Regex = /^\+[1-9]\d{1,14}$/;
+        if (e164Regex.test(customerData.phone)) {
+          hospitableCustomerData.phone = customerData.phone;
+        } else {
+          console.warn(
+            `[Hospitable Client] Invalid phone format: ${customerData.phone}. Skipping phone field. Expected E.164 format (e.g., +1234567890)`
+          );
+        }
+      }
+      if (customerData.timezone) {
+        hospitableCustomerData.timezone = customerData.timezone;
+      }
+
       console.log(
-        `[Hospitable Client] Attempting to create customer WITHOUT ID first...`
+        `[Hospitable Client] Creating customer with ID: ${customerId}`
       );
       console.log(
-        `[Hospitable Client] Raw customerData received:`,
-        JSON.stringify(customerData, null, 2)
-      );
-      console.log(
-        `[Hospitable Client] Prepared hospitableCustomerData:`,
+        `[Hospitable Client] Customer data:`,
         JSON.stringify(hospitableCustomerData, null, 2)
       );
 
-      try {
-        // Create customer using platform token for authorization
-        const response = await axios.post(
-          "https://connect.hospitable.com/api/v1/customers",
-          hospitableCustomerData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Connect-Version": HOSPITABLE_API_VERSION,
-              Authorization: `Bearer ${platformToken}`,
-            },
-          }
-        );
+      // Create customer using platform token for authorization
+      const response = await axios.post(
+        "https://connect.hospitable.com/api/v1/customers",
+        hospitableCustomerData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Connect-Version": HOSPITABLE_API_VERSION,
+            Authorization: `Bearer ${platformToken}`,
+          },
+        }
+      );
 
-        console.log(`[Hospitable Client] SUCCESS - Hospitable generated ID!`);
-        console.log(
-          `[Hospitable Client] Customer created:`,
-          JSON.stringify(response.data, null, 2)
-        );
+      console.log(`[Hospitable Client] Customer created successfully`);
+      console.log(
+        `[Hospitable Client] Response:`,
+        JSON.stringify(response.data, null, 2)
+      );
 
-        return response.data;
-      } catch (firstError) {
-        console.log(
-          `[Hospitable Client] First attempt failed, trying with generated ID...`
-        );
-
-        // If that fails, try WITH a generated ID
-        const generateSixDigitId = () => {
-          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-          let result = "";
-          for (let i = 0; i < 6; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-          }
-          return result;
-        };
-
-        const customerId = customerData.id || generateSixDigitId();
-
-        hospitableCustomerData = {
-          id: customerId,
-          name: customerData.name,
-          email: customerData.email,
-          ...(customerData.phone && { phone: customerData.phone }),
-          ...(customerData.timezone && { timezone: customerData.timezone }),
-        } as any;
-
-        console.log(
-          `[Hospitable Client] Raw customerData for fallback:`,
-          JSON.stringify(customerData, null, 2)
-        );
-        console.log(
-          `[Hospitable Client] Prepared hospitableCustomerData with ID:`,
-          JSON.stringify(hospitableCustomerData, null, 2)
-        );
-
-        const response = await axios.post(
-          "https://connect.hospitable.com/api/v1/customers",
-          hospitableCustomerData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Connect-Version": HOSPITABLE_API_VERSION,
-              Authorization: `Bearer ${platformToken}`,
-            },
-          }
-        );
-
-        console.log(`[Hospitable Client] SUCCESS with generated ID!`);
-        console.log(
-          `[Hospitable Client] Customer created:`,
-          JSON.stringify(response.data, null, 2)
-        );
-
-        return response.data;
-      }
+      return response.data;
     } catch (error) {
-      console.error("[Hospitable Client] Both attempts failed!");
-      console.error("Error creating customer:", error);
+      console.error("[Hospitable Client] Error creating customer:", error);
       if (axios.isAxiosError(error) && error.response) {
         console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
@@ -375,6 +362,94 @@ export function createServerApiClient() {
   }
 
   /**
+   * Create an auth code for a customer to start the connection flow
+   * API Endpoint: POST https://connect.hospitable.com/api/v1/auth-codes
+   * Requires: Bearer token, customer_id, redirect_url
+   */
+  async function createAuthCode(
+    customerId: string,
+    redirectUrl: string
+  ): Promise<any> {
+    try {
+      // Hospitable platform token is required for this operation
+      const platformToken = process.env.HOSPITABLE_PLATFORM_TOKEN;
+
+      if (!platformToken) {
+        throw new Error(
+          "Missing HOSPITABLE_PLATFORM_TOKEN environment variable. Please set this in your .env file."
+        );
+      }
+
+      console.log(
+        `[Hospitable Client] Creating auth code for customer: ${customerId}`
+      );
+      console.log(`[Hospitable Client] Redirect URL: ${redirectUrl}`);
+      console.log(
+        `[Hospitable Client] Using token: ${platformToken.substring(0, 8)}...`
+      );
+
+      const requestPayload = {
+        customer_id: customerId,
+        redirect_url: redirectUrl,
+      };
+
+      console.log(
+        `[Hospitable Client] Request payload:`,
+        JSON.stringify(requestPayload, null, 2)
+      );
+
+      const response = await axios.post(
+        "https://connect.hospitable.com/api/v1/auth-codes",
+        requestPayload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Connect-Version": HOSPITABLE_API_VERSION,
+            Authorization: `Bearer ${platformToken}`,
+          },
+        }
+      );
+
+      console.log(
+        `[Hospitable Client] ✅ Auth code created successfully for customer ${customerId}`
+      );
+      console.log(
+        `[Hospitable Client] Response:`,
+        JSON.stringify(response.data, null, 2)
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error(
+        `[Hospitable Client] ❌ Error creating auth code for customer ${customerId}:`
+      );
+
+      if (axios.isAxiosError(error)) {
+        console.error(`Status: ${error.response?.status}`);
+        console.error(`Status Text: ${error.response?.statusText}`);
+        console.error(
+          `Response Data:`,
+          JSON.stringify(error.response?.data, null, 2)
+        );
+        console.error(
+          `Request Headers:`,
+          JSON.stringify(error.config?.headers, null, 2)
+        );
+        console.error(`Request URL:`, error.config?.url);
+        console.error(`Request Method:`, error.config?.method?.toUpperCase());
+        console.error(
+          `Request Data:`,
+          JSON.stringify(error.config?.data, null, 2)
+        );
+      } else {
+        console.error(`General Error:`, error);
+      }
+
+      throw error;
+    }
+  }
+
+  /**
    * Get user profile data for authenticated user
    */
   async function getUserProfile(): Promise<any> {
@@ -394,6 +469,7 @@ export function createServerApiClient() {
     exchangeCodeForToken,
     refreshAccessToken,
     createCustomer,
+    createAuthCode,
     getCustomerListings,
     getListingImages,
     getUserProfile,

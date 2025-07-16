@@ -540,30 +540,91 @@ export async function connectHospitable(
 
     // Generate auth link for a customer
     if (action === "auth-link" && customerId) {
-      // Create URL for Hospitable Connect flow
+      // Create auth code using the Hospitable API
       const redirectUrl =
         process.env.NEXT_PUBLIC_HOSPITABLE_REDIRECT_URI ||
         "http://localhost:5000/auth/callback";
-      const token = process.env.HOSPITABLE_CONNECT_TOKEN;
 
-      if (!token) {
-        throw new Error(
-          "HOSPITABLE_CONNECT_TOKEN environment variable is not set"
+      console.log(
+        `[Flow Controller] Generating auth link for customer: ${customerId}`
+      );
+      console.log(`[Flow Controller] Using redirect URL: ${redirectUrl}`);
+
+      try {
+        const client = createServerApiClient();
+        const authCodeResponse = await client.createAuthCode(
+          customerId,
+          redirectUrl
         );
+        console.log(authCodeResponse, "sdfsdfsdfsdfsdfsdf");
+
+        console.log(
+          `[Flow Controller] Auth code response received:`,
+          JSON.stringify(authCodeResponse, null, 2)
+        );
+
+        // Check if we got a valid response
+        if (!authCodeResponse) {
+          console.error(`[Flow Controller] No response from createAuthCode`);
+          res.status(500).json({
+            message:
+              "Failed to generate auth code - no response from Hospitable API",
+            customerId: customerId,
+            redirectUrl: redirectUrl,
+          });
+          return;
+        }
+
+        // Extract the auth URL from the Hospitable API response
+        // The API returns: { data: { return_url: "...", expires_at: "..." } }
+        const authUrl =
+          authCodeResponse.data?.return_url ||
+          authCodeResponse.return_url ||
+          authCodeResponse.auth_url ||
+          authCodeResponse.url ||
+          null;
+
+        const expiresAt = authCodeResponse.data?.expires_at || null;
+
+        const responseData = {
+          authUrl: authUrl,
+          expiresAt: expiresAt,
+        };
+
+        console.log(
+          `[Flow Controller] Sending response:`,
+          JSON.stringify(responseData, null, 2)
+        );
+
+        res.status(200).json(responseData);
+        return;
+      } catch (authError) {
+        console.error(
+          `[Flow Controller] Error generating auth code:`,
+          authError
+        );
+
+        // Return error details along with basic info
+        res.status(500).json({
+          message: "Failed to generate auth code",
+          error:
+            authError instanceof Error ? authError.message : String(authError),
+          customerId: customerId,
+          redirectUrl: redirectUrl,
+        });
+        return;
       }
-
-      const authUrl = `https://connect.hospitable.com/?token=${token}&redirect_url=${encodeURIComponent(
-        redirectUrl
-      )}`;
-
-      res.status(200).json({ authUrl });
-      return;
     }
 
-    // Create a new customer
+    // Create a new customer and generate auth link in one step
     if (action === "customer") {
+      console.log(
+        `[Flow Controller] Creating customer and generating auth link...`
+      );
+
       const client = createServerApiClient();
 
+      // Step 1: Create customer
       const customerResponse = await client.createCustomer(req.body);
 
       // Extract customer data - handle the actual nested structure from Hospitable
@@ -586,30 +647,76 @@ export async function connectHospitable(
         customerId = customerData.id;
       }
 
-      // Also generate auth URL for the newly created customer
+      console.log(`[Flow Controller] Customer created with ID: ${customerId}`);
+
+      // Step 2: Generate auth URL for the newly created customer
       const redirectUrl =
         process.env.NEXT_PUBLIC_HOSPITABLE_REDIRECT_URI ||
         "http://localhost:5000/auth/callback";
-      const token = process.env.HOSPITABLE_CONNECT_TOKEN;
 
-      if (!token) {
-        throw new Error(
-          "HOSPITABLE_CONNECT_TOKEN environment variable is not set"
+      console.log(
+        `[Flow Controller] Generating auth link for new customer: ${customerId}`
+      );
+
+      try {
+        const authCodeResponse = await client.createAuthCode(
+          customerId,
+          redirectUrl
         );
+
+        console.log(
+          `[Flow Controller] Auth code response for new customer:`,
+          JSON.stringify(authCodeResponse, null, 2)
+        );
+
+        // Extract from nested data structure: { data: { return_url: "..." } }
+        const authUrl =
+          authCodeResponse.data?.return_url ||
+          authCodeResponse.return_url ||
+          authCodeResponse.auth_url ||
+          authCodeResponse.url;
+
+        const expiresAt = authCodeResponse.data?.expires_at || null;
+
+        // Return complete response with customer and auth URL
+        const apiResponse = {
+          success: true,
+          message: "Customer created and auth link generated successfully",
+          customer: customer,
+          customerId: customerId,
+          authUrl: authUrl,
+          expiresAt: expiresAt,
+          redirectUrl: redirectUrl,
+        };
+
+        console.log(
+          `[Flow Controller] ✅ Complete customer+auth response:`,
+          JSON.stringify(apiResponse, null, 2)
+        );
+
+        res.status(201).json(apiResponse);
+        return;
+      } catch (authError) {
+        console.error(
+          `[Flow Controller] ❌ Failed to create auth code for new customer:`,
+          authError
+        );
+
+        // Still return customer data even if auth link fails
+        res.status(201).json({
+          success: true,
+          message:
+            "Customer created successfully, but failed to generate auth link",
+          customer: customer,
+          customerId: customerId,
+          authUrl: null,
+          expiresAt: null,
+          redirectUrl: redirectUrl,
+          authError:
+            authError instanceof Error ? authError.message : String(authError),
+        });
+        return;
       }
-
-      const authUrl = `https://connect.hospitable.com/?token=${token}&redirect_url=${encodeURIComponent(
-        redirectUrl
-      )}`;
-
-      const apiResponse = {
-        customer: customer,
-        customerId: customerId, // Also include at top level for easy access
-        authUrl,
-      };
-
-      res.status(201).json(apiResponse);
-      return;
     }
 
     // Exchange auth code for token
