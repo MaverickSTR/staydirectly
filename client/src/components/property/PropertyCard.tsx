@@ -55,6 +55,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               src={imageUrl} 
               alt={title || name} 
               className="w-full h-full object-cover img-zoom"
+              loading="lazy"
+              decoding="async"
+              style={{ 
+                imageRendering: 'auto',
+                backfaceVisibility: 'hidden',
+                perspective: '1000px'
+              }}
             />
             <div className="absolute top-2 right-2">
               <HeartButton propertyId={id} className="" />

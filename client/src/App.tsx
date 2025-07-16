@@ -21,6 +21,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { APIProvider } from "@vis.gl/react-google-maps"; 
 import { usePrefetchCommonData } from "@/lib/api";
+import { cacheWarmers } from "@/lib/queryClient";
 import { useEffect } from "react";
 import { Layout } from "./components/layout";
 
@@ -28,10 +29,27 @@ function Router() {
   const { prefetchFeaturedData } = usePrefetchCommonData();
   const [location] = useLocation();
 
-  // Prefetch commonly needed data when app loads
+  // Prefetch commonly needed data when app loads and warm cache
   useEffect(() => {
+    // Warm essential data immediately
+    cacheWarmers.warmEssentialData();
+    
+    // Also use the existing prefetch function for backward compatibility
     prefetchFeaturedData();
-  }, [prefetchFeaturedData]);
+
+    // Prefetch navigation data based on current location
+    if (location.startsWith('/property/')) {
+      const propertyId = parseInt(location.split('/')[2]);
+      if (propertyId) {
+        cacheWarmers.warmNavigationData(propertyId);
+      }
+    } else if (location.startsWith('/city/')) {
+      const cityName = decodeURIComponent(location.split('/')[2]);
+      if (cityName) {
+        cacheWarmers.warmNavigationData(undefined, cityName);
+      }
+    }
+  }, [prefetchFeaturedData, location]);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -42,7 +60,7 @@ function Router() {
   const isHomePage = location === "/";
   const mainClasses = isHomePage 
     ? "flex-grow" 
-    : "flex-grow w-full md:w-[90%] mx-auto py-20";
+    : "flex-grow w-[95%] md:w-[90%] mx-auto py-20";
 
   return (
     <div className="flex flex-col min-h-screen">

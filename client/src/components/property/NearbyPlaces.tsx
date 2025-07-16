@@ -1,5 +1,7 @@
 // src/components/NearbyPlaces.tsx
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getCacheConfig } from "@/lib/queryClient";
 import { MapPin } from "lucide-react";
 
 // Haversine formula to compute distance in miles
@@ -52,78 +54,38 @@ export default function NearbyPlaces({
   radius = 2000,
   types = ["restaurant", "supermarket", "park"],
 }: NearbyPlacesProps) {
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!latitude || !longitude) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchFromServer = async () => {
-      try {
-        const res = await fetch(`/api/nearby?lat=${latitude}&lng=${longitude}`);
-        if (!res.ok) throw new Error("fetch failed");
-        const data: Place[] = await res.json();
-        setPlaces(data);
-      } catch {
-        setError("Unable to fetch nearby places");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Check if Google Maps API is available and properly loaded
-    if (typeof window !== 'undefined' && 
-        window.google?.maps?.places && 
-        window.google.maps.LatLng &&
-        window.google.maps.places.PlacesService) {
+  // Use React Query for cached nearby places data
+  const { 
+    data: places = [], 
+    error, 
+    isLoading: loading 
+  } = useQuery({
+    queryKey: ['nearbyPlaces', latitude, longitude, radius, types],
+    queryFn: async (): Promise<Place[]> => {
+      if (!latitude || !longitude) return [];
       
-      try {
-        const service = new window.google.maps.places.PlacesService(
-          document.createElement("div")
-        );
-        
-        service.nearbySearch(
-          {
-            location: new window.google.maps.LatLng(latitude, longitude),
-            radius,
-            type: types,
-          },
-          (results: any, status: any) => {
-            if (
-              status === window.google.maps.places.PlacesServiceStatus.OK &&
-              results
-            ) {
-              setPlaces(
-                results.slice(0, 10).map((p: any) => ({
-                  id: p.place_id,
-                  displayName: { text: p.name },
-                  formattedAddress: p.vicinity,
-                  location: {
-                    latitude: p.geometry.location.lat(),
-                    longitude: p.geometry.location.lng(),
-                  },
-                }))
-              );
-              setLoading(false);
-            } else {
-              // If Google Places API fails, fall back to server
-              fetchFromServer();
-            }
-          }
-        );
-      } catch (googleError) {
-        console.warn('Google Places API error, falling back to server:', googleError);
-        fetchFromServer();
-      }
-    } else {
-      // Google Maps API not available, use server fallback
-      fetchFromServer();
+      const res = await fetch(`/api/nearby?lat=${latitude}&lng=${longitude}`);
+      if (!res.ok) throw new Error("fetch failed");
+      return res.json();
+    },
+    enabled: !!(latitude && longitude), // Only run if coordinates are available
+    ...getCacheConfig.static, // Use static caching since nearby places don't change often
+    staleTime: 1000 * 60 * 60, // 1 hour - places data is relatively static
+    gcTime: 1000 * 60 * 60 * 6, // 6 hours - keep in cache for a long time
+  });
+
+  const fetchFromServer = async () => {
+    // This function is kept for the Google Maps fallback logic below
+    try {
+      const res = await fetch(`/api/nearby?lat=${latitude}&lng=${longitude}`);
+      if (!res.ok) throw new Error("fetch failed");
+      return await res.json();
+    } catch {
+      throw new Error("Unable to fetch nearby places");
     }
-  }, [latitude, longitude, radius, types]);
+  };
+
+
 
   if (loading) {
     return (
@@ -154,7 +116,7 @@ export default function NearbyPlaces({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
           </div>
-          <p className="text-gray-500 text-sm">{error}</p>
+          <p className="text-gray-500 text-sm">{error?.message || 'Unable to fetch nearby places'}</p>
         </div>
       </div>
     );

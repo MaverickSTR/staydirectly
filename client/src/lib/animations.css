@@ -98,10 +98,13 @@
 
 .img-zoom {
   transition: transform 0.5s ease;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
 }
 
 .img-zoom:hover {
-  transform: scale(1.05);
+  transform: scale3d(1.05, 1.05, 1);
 }
 
 /* Smooth page transitions */

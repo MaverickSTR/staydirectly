@@ -4,7 +4,8 @@ import { PropertyCard } from "@/components/property";
 import { MapView } from "@/components/map";
 import { Button } from "@/components/ui/button";
 import { Grid, Map } from "lucide-react";
-import { useSearchProperties, useProperties } from '@/lib/api';
+import { useProperties } from '@/lib/api';
+import { useDebouncedSearch } from '@/hooks/use-debounced-search';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { FilterList, SearchPagination } from '@/components/search';
 import { GoogleMapView } from '@/components/map';
@@ -88,14 +89,17 @@ function getLocationLabel(properties: Property[]): string {
   // Determine if we have any search criteria (query or meaningful filters)
   const hasSearchCriteria = query.trim() || Object.keys(filters).length > 0;
   
-  // Use appropriate hook based on whether we have search criteria
-  const searchResult = useSearchProperties(query, filters);
+  // Use debounced search for better performance
+  const searchResult = useDebouncedSearch(query, filters);
   const allPropertiesResult = useProperties();
   
   // Select the appropriate result based on search criteria
   const { data: properties, isLoading, isError } = hasSearchCriteria 
     ? searchResult 
     : allPropertiesResult;
+
+  // Show loading indicator if debouncing
+  const isReallyLoading = isLoading || (hasSearchCriteria && searchResult.isDebouncing);
 
   // Calculate pagination values
   const totalItems = properties?.length || 0;
@@ -194,7 +198,7 @@ function getLocationLabel(properties: Property[]): string {
         
         {/* Results Count */}
         <p className="text-gray-600 mb-4">
-          {isLoading ? 'Searching...' : 
+          {isReallyLoading ? 'Searching...' : 
            isError ? 'Error loading results' :
            `Showing ${startIndex + 1}-${endIndex} of ${totalItems} properties`}
         </p>
@@ -203,7 +207,7 @@ function getLocationLabel(properties: Property[]): string {
         <div className={`flex flex-col ${viewMode === 'map' ? 'lg:flex-row' : ''} gap-6 mb-12`}>
           {/* Properties grid - either full width or left side depending on view mode */}
           <div className={`order-2 lg:order-1 ${viewMode === 'map' ? 'lg:w-3/5' : 'w-full'}`}>
-            {isLoading ? (
+            {isReallyLoading ? (
               // Skeleton loading state for grid
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {Array.from({ length: 4 }).map((_, index) => (
@@ -241,7 +245,7 @@ function getLocationLabel(properties: Property[]): string {
             )}
             
             {/* Pagination */}
-            {!isLoading && !isError && properties && properties.length > 0 && (
+            {!isReallyLoading && !isError && properties && properties.length > 0 && (
               <div className="mt-8">
                 <SearchPagination 
                   currentPage={currentPage} 
@@ -255,7 +259,7 @@ function getLocationLabel(properties: Property[]): string {
           {/* Map view - either hidden, full width on mobile or right side on desktop */}
           {viewMode === 'map' && (
             <div className="order-1 lg:order-2 lg:w-2/5 h-[400px] lg:h-[calc(100vh-240px)] lg:min-h-[600px] lg:sticky lg:top-6 bg-gray-100 rounded-lg shadow-sm overflow-hidden">
-              {isLoading ? (
+              {isReallyLoading ? (
                 <div className="flex items-center justify-center h-full bg-gray-100">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-2"></div>

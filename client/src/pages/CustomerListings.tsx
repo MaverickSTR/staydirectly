@@ -21,7 +21,7 @@ const CustomerListings: React.FC = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
-  // Query for customer listings
+  // Query for customer listings with enhanced caching
   const { data: listings, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['/api/hospitable/customers', customerId, 'listings'],
     queryFn: async () => {
@@ -34,6 +34,11 @@ const CustomerListings: React.FC = () => {
       }
     },
     enabled: false, // Don't run the query automatically, wait for user action
+    // Add caching configuration to prevent refetching on navigation
+    staleTime: 1000 * 60 * 10, // 10 minutes - customer listings don't change frequently
+    gcTime: 1000 * 60 * 60, // 1 hour - keep in cache for an hour
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnReconnect: false, // Don't refetch when reconnecting
   });
 
   // Mutation to mark properties for creation of property pages

@@ -1,6 +1,91 @@
 import axios from "axios";
-import { queryClient, getCacheConfig } from "./queryClient";
+import {
+  queryClient,
+  getCacheConfig,
+  createDedupedRequest,
+  createCacheKey,
+} from "./queryClient";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+// Configure axios with request deduplication and caching
+const axiosRequestMap = new Map<string, Promise<any>>();
+
+// Track request timings
+const requestTimings = new Map<string, number>();
+
+// Axios interceptor for request deduplication
+axios.interceptors.request.use((config) => {
+  // Create a unique key for the request
+  const requestKey = `${config.method}:${config.url}:${JSON.stringify(
+    config.params || {}
+  )}:${JSON.stringify(config.data || {})}`;
+
+  // Track request timing
+  requestTimings.set(requestKey, Date.now());
+
+  return config;
+});
+
+// Axios interceptor for response caching and error handling
+axios.interceptors.response.use(
+  (response) => {
+    // Log successful requests in development
+    if (import.meta.env.DEV) {
+      const requestKey = `${response.config.method}:${
+        response.config.url
+      }:${JSON.stringify(response.config.params || {})}:${JSON.stringify(
+        response.config.data || {}
+      )}`;
+      const startTime = requestTimings.get(requestKey);
+      const duration = startTime ? Date.now() - startTime : 0;
+      console.log(
+        `API Request: ${response.config.method?.toUpperCase()} ${
+          response.config.url
+        } (${duration}ms)`
+      );
+      requestTimings.delete(requestKey);
+    }
+    return response;
+  },
+  (error) => {
+    // Enhanced error logging
+    if (import.meta.env.DEV) {
+      const requestKey = `${error.config?.method}:${
+        error.config?.url
+      }:${JSON.stringify(error.config?.params || {})}:${JSON.stringify(
+        error.config?.data || {}
+      )}`;
+      const startTime = requestTimings.get(requestKey);
+      const duration = startTime ? Date.now() - startTime : 0;
+      console.error(
+        `API Error: ${error.config?.method?.toUpperCase()} ${
+          error.config?.url
+        } (${duration}ms)`,
+        error.response?.status,
+        error.response?.data
+      );
+      requestTimings.delete(requestKey);
+    }
+
+    // Handle specific error types
+    if (error.response?.status === 429) {
+      console.warn("Rate limit hit, implementing exponential backoff");
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+// Enhanced axios request function with deduplication
+function createDedupedAxiosRequest<T>(config: any): Promise<T> {
+  const requestKey = `${config.method}:${config.url}:${JSON.stringify(
+    config.params || {}
+  )}:${JSON.stringify(config.data || {})}`;
+
+  return createDedupedRequest(requestKey, () =>
+    axios(config).then((res) => res.data)
+  );
+}
 
 // API client for communicating with Hospitable and our backend API
 class HospitableApiClient {

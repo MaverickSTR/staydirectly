@@ -258,7 +258,7 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({ className }) => {
       {/* Mobile - Custom Modal Trigger */}
       <div className="md:hidden">
         <Button
-          className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-full py-4 px-6 shadow-lg flex items-center justify-between"
+          className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-full py-7 px-7 shadow-lg flex items-center justify-between"
           onClick={() => setIsModalOpen(true)}
         >
           <div className="flex items-center space-x-3">

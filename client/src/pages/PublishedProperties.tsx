@@ -63,6 +63,7 @@ import {
 import { Link } from 'wouter';
 import { formatDistanceToNow } from 'date-fns';
 import { apiRequest } from '@/lib/queryClient';
+import { useProperties } from '@/lib/api';
 
 // Action menu component for property card
 interface PropertyActionMenuProps {
@@ -121,18 +122,13 @@ const PublishedProperties: React.FC = () => {
   
   // Using getOptimizedAirbnbImageUrl from property-utils.ts instead of a local function
   
-  // Query for published properties
-  const { data: properties, isLoading, isError } = useQuery({
-    queryKey: ['/api/properties', { published: !showUnpublished }],
-    queryFn: async () => {
-      const url = `/api/properties?isPublished=${!showUnpublished ? 'true' : 'all'}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch properties');
-      }
-      return response.json();
-    }
-  });
+  // Use optimized hook for properties with built-in caching
+  const { data: allProperties, isLoading, isError } = useProperties();
+
+  // Filter properties based on published state (client-side filtering for better performance)
+  const properties = showUnpublished 
+    ? allProperties // Show all properties when showUnpublished is true
+    : allProperties?.filter(property => property.isPublished) || []; // Show only published when false
   
   // Mutation for updating a property (used for both editing and unpublishing)
   const updatePropertyMutation = useMutation({

@@ -11,7 +11,7 @@ const FeaturedProperties: React.FC = () => {
     <div className="container px-4 py-12  mx-auto md:w-[90%]">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-display text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter">Featured Properties</h2>
-        <Link href="/search" className="py-2 px-4 border border-black text-black rounded-lg hover:scale-105 font-semibold tracking-tight flex items-center transition-all duration-200">
+        <Link href="/search" className="py-2 px-4 border border-black text-black rounded-lg hover:scale-105 font-semibold tracking-tight flex items-center transition-all duration-200 w-[150px] text-center">
           View all <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>
