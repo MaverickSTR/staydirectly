@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
   const isHomePage = location === '/';
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm w-[90%] mx-auto rounded-lg opacity-90">
+    <header className="headerGlass fixed top-0 left-1/2 transform -translate-x-1/2 z-50  shadow-sm w-[90%] rounded-md mt-2">
       <div className="container mx-auto px-4 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -44,22 +44,47 @@ const Navbar: React.FC = () => {
             <span className="text-black text-2xl font-bold">StayDirectly</span>
           </Link>
 
-          {/* Spacer for centering links and dropdown */}
-          <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8"></div>
+          {/* Center Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center max-w-2xl mx-8 text-lg">
+            <Link to="/featured" className="text-gray-800 hover:text-black transition-colors relative group">
+              <span className="relative">
+                Featured
+                <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+              </span>
+            </Link>
+            <Link to="/destinations" className="text-gray-800 hover:text-black transition-colors relative group">
+              <span className="relative">
+                Destinations
+                <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+              </span>
+            </Link>
+            <Link to="/search" className="text-gray-800 hover:text-black transition-colors relative group">
+              <span className="relative">
+                Properties
+                <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+              </span>
+            </Link>
+          </nav>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/search" className="text-gray-800 hover:text-black transition-colors">
-              Book Your Stay
+            <Link to="/search" className="text-gray-800 hover:text-black transition-colors relative group">
+              <span className="relative">
+                Book Your Stay
+                <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+              </span>
             </Link>
             
             {/* Markets Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center text-gray-800 hover:text-black transition-colors">
-                  <Building className="mr-1 h-4 w-4" />
-                  <span>Markets</span>
-                  <ChevronDown className="ml-1 h-4 w-4" />
+                <button className="flex items-center text-gray-800 hover:text-black transition-colors relative group">
+                  <span className="flex items-center relative">
+                    <Building className="mr-1 h-4 w-4" />
+                    <span>Markets</span>
+                    <ChevronDown className="ml-1 h-4 w-4" />
+                    <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                  </span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-56">
@@ -136,6 +161,16 @@ const Navbar: React.FC = () => {
                   </Link>
                   <Link to="/search" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
                     Book Your Stay
+                  </Link>
+                  
+                  <Link to="/featured" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
+                    Featured
+                  </Link>
+                  <Link to="/destinations" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
+                    Destinations
+                  </Link>
+                  <Link to="/properties" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
+                    Properties
                   </Link>
                   
                   {/* Mobile Markets Section */}

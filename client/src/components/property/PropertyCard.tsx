@@ -47,7 +47,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     <div id={`property-${id}`} className="property-card-container p-1">
       <Link href={getPropertyUrl(id, title || name)}>
         <Card 
-          className="relative bg-white rounded-xl overflow-hidden hover-lift h-full fade-in  border border-gray-700"
+          className="relative bg-white rounded-xl overflow-hidden hover-lift h-full fade-in border border-gray-700"
           onMouseEnter={handleMouseEnter}
         >
           <div className="relative aspect-[4/3] overflow-hidden img-zoom-container">
@@ -83,7 +83,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 <p className="text-sm text-gray-500">{formatPrice(price * 6)} total</p>
               )}
             </div>
-            <div className="flex items-center gap-4 text-gray-600 text-sm mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-4 text-gray-600 text-sm mt-3 pt-3 border-t border-gray-100 w-full">
               <div className="flex items-center gap-1">
                 <Bed className="h-4 w-4" />
                 <span>{bedrooms}</span>

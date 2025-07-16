@@ -138,3 +138,12 @@ iframe, .revyoos-embed-widget, .booking-widget-container {
     min-width: 44px;
   }
 }
+
+.headerGlass {
+background: rgba(255, 255, 255, 0.47);
+border-radius: 16px;
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(3.6px);
+-webkit-backdrop-filter: blur(3.6px);
+border: 1px solid rgba(255, 255, 255, 0.23);
+}
