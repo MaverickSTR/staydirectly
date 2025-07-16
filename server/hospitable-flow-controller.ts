@@ -187,10 +187,11 @@ export async function importCustomerListings(
       allCustomerListings;
     const firstProperty: Property | undefined = allCustomerListingsTyped?.sort(
       (a: Property, b: Property) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        new Date(b.updatedAt || 0).getTime() -
+        new Date(a.updatedAt || 0).getTime()
     )[0];
 
-    const firstPropertyUpdatedAt = firstProperty
+    const firstPropertyUpdatedAt = firstProperty?.updatedAt
       ? new Date(firstProperty.updatedAt)
       : null;
 

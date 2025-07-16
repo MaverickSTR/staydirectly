@@ -1,5 +1,6 @@
 import React from 'react';
 import { HeroSection, FeaturedProperties, TestimonialsSection } from '@/components/home';
+import { FAQ } from '@/components/common';
 import { FeaturedDestinations } from '@/components/destinations';
 import { Meta } from '@/lib/seo';
 
@@ -16,6 +17,7 @@ const Home: React.FC = () => {
       <FeaturedDestinations />
       <FeaturedProperties />
       <TestimonialsSection />
+      <FAQ />
     </>
   );
 };

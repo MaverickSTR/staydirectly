@@ -93,7 +93,13 @@ export default defineConfig(async ({ mode }) => {
     server: {
       // Use different port for Vite dev server to avoid conflicts
       port: 5173,
-      host: true,
+
+      // HOST OPTIONS - controls who can connect to your dev server
+      host: true, // Current: allows external connections (0.0.0.0)
+      // Alternative options:
+      // host: 'localhost', // Only localhost access
+      // host: '192.168.1.100', // Specific IP only
+
       proxy: {
         "/api": {
           target: "http://localhost:5000",
@@ -101,8 +107,20 @@ export default defineConfig(async ({ mode }) => {
           secure: false,
         },
       },
-      // Handle CORS properly
-      cors: true,
+
+      // CORS OPTIONS - controls cross-origin requests
+      cors: true, // Current: allows all origins
+      // More specific CORS examples:
+      // cors: {
+      //   origin: ['http://localhost:3000', 'https://yourdomain.com'],
+      //   credentials: true
+      // },
+
+      // CUSTOM HEADERS (if needed for additional security)
+      // headers: {
+      //   'X-Frame-Options': 'DENY',
+      //   'X-Content-Type-Options': 'nosniff'
+      // },
     },
     // Ensure proper base path
     base: "/",

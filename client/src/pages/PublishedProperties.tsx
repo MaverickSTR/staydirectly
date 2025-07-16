@@ -620,7 +620,7 @@ const PublishedProperties: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {properties?.length > 0 ? (
                 properties.map((property: any) => (
-                  <Card key={property.id} className={`overflow-hidden ${!property.isPublished ? 'opacity-60' : ''}`}>
+                  <Card key={property.id} className={`overflow-hidden ${!property.isPublished ? 'border-dashed border-2 border-gray-300' : ''}`}>
                     <div className="relative h-48 overflow-hidden">
                       <AirbnbImageOptimizer 
                         imageUrl={property.imageUrl || '/placeholder-property.jpg'} 
@@ -640,13 +640,17 @@ const PublishedProperties: React.FC = () => {
                         onDelete={handleDelete}
                       />
                       
-                      {property.isPublished && (
-                        <div className="absolute top-2 left-2">
+                      <div className="absolute top-2 left-2">
+                        {property.isPublished ? (
                           <Badge className="bg-green-600 hover:bg-green-700">
                             <CheckCircle2 className="h-3 w-3 mr-1" /> Published
                           </Badge>
-                        </div>
-                      )}
+                        ) : (
+                          <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
+                            <EyeOff className="h-3 w-3 mr-1" /> Draft
+                          </Badge>
+                        )}
+                      </div>
                       {property.platformType && (
                         <div className="absolute bottom-2 left-2">
                           <Badge variant="secondary" className="bg-white/80 text-black">
@@ -818,17 +822,17 @@ const PublishedProperties: React.FC = () => {
                               )}
                             </td>
                             <td className="px-6 py-4">
-                              <div className="flex flex-col gap-1">
+                              <div className="flex flex-col gap-1 max-w-[140px]">
                                 {property.slug ? (
-                                  <Badge variant="outline" className="inline-flex items-center">
-                                    <LinkIcon className="h-3 w-3 mr-1" />
-                                    {property.slug}
+                                  <Badge variant="outline" className="inline-flex items-center truncate max-w-full" title={property.slug}>
+                                    <LinkIcon className="h-3 w-3 mr-1 flex-shrink-0" />
+                                    <span className="truncate">{property.slug}</span>
                                   </Badge>
                                 ) : (
                                   <span className="text-muted-foreground">—</span>
                                 )}
                                 {property.metaTitle && (
-                                  <span className="text-xs text-muted-foreground truncate max-w-[120px]" title={property.metaTitle}>
+                                  <span className="text-xs text-muted-foreground truncate block" title={property.metaTitle}>
                                     {property.metaTitle}
                                   </span>
                                 )}

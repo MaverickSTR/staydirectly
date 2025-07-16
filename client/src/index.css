@@ -47,6 +47,32 @@
   .text-body {
     @apply font-normal tracking-normal;
   }
+
+  /* Testimonials Carousel Animation */
+  .testimonials-scroll {
+    animation: scroll-right-to-left 60s linear infinite;
+  }
+
+  .testimonials-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes scroll-right-to-left {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Smooth scrolling performance optimization */
+  .testimonials-scroll {
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
 }
 
 /* Custom styles for embedding widgets */

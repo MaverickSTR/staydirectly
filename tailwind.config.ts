@@ -102,10 +102,19 @@ export default {
             height: "0",
           },
         },
+        "scroll-right-to-left": {
+          "0%": {
+            transform: "translateX(0)",
+          },
+          "100%": {
+            transform: "translateX(-50%)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "scroll-right-to-left": "scroll-right-to-left 60s linear infinite",
       },
     },
   },

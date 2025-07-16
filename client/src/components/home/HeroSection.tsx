@@ -3,13 +3,13 @@ import { CustomSearchBar } from '@/components/search';
 
 const HeroSection: React.FC = () => {
   return (
-    <div className="relative min-h-[70vh] md:min-h-[80vh] bg-cover bg-center flex flex-col" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')" }}>
+    <div className="relative min-h-[70vh] md:min-h-[90vh] bg-cover bg-center flex flex-col" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')" }}>
       {/* Background overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-30"></div>
       
       {/* Main content container */}
       <div className="relative z-10 flex flex-col justify-center items-center text-white px-4 flex-grow mt-6">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 max-w-[90%] md:max-w-3xl mx-auto">
           <h1 className="hero-text text-4xl sm:text-5xl md:text-hero-3xl lg:text-hero-4xl font-black mb-6 tracking-tighter">
             Find your next perfect stay
           </h1>
@@ -19,7 +19,7 @@ const HeroSection: React.FC = () => {
         </div>
         
         {/* Search bar container */}
-        <div className="w-full max-w-4xl mt-8">
+        <div className=" mt-8">
           <CustomSearchBar className="" />
         </div>
       </div>
