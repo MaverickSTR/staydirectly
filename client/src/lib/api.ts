@@ -251,6 +251,8 @@ class HospitableApiClient {
       queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
       queryClient.invalidateQueries({ queryKey: ["/api/properties/featured"] });
 
+      console.log("markListingsForPublishing response:", response.data);
+
       return response.data;
     } catch (error) {
       console.error(

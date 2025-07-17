@@ -90,6 +90,7 @@ const CustomerHospitableListings: React.FC = () => {
     // Handle saving the selected properties
     const handleSaveSelection = () => {
         const selectedIds = Object.keys(selectedListings).filter(id => selectedListings[id]);
+        console.log('Publishing selectedIds:', selectedIds); // <-- Log selectedIds before sending to backend
         if (selectedIds.length > 0) {
             markForPublishingMutation.mutate(selectedIds);
         } else {

@@ -146,6 +146,7 @@ export async function importCustomerListings(
   res: Response
 ): Promise<void> {
   try {
+    console.log("[IMPORT] Request body:", req.body); // Log incoming request
     const { customerId, shouldAvoidUpdateForCustomer } = req.body;
 
     if (!customerId) {
@@ -201,6 +202,7 @@ export async function importCustomerListings(
     const response = await enqueueRequest(rateLimitKey, () =>
       client.getCustomerListings(customerId)
     );
+    console.log("[IMPORT] Raw listings from Hospitable:", response); // Log raw data from Hospitable
 
     if (!response?.length) {
       res
@@ -477,6 +479,8 @@ export async function markPropertiesForPublishing(
   res: Response
 ): Promise<void> {
   try {
+    // Log the incoming request body
+    // console.log("Request body:", req.body);
     const { customerId, listingIds } = req.body;
 
     if (
@@ -491,38 +495,135 @@ export async function markPropertiesForPublishing(
       return;
     }
 
-    // Update each property
+    // Create API client for Hospitable
+    const client = createServerApiClient();
     const updatedProperties = [];
 
     for (const listingId of listingIds) {
       try {
+        // Log the platformId being searched
+        // const platformId = `${customerId}:${listingId}`;
+        // console.log("Looking for property with platformId:", platformId);
         // Find property by platform ID
-        const property = await storage.getPropertyByPlatformId(
+        let property = await storage.getPropertyByPlatformId(
           `${customerId}:${listingId}`
         );
 
         if (!property) {
-          continue;
+          // console.log("No property found for platformId:", platformId);
+          // Fetch all listings for the customer (could optimize to fetch just one if API allows)
+          const listings = await client.getCustomerListings(customerId);
+          const prop = listings.find((l: any) => l.id === listingId);
+          if (!prop) {
+            // console.log("No listing data found for", platformId);
+            continue;
+          }
+          // Build property data (reuse logic from importCustomerListings)
+          const propertyData = {
+            name: prop.private_name || prop.public_name || "Unnamed Property",
+            title: prop.public_name || prop.private_name || "Unnamed Property",
+            description: prop.description || "Beautiful property",
+            price: Number(prop.base_price) || 99,
+            imageUrl: (prop.picture || prop.photos?.[0]?.url || "").replace(
+              /\/im(?=\/)/g,
+              ""
+            ),
+            additionalImages:
+              prop.photos
+                ?.slice(1)
+                .map((p: any) => p.url.replace(/\/im(?=\/)/g, "")) || [],
+            city: prop.address?.city || "Unknown",
+            state: prop.address?.state || "",
+            zipCode: prop.address?.zipcode || "",
+            country: (() => {
+              const code = prop.address?.country_code;
+              if (!code) return "Unknown";
+              const name = countries.getName(code.toUpperCase(), "en", {
+                select: "official",
+              });
+              return name || code;
+            })(),
+            location: `${prop.address?.city || ""}, ${
+              prop.address?.state || ""
+            }, ${prop.address?.country_code || ""}`
+              .replace(/, ,/g, ",")
+              .replace(/^, /, "")
+              .replace(/, $/, ""),
+            latitude: prop.address?.latitude
+              ? Number(prop.address.latitude)
+              : null,
+            longitude: prop.address?.longitude
+              ? Number(prop.address.longitude)
+              : null,
+            bedrooms: prop.bedrooms ? Number(prop.bedrooms) : 1,
+            bathrooms: prop.bathrooms ? Number(prop.bathrooms) : 1,
+            maxGuests: prop.max_guests ? Number(prop.max_guests) : 2,
+            type: prop.property_type || "Apartment",
+            capacity: prop.capacity
+              ? {
+                  max: prop.capacity.max
+                    ? Number(prop.capacity.max)
+                    : prop.max_guests
+                    ? Number(prop.max_guests)
+                    : 2,
+                  beds: prop.capacity.beds
+                    ? Number(prop.capacity.beds)
+                    : prop.beds
+                    ? Number(prop.beds)
+                    : 1,
+                  bedrooms: prop.capacity.bedrooms
+                    ? Number(prop.capacity.bedrooms)
+                    : prop.bedrooms
+                    ? Number(prop.bedrooms)
+                    : 1,
+                  bathrooms: prop.capacity.bathrooms
+                    ? Number(prop.capacity.bathrooms)
+                    : prop.bathrooms
+                    ? Number(prop.bathrooms)
+                    : 1,
+                }
+              : null,
+            amenities: prop.amenities || [],
+            featuredAmenities:
+              prop.featured_amenities || prop.amenities?.slice(0, 6) || [],
+            externalId: prop.id,
+            externalSource: "hospitable",
+            platformId: `${customerId}:${listingId}`,
+            slug: `${prop.id}-${(
+              prop.public_name ||
+              prop.private_name ||
+              "property"
+            )
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")}`,
+            hostId: 1, // Default host ID
+            hostName: prop.host_name || "StayDirectly Host",
+            isActive: true,
+            isVerified: true,
+            status: "active",
+          };
+          // Create new property
+          property = await storage.createProperty(propertyData);
+          // console.log("Created new property for", platformId);
+        } else {
+          // Mark as published
+          property = await storage.updateProperty(property.id, {
+            isActive: true,
+            isVerified: true,
+            status: "active",
+          });
         }
-
-        // Mark as published
-        const updated = await storage.updateProperty(property.id, {
-          isActive: true,
-          isVerified: true,
-          status: "active",
-        });
-
-        updatedProperties.push(updated);
+        updatedProperties.push(property);
       } catch (error) {
         // Silent error handling - property publish failed
       }
     }
 
     // Log the result to the backend console
-    console.log(
-      `[markPropertiesForPublishing] Published properties for customerId=${customerId}:`,
-      updatedProperties
-    );
+    // console.log(
+    //   `[markPropertiesForPublishing] Published properties for customerId=${customerId}:`,
+    //   updatedProperties
+    // );
 
     res.status(200).json(updatedProperties);
   } catch (error) {

@@ -80,7 +80,7 @@ const HospitableListingImporter: React.FC<HospitableListingImporterProps> = ({
       setIsImporting(true);
       setImportProgress(0);
       setImportedCount(0);
-
+      console.log('[IMPORT] Sending importListings request for customerId:', customerId); // Log before request
       try {
         // Simulate progress updates
         const progressInterval = setInterval(() => {
@@ -95,7 +95,7 @@ const HospitableListingImporter: React.FC<HospitableListingImporterProps> = ({
 
         // Pass the customer ID to the import endpoint
         const data = await hospitable.importListings(customerId);
-        
+        console.log('[IMPORT] Received response from importListings:', data); // Log after response
         clearInterval(progressInterval);
         setImportProgress(100);
         
