@@ -87,31 +87,63 @@ Sitemap: https://staydirectly.com/sitemap.xml
     hospitable_controller.markPropertiesForPublishing
   );
 
-  // API route for fetching property images
+  // Get all customers from Hospitable
   app.get(
-    "/api/hospitable/property-images/:customerId/:listingId",
-    userRateLimiter,
+    "/api/hospitable/customers",
+    generalRateLimiter,
     async (req: Request, res: Response) => {
       try {
-        const { customerId, listingId } = req.params;
-        const position = parseInt((req.query.position as string) || "0");
+        const client = createServerApiClient();
+        const customers = await client.getAllCustomers();
+        res.json(customers);
+      } catch (error) {
+        console.error("Error fetching customers from Hospitable:", error);
+        res.status(500).json({
+          message: "Failed to fetch customers from Hospitable",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  );
 
-        if (!customerId || !listingId) {
-          return res
-            .status(400)
-            .json({ message: "Missing required parameters" });
+  // Get listings for a specific customer from Hospitable
+  app.get(
+    "/api/hospitable/customers/:customerId/listings",
+    generalRateLimiter,
+    async (req: Request, res: Response) => {
+      try {
+        const { customerId } = req.params;
+
+        if (!customerId) {
+          return res.status(400).json({
+            message: "Customer ID is required",
+            error: "Please provide a valid customerId in the URL path",
+          });
         }
 
-        // Forward the request to our controller
-        await hospitable_controller.fetchPropertyImages(
-          {
-            body: { customerId, listingId, position },
-          } as Request,
-          res
+        console.log(
+          `[API Route] Fetching listings for customer: ${customerId}`
         );
+
+        const client = createServerApiClient();
+        const listings = await client.getCustomerListings(customerId);
+
+        res.json({
+          success: true,
+          customerId,
+          count: listings.length,
+          data: listings,
+        });
       } catch (error) {
-        console.error("Error handling property images request:", error);
-        res.status(500).json({ message: "Error fetching property images" });
+        console.error(
+          `Error fetching listings for customer ${req.params.customerId}:`,
+          error
+        );
+        res.status(500).json({
+          message: "Failed to fetch customer listings from Hospitable",
+          customerId: req.params.customerId,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     }
   );

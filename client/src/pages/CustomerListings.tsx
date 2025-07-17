@@ -6,12 +6,253 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Search, Star, ExternalLink, Save } from 'lucide-react';
+import { Loader2, Search, Star, ExternalLink, Save, Users, Mail, Phone, Clock } from 'lucide-react';
 import { HospitableListingImporter } from '@/components/hospitable';
 import { DataRefreshScheduler, ListingDataDetail } from '@/components/hospitable';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+// Customer type definition based on Hospitable API response
+type HospitableCustomer = {
+  id: string;
+  email: string;
+  name: string;
+  phone?: string;
+  timezone?: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+// CustomerTable component with pagination and data fetching
+const CustomerTable: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const customersPerPage = 10;
+  
+  // Fetch customers from Hospitable API
+  const { data: customers, isLoading, isError, error } = useQuery({
+    queryKey: ['hospitable-customers'],
+    queryFn: async () => {
+      const response = await fetch('/api/hospitable/customers');
+      if (!response.ok) {
+        throw new Error('Failed to fetch customers');
+      }
+      return response.json() as Promise<HospitableCustomer[]>;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
+  });
+  
+  // Calculate pagination
+  const totalPages = Math.ceil((customers?.length || 0) / customersPerPage);
+  const startIndex = (currentPage - 1) * customersPerPage;
+  const endIndex = startIndex + customersPerPage;
+  const currentCustomers = customers?.slice(startIndex, endIndex) || [];
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+  
+  const goToPrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  const goToNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Hospitable Customers Directory
+          </CardTitle>
+          <CardDescription>Loading customers from Hospitable...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center items-center h-40">
+            <Loader2 className="h-8 w-8 animate-spin text-black" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card className="mb-8 bg-destructive/10 border-destructive">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Hospitable Customers Directory
+          </CardTitle>
+          <CardDescription>Failed to load customers</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-red-600">
+            {error instanceof Error ? error.message : 'An error occurred while fetching customers'}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Hospitable Customers Directory
+        </CardTitle>
+        <CardDescription>
+          List of all customers from Hospitable ({customers?.length || 0} total customers)
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableCaption>
+            Showing {startIndex + 1}-{Math.min(endIndex, customers?.length || 0)} of {customers?.length || 0} customers
+          </TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-24">ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Timezone</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentCustomers.map((customer) => (
+              <TableRow key={customer.id}>
+                <TableCell className="font-medium max-w-24 truncate" title={customer.id}>
+                  {customer.id}
+                </TableCell>
+                <TableCell>{customer.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-500" />
+                    <a href={`mailto:${customer.email}`} className="text-gray-700 hover:text-gray-900 hover:underline">
+                      {customer.email}
+                    </a>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {customer.phone ? (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-gray-500" />
+                      <a href={`tel:${customer.phone}`} className="text-gray-700 hover:text-gray-900 hover:underline">
+                        {customer.phone}
+                      </a>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400">Not provided</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {customer.timezone ? (
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      <Badge variant="outline">{customer.timezone}</Badge>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400">Not provided</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {customer.status ? (
+                    <Badge variant={customer.status === 'active' ? 'default' : 'secondary'}>
+                      {customer.status}
+                    </Badge>
+                  ) : (
+                    <span className="text-gray-400">Unknown</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Link to={`/customer-listings/${customer.id}`}>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                      >
+                        Load Listings
+                      </Button>
+                    </Link>
+                    <Button variant="ghost" size="sm">
+                      View Details
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={goToPrevious}
+                    className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                
+                {/* Page numbers */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={goToNext}
+                    className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 // Basic component to display customer listings
 const CustomerListings: React.FC = () => {
@@ -20,6 +261,8 @@ const CustomerListings: React.FC = () => {
   const [selectedListings, setSelectedListings] = useState<Record<string, boolean>>({});
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Removed event listener since we now navigate to a separate page
   
   // Query for customer listings with enhanced caching
   const { data: listings, isLoading, isError, error, refetch } = useQuery({
@@ -28,6 +271,7 @@ const CustomerListings: React.FC = () => {
       setIsSearching(true);
       try {
         const data = await hospitable.getCustomerListings(customerId);
+        console.log(data);
         return data;
       } finally {
         setIsSearching(false);
@@ -129,6 +373,9 @@ const CustomerListings: React.FC = () => {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8 text-center">Hospitable Customer Listings</h1>
       
+      {/* Hospitable Customers Directory Table */}
+      <CustomerTable />
+      
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Search Customer Listings</CardTitle>
@@ -137,7 +384,7 @@ const CustomerListings: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <Input
                 placeholder="Enter customer ID (e.g., 24RZHJ)"
@@ -244,10 +491,8 @@ const CustomerListings: React.FC = () => {
                             alt={listing.public_name || listing.private_name || 'Property'} 
                             className="w-full h-full object-cover transition-transform hover:scale-105"
                             onError={(e) => {
-                              // Try to fetch from Hospitable API if initial image fails
-                              if (customerId && listing.id) {
-                                e.currentTarget.src = `/api/hospitable/property-images/${customerId}/${listing.id}/primary`;
-                              }
+                              // Use placeholder image if initial image fails
+                              e.currentTarget.src = '/placeholder-property.jpg';
                             }}
                           />
                         </div>

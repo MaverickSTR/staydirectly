@@ -151,7 +151,27 @@ class HospitableApiClient {
       const response = await axios.get(
         `${this.baseUrl}/customers/${customerId}/listings`
       );
-      return response.data;
+
+      // The new endpoint returns { success, customerId, count, data }
+      // We need to extract just the data array
+      if (
+        response.data &&
+        response.data.data &&
+        Array.isArray(response.data.data)
+      ) {
+        return response.data.data;
+      }
+
+      // Fallback for other response formats
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+
+      console.warn(
+        `Unexpected response format for customer ${customerId}:`,
+        response.data
+      );
+      return [];
     } catch (error) {
       console.error(
         `Error fetching listings for customer ${customerId}:`,
@@ -198,12 +218,15 @@ class HospitableApiClient {
     shouldUpdateCached = false
   ): Promise<any> {
     try {
-      const response = await axios.post(`/api/hospitable/fetch-images`, {
-        customerId,
-        listingId,
-        position: position || 0,
-        shouldUpdateCachedImages: shouldUpdateCached,
-      });
+      const response = await axios.post(
+        `/api/hospitable/fetch-property-images`,
+        {
+          customerId,
+          listingId,
+          position: position || 0,
+          shouldUpdateCachedImages: shouldUpdateCached,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error(`Error fetching images for customer ${customerId}:`, error);

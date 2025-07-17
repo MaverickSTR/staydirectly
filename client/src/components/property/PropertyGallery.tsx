@@ -80,16 +80,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
     storedDbImages
   );
   
-  // Get the API base URL for direct API requests if needed
-  const getDirectApiImageUrl = useCallback((position: number = 0) => {
-    if (!platformId) return null;
-    
-    const { customerId, listingId } = extractPropertyIds(platformId);
-    if (!customerId || !listingId) return null;
-    
-    // Use the direct API endpoint with a unique cache-busting param for each position
-    return `/api/hospitable/property-images/${customerId || defaultCustomerId}/${listingId}?pos=${position}&t=${Date.now()}`;
-  }, [platformId, defaultCustomerId]);
+  // Removed getDirectApiImageUrl - was using broken endpoint that returned JSON instead of images
   
   // Handle image load errors with smart fallback logic
   const handleImageLoadError = useCallback((index: number, imageUrl: string) => {
@@ -199,15 +190,8 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
       }
       
       return Array.from({ length }, (_, idx) => {
-        // Add randomization to API request to get varied image results
-        const randomSeed = Math.floor(Math.random() * 1000);
-        const staggerDelay = idx * 5000; // 5 seconds between each request
-        const apiUrl = getDirectApiImageUrl(idx);
-        const delayParam = `&delay=${staggerDelay}&seed=${randomSeed}&t=${Date.now() + idx * 1000}`;
-        
-        return apiUrl 
-          ? apiUrl + delayParam
-          : '/placeholder-property.jpg';
+        // Use placeholder for all fallback images since the API endpoint was broken
+        return '/placeholder-property.jpg';
       });
     };
     
@@ -315,8 +299,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
     providedImages, 
     imageUrl, 
     additionalImages, 
-    platformId, 
-    getDirectApiImageUrl
+    platformId
   ]);
   
   // Navigation handlers

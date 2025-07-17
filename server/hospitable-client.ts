@@ -450,6 +450,44 @@ export function createServerApiClient() {
   }
 
   /**
+   * Get all customers from Hospitable
+   */
+  async function getAllCustomers(): Promise<HospitableCustomer[]> {
+    try {
+      console.log(`[Hospitable Client] Fetching all customers`);
+
+      const platformToken = process.env.HOSPITABLE_PLATFORM_TOKEN;
+
+      if (!platformToken) {
+        throw new Error(
+          "Missing HOSPITABLE_PLATFORM_TOKEN environment variable"
+        );
+      }
+
+      const response = await axios.get(
+        "https://connect.hospitable.com/api/v1/customers",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Connect-Version": HOSPITABLE_API_VERSION,
+            Authorization: `Bearer ${platformToken}`,
+          },
+        }
+      );
+
+      return response.data.data || [];
+    } catch (error) {
+      console.error("[Hospitable Client] Error fetching all customers:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Get user profile data for authenticated user
    */
   async function getUserProfile(): Promise<any> {
@@ -470,6 +508,7 @@ export function createServerApiClient() {
     refreshAccessToken,
     createCustomer,
     createAuthCode,
+    getAllCustomers,
     getCustomerListings,
     getListingImages,
     getUserProfile,

@@ -204,3 +204,6 @@ backdrop-filter: blur(3.6px);
 -webkit-backdrop-filter: blur(3.6px);
 border: 1px solid rgba(255, 255, 255, 0.23);
 }
+.home-stat{
+  border-radius: 200px 0px 0px 0px;
+}

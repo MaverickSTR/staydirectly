@@ -7,7 +7,7 @@ type Props = {
 
 const Layout = ({ children }: Props) => {
   return (
-    <div>
+    <div className=''>
         <Navbar />
         <main className="flex-grow ">
             {children}

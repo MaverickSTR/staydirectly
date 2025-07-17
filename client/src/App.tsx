@@ -14,6 +14,7 @@ import HospitableSearch from "@/pages/HospitableSearch";
 import AirbnbImport from "@/pages/AirbnbImport";
 import HospitableConnect from "@/pages/HospitableConnect";
 import CustomerListings from "@/pages/CustomerListings";
+import CustomerHospitableListings from "@/pages/CustomerHospitableListings";
 import PublishedProperties from "@/pages/PublishedProperties";
 import HospitableIntegration from "@/pages/HospitableIntegration";
 import HospitableImport from "@/pages/HospitableImport";
@@ -59,7 +60,7 @@ function Router() {
   // Home page should be full width, others should be constrained
   const isHomePage = location === "/";
   const mainClasses = isHomePage 
-    ? "flex-grow" 
+    ? "flex-grow " 
     : "flex-grow w-[95%] md:w-[90%] mx-auto py-20";
 
   return (
@@ -77,6 +78,7 @@ function Router() {
           <Route path="/hospitable-search" component={HospitableSearch} />
           <Route path="/connect" component={HospitableConnect} />
           <Route path="/customer-listings" component={CustomerListings} />
+          <Route path="/customer-listings/:customerId" component={CustomerHospitableListings} />
           <Route path="/published-properties" component={PublishedProperties} />
           <Route path="/hospitable-integration" component={HospitableIntegration} />
           <Route path="/import" component={HospitableImport} />

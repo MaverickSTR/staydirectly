@@ -315,14 +315,14 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({ className }) => {
 
       {/* Desktop - Inline Search Bar */}
       <div className="hidden md:block">
-        <div className="bg-white shadow-lg border border-gray-200 rounded-full flex items-center p-1 gap-0 max-w-4xl mx-auto">
+        <div className="bg-white shadow-lg border border-gray-200 rounded-full flex items-center  p-1 gap-0 w-fit ">
           <SearchForm />
-          <div className="flex justify-center pl-2">
+          <div className="flex justify-center pl-2 w-full">
             <Button
-              className="rounded-full bg-[#FF385C] hover:bg-[#E00B41] text-white w-12 h-12 flex items-center justify-center shadow-md transition-all duration-200 hover:shadow-lg"
+              className="rounded-full bg-gray-600 hover:bg-gray-700 text-white w-14 h-14 flex items-center justify-center shadow-md transition-all duration-200 hover:shadow-lg"
               onClick={handleSearch}
             >
-              <Search className="h-5 w-5" />
+              <Search size={30} className=" text-xl" />
             </Button>
           </div>
         </div>

@@ -127,7 +127,7 @@ const PublishedProperties: React.FC = () => {
 
   // Filter properties based on published state (client-side filtering for better performance)
   const properties = showUnpublished 
-    ? allProperties // Show all properties when showUnpublished is true
+    ? allProperties || [] // Show all properties when showUnpublished is true
     : allProperties?.filter(property => property.isPublished) || []; // Show only published when false
   
   // Mutation for updating a property (used for both editing and unpublishing)
@@ -622,10 +622,7 @@ const PublishedProperties: React.FC = () => {
                         imageUrl={property.imageUrl || '/placeholder-property.jpg'} 
                         alt={property.title || property.name || 'Property'} 
                         className="w-full h-full transition-transform hover:scale-105"
-                        fallbackUrl={property.platformId ? 
-                          `/api/hospitable/property-images/${extractPropertyIds(property.platformId).customerId}/${extractPropertyIds(property.platformId).listingId}/primary` : 
-                          '/placeholder-property.jpg'
-                        }
+                        fallbackUrl="/placeholder-property.jpg"
                       />
                       
                       {/* Property action menu */}
@@ -756,10 +753,7 @@ const PublishedProperties: React.FC = () => {
                                     imageUrl={property.imageUrl || '/placeholder-property.jpg'} 
                                     alt={property.title || property.name} 
                                     className="w-full h-full"
-                                    fallbackUrl={property.platformId ? 
-                                      `/api/hospitable/property-images/${extractPropertyIds(property.platformId).customerId}/${extractPropertyIds(property.platformId).listingId}/primary` : 
-                                      '/placeholder-property.jpg'
-                                    }
+                                    fallbackUrl="/placeholder-property.jpg"
                                   />
                                 </div>
                                 <div className="line-clamp-1">
