@@ -10,6 +10,7 @@ import { HospitableListingImporter } from '@/components/hospitable';
 import { DataRefreshScheduler, ListingDataDetail } from '@/components/hospitable';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { useProperties } from '@/lib/api';
 
 const CustomerHospitableListings: React.FC = () => {
     const { customerId } = useParams<{ customerId: string }>();
@@ -17,6 +18,17 @@ const CustomerHospitableListings: React.FC = () => {
     const [copied, setCopied] = useState(false);
     const queryClient = useQueryClient();
     const { toast } = useToast();
+    const { data: allProperties } = useProperties();
+
+    // Build a set of platformIds for fast lookup
+    const publishedPlatformIds = React.useMemo(() => {
+        if (!allProperties) return new Set<string>();
+        return new Set(
+            allProperties
+                .filter((p: any) => p.platformId)
+                .map((p: any) => p.platformId)
+        );
+    }, [allProperties]);
 
     // Query for customer listings
     const { data: listings, isLoading, isError, error, refetch } = useQuery({
@@ -219,111 +231,123 @@ const CustomerHospitableListings: React.FC = () => {
                                 <div className="grid grid-cols-1 gap-8">
                                     {(Array.isArray(listings) ? listings : [])
                                         .sort((a: any, b: any) => (a.private_name || '').localeCompare(b.private_name || ''))
-                                        .map((listing: any) => (
-                                            <Card
-                                                key={listing.id}
-                                                className={`overflow-hidden pr-4 pt-3 relative ${selectedListings[listing.id] ? 'ring-2 ring-black' : ''}`}
-                                            >
-                                                <div className="absolute top-2 right-2 z-10">
-                                                    <Checkbox
-                                                        id={`select-${listing.id}`}
-                                                        checked={selectedListings[listing.id] || false}
-                                                        onCheckedChange={() => toggleSelection(listing.id)}
-                                                        className="h-5 w-5 bg-white border-gray-200"
-                                                    />
-                                                </div>
-                                                {selectedListings[listing.id] && (
-                                                    <div className="absolute top-2 left-2 z-10">
-                                                        <Badge variant="default" className="bg-black">
-                                                            <Star className="h-3.5 w-3.5 mr-1" /> Selected
-                                                        </Badge>
-                                                    </div>
-                                                )}
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="h-56 overflow-hidden">
-                                                        <img
-                                                            src={getHighQualityImageUrl(listing.picture || listing.photos?.[0]?.url || '/placeholder-property.jpg')}
-                                                            alt={listing.public_name || listing.private_name || 'Property'}
-                                                            className="w-full h-full object-cover transition-transform hover:scale-105"
-                                                            onError={(e) => {
-                                                                // Use placeholder image if initial image fails
-                                                                e.currentTarget.src = '/placeholder-property.jpg';
-                                                            }}
+                                        .map((listing: any) => {
+                                            // Construct the platformId for this listing
+                                            const platformId = `${customerId}:${listing.id}`;
+                                            const isPublished = publishedPlatformIds.has(platformId);
+                                            return (
+                                                <Card
+                                                    key={listing.id}
+                                                    className={`overflow-hidden pr-4 pt-3 relative ${selectedListings[listing.id] ? 'ring-2 ring-black' : ''}`}
+                                                >
+                                                    <div className="absolute top-2 right-2 z-10">
+                                                        <Checkbox
+                                                            id={`select-${listing.id}`}
+                                                            checked={selectedListings[listing.id] || false}
+                                                            onCheckedChange={() => toggleSelection(listing.id)}
+                                                            className="h-5 w-5 bg-white border-gray-200"
+                                                            disabled={isPublished}
+                                                            title={isPublished ? 'Already published' : 'Select for Publishing'}
                                                         />
                                                     </div>
+                                                    {selectedListings[listing.id] && (
+                                                        <div className="absolute top-2 left-2 z-10">
+                                                            <Badge variant="default" className="bg-black">
+                                                                <Star className="h-3.5 w-3.5 mr-1" /> Selected
+                                                            </Badge>
+                                                        </div>
+                                                    )}
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div className="h-56 overflow-hidden">
+                                                            <img
+                                                                src={getHighQualityImageUrl(listing.picture || listing.photos?.[0]?.url || '/placeholder-property.jpg')}
+                                                                alt={listing.public_name || listing.private_name || 'Property'}
+                                                                className="w-full h-full object-cover transition-transform hover:scale-105"
+                                                                onError={(e) => {
+                                                                    // Use placeholder image if initial image fails
+                                                                    e.currentTarget.src = '/placeholder-property.jpg';
+                                                                }}
+                                                            />
+                                                        </div>
 
-                                                    <div className="md:col-span-2 p-4">
-                                                        <div className="flex flex-col h-full">
-                                                            <div>
-                                                                <div className="flex justify-between items-start mb-2">
-                                                                    <div>
-                                                                        <h3 className="text-lg font-bold">
-                                                                            {listing.private_name || `Property ${listing.id}`}
-                                                                        </h3>
-                                                                        <p className="text-sm text-muted-foreground">
-                                                                            ID: {listing.id}
-                                                                        </p>
+                                                        <div className="md:col-span-2 p-4">
+                                                            <div className="flex flex-col h-full">
+                                                                <div>
+                                                                    <div className="flex justify-between items-start mb-2">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <h3 className="text-lg font-bold">
+                                                                                {listing.private_name || `Property ${listing.id}`}
+                                                                            </h3>
+                                                                            {/* Published indicator */}
+                                                                            {isPublished && (
+                                                                                <Badge variant="default" className="ml-2 bg-green-600 text-white">
+                                                                                    Published
+                                                                                </Badge>
+                                                                            )}
+                                                                        </div>
+                                                                        <Badge variant="outline" className="ml-2">
+                                                                            {listing.platform || 'Hospitable'}
+                                                                        </Badge>
                                                                     </div>
-                                                                    <Badge variant="outline" className="ml-2">
-                                                                        {listing.platform || 'Hospitable'}
-                                                                    </Badge>
+                                                                    <h4 className="font-semibold text-black">
+                                                                        Public Title: {listing.public_name || 'Not Set'}
+                                                                    </h4>
+                                                                    <p className="text-sm text-gray-500 mt-1">
+                                                                        {listing.address ?
+                                                                            `${listing.address.street || ''}, ${listing.address.city || ''}, ${listing.address.state || ''}, ${listing.address.country_code || ''}` :
+                                                                            'Location not available'}
+                                                                    </p>
+                                                                    <div className="grid grid-cols-2 gap-4 mt-4">
+                                                                        <div>
+                                                                            <h5 className="text-sm font-medium">Capacity Details</h5>
+                                                                            <ul className="text-sm mt-1">
+                                                                                <li>Guests: {listing.capacity?.max || listing.max_guests || '0'}</li>
+                                                                                <li>Bedrooms: {listing.capacity?.bedrooms || listing.bedrooms || '0'}</li>
+                                                                                <li>Beds: {listing.capacity?.beds || '0'}</li>
+                                                                                <li>Bathrooms: {listing.capacity?.bathrooms || listing.bathrooms || '0'}</li>
+                                                                            </ul>
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <h5 className="text-sm font-medium">Pricing & Availability</h5>
+                                                                            <ul className="text-sm mt-1">
+                                                                                <li>Base Price: ${listing.base_price || '0'}/night</li>
+                                                                                <li>Check-in: {listing.check_in || 'N/A'}</li>
+                                                                                <li>Check-out: {listing.check_out || 'N/A'}</li>
+                                                                                <li>Status: {listing.available ? 'Available' : 'Unavailable'}</li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <h4 className="font-semibold text-black">
-                                                                    Public Title: {listing.public_name || 'Not Set'}
-                                                                </h4>
-                                                                <p className="text-sm text-gray-500 mt-1">
-                                                                    {listing.address ?
-                                                                        `${listing.address.street || ''}, ${listing.address.city || ''}, ${listing.address.state || ''}, ${listing.address.country_code || ''}` :
-                                                                        'Location not available'}
-                                                                </p>
-                                                                <div className="grid grid-cols-2 gap-4 mt-4">
-                                                                    <div>
-                                                                        <h5 className="text-sm font-medium">Capacity Details</h5>
-                                                                        <ul className="text-sm mt-1">
-                                                                            <li>Guests: {listing.capacity?.max || listing.max_guests || '0'}</li>
-                                                                            <li>Bedrooms: {listing.capacity?.bedrooms || listing.bedrooms || '0'}</li>
-                                                                            <li>Beds: {listing.capacity?.beds || '0'}</li>
-                                                                            <li>Bathrooms: {listing.capacity?.bathrooms || listing.bathrooms || '0'}</li>
-                                                                        </ul>
-                                                                    </div>
 
-                                                                    <div>
-                                                                        <h5 className="text-sm font-medium">Pricing & Availability</h5>
-                                                                        <ul className="text-sm mt-1">
-                                                                            <li>Base Price: ${listing.base_price || '0'}/night</li>
-                                                                            <li>Check-in: {listing.check_in || 'N/A'}</li>
-                                                                            <li>Check-out: {listing.check_out || 'N/A'}</li>
-                                                                            <li>Status: {listing.available ? 'Available' : 'Unavailable'}</li>
-                                                                        </ul>
-                                                                    </div>
+                                                                <div className="flex justify-between items-center mt-4 pt-2 border-t">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => window.open(listing.listing_url || '#', '_blank')}
+                                                                        disabled={!listing.listing_url}
+                                                                    >
+                                                                        <ExternalLink className="h-4 w-4 mr-1" /> View on Platform
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant={selectedListings[listing.id] ? "default" : "outline"}
+                                                                        size="sm"
+                                                                        onClick={() => toggleSelection(listing.id)}
+                                                                        disabled={isPublished}
+                                                                        title={isPublished ? 'Already published' : (selectedListings[listing.id] ? 'Selected for Publishing' : 'Select for Publishing')}
+                                                                    >
+                                                                        {isPublished ? 'Already Published' : (selectedListings[listing.id] ? 'Selected for Publishing' : 'Select for Publishing')}
+                                                                    </Button>
                                                                 </div>
-                                                            </div>
 
-                                                            <div className="flex justify-between items-center mt-4 pt-2 border-t">
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() => window.open(listing.listing_url || '#', '_blank')}
-                                                                    disabled={!listing.listing_url}
-                                                                >
-                                                                    <ExternalLink className="h-4 w-4 mr-1" /> View on Platform
-                                                                </Button>
-                                                                <Button
-                                                                    variant={selectedListings[listing.id] ? "default" : "outline"}
-                                                                    size="sm"
-                                                                    onClick={() => toggleSelection(listing.id)}
-                                                                >
-                                                                    {selectedListings[listing.id] ? 'Selected for Publishing' : 'Select for Publishing'}
-                                                                </Button>
+                                                                {/* Show all data points from the API */}
+                                                                <ListingDataDetail listing={listing} />
                                                             </div>
-
-                                                            {/* Show all data points from the API */}
-                                                            <ListingDataDetail listing={listing} />
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </Card>
-                                        ))}
+                                                </Card>
+                                            );
+                                        })}
                                 </div>
                             </CardContent>
                             <CardFooter className="flex justify-between">

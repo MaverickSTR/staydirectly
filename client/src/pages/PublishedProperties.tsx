@@ -125,6 +125,9 @@ const PublishedProperties: React.FC = () => {
   // Use optimized hook for properties with built-in caching
   const { data: allProperties, isLoading, isError } = useProperties();
 
+  // Debug: Log all properties fetched from backend
+  console.log('Fetched all properties from backend:', allProperties);
+
   // Filter properties based on published state (client-side filtering for better performance)
   const properties = showUnpublished 
     ? allProperties || [] // Show all properties when showUnpublished is true

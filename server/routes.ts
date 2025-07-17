@@ -311,15 +311,26 @@ Sitemap: https://staydirectly.com/sitemap.xml
     strictRateLimiter,
     async (req: Request, res: Response) => {
       try {
+        console.log("[POST /api/properties] Received body:", req.body);
         const propertyData = insertPropertySchema.parse(req.body);
+        console.log(
+          "[POST /api/properties] Parsed propertyData:",
+          propertyData
+        );
         const property = await storage.createProperty(propertyData);
+        console.log("[POST /api/properties] Created property:", property);
         res.status(201).json(property);
       } catch (error) {
         if (error instanceof z.ZodError) {
+          console.error(
+            "[POST /api/properties] Validation error:",
+            error.errors
+          );
           return res
             .status(400)
             .json({ message: "Invalid property data", errors: error.errors });
         }
+        console.error("[POST /api/properties] Unexpected error:", error);
         res.status(500).json({ message: "Failed to create property" });
       }
     }

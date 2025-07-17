@@ -518,6 +518,12 @@ export async function markPropertiesForPublishing(
       }
     }
 
+    // Log the result to the backend console
+    console.log(
+      `[markPropertiesForPublishing] Published properties for customerId=${customerId}:`,
+      updatedProperties
+    );
+
     res.status(200).json(updatedProperties);
   } catch (error) {
     res.status(500).json({

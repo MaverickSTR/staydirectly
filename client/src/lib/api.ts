@@ -242,7 +242,7 @@ class HospitableApiClient {
     listingIds: string[]
   ): Promise<any> {
     try {
-      const response = await axios.post(`/api/hospitable/mark-for-publishing`, {
+      const response = await axios.post(`/api/hospitable/publish-properties`, {
         customerId,
         listingIds,
       });
