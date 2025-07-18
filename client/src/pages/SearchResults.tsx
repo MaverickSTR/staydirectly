@@ -36,66 +36,78 @@ function getLocationLabel(properties: Property[]): string {
 }
 
 
-  const SearchResults: React.FC = () => {
-    const [location] = useLocation();
-    
-    const [currentPage, setCurrentPage] = useState(1);
-    
-    const [viewMode, setViewMode] = useState<'grid' | 'map'>('map');
-    const [selectedProperty, setSelectedProperty] = useState<number | string | null>(null);
+const SearchResults: React.FC = () => {
+  const [location] = useLocation();
 
-    const [query, setQuery] = useState<string>('');
-    const [filters, setFilters] = useState<any>({});
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('map');
+  const [selectedProperty, setSelectedProperty] = useState<number | string | null>(null);
 
-    useEffect(() => {
-      const searchParams = new URLSearchParams(window.location.search);
-      console.log("SearchResults - Full search params:");
-      for (const [key, value] of searchParams.entries()) {
-        console.log(`SearchResults - ${key}: ${value}`);
+  // Auto-switch to grid view on small screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768 && viewMode === 'map') {
+        setViewMode('grid');
       }
+    };
 
-      const q = searchParams.get('q') || '';
-      console.log('SearchResults - Setting query:', q);
-      setQuery(q);
+    // Check on mount
+    handleResize();
 
-      const newFilters: any = {};
-      for (const [key, value] of searchParams.entries()) {
-        switch (key) {
-          case 'minPrice':
-          case 'maxPrice':
-          case 'bedrooms':
-          case 'bathrooms':
-          case 'guests':
-            newFilters[key] = parseInt(value);
-            break;
-          case 'amenities':
-            newFilters[key] = value.split(',');
-            break;
-          default:
-            if (key !== 'q') newFilters[key] = value;
-        }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [viewMode]);
+
+  const [query, setQuery] = useState<string>('');
+  const [filters, setFilters] = useState<any>({});
+
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    console.log("SearchResults - Full search params:");
+    for (const [key, value] of searchParams.entries()) {
+      console.log(`SearchResults - ${key}: ${value}`);
+    }
+
+    const q = searchParams.get('q') || '';
+    console.log('SearchResults - Setting query:', q);
+    setQuery(q);
+
+    const newFilters: any = {};
+    for (const [key, value] of searchParams.entries()) {
+      switch (key) {
+        case 'minPrice':
+        case 'maxPrice':
+        case 'bedrooms':
+        case 'bathrooms':
+        case 'guests':
+          newFilters[key] = parseInt(value);
+          break;
+        case 'amenities':
+          newFilters[key] = value.split(',');
+          break;
+        default:
+          if (key !== 'q') newFilters[key] = value;
       }
+    }
 
-      console.log('SearchResults - Setting filters:', newFilters);
-      setFilters(newFilters);
-    }, [location]);
+    console.log('SearchResults - Setting filters:', newFilters);
+    setFilters(newFilters);
+  }, [location]);
 
-
-
-
-  const pageSize = 12;
+  const pageSize = 10; // Show 10 properties per page
 
   // Determine if we have any search criteria (query or meaningful filters)
   const hasSearchCriteria = query.trim() || Object.keys(filters).length > 0;
-  
+
   // Use debounced search for better performance
   const searchResult = useDebouncedSearch(query, filters);
   const allPropertiesResult = useProperties();
-  
+
   // Select the appropriate result based on search criteria
-  const { data: properties, isLoading, isError } = hasSearchCriteria 
-    ? searchResult 
+  const { data: properties, isLoading, isError } = hasSearchCriteria
+    ? searchResult
     : allPropertiesResult;
 
   // Show loading indicator if debouncing
@@ -108,6 +120,8 @@ function getLocationLabel(properties: Property[]): string {
   const endIndex = Math.min(startIndex + pageSize, totalItems);
   const currentItems = properties?.slice(startIndex, endIndex) || [];
 
+  console.log(properties)
+
   // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -116,15 +130,15 @@ function getLocationLabel(properties: Property[]): string {
 
   // Handle filter change
   const handleFilterChange = (newFilters: any) => {
-    
-    
+
+
     // If newFilters is empty (clearing filters), replace instead of merge
     const isClearing = Object.keys(newFilters).length === 0;
     const updatedFilters = isClearing ? {} : { ...filters, ...newFilters };
-    
+
     setFilters(updatedFilters);
     setCurrentPage(1);
-    
+
     // If clearing filters, also clear the search query to go to "All Properties"
     if (isClearing && query.trim()) {
       console.log('SearchResults - Clearing query to go to All Properties');
@@ -140,14 +154,14 @@ function getLocationLabel(properties: Property[]): string {
 
   return (
     <>
-      <Meta 
+      <Meta
         title={hasSearchCriteria ? (query ? `${query} - Search Results | StayDirectly` : 'Filtered Properties | StayDirectly') : 'All Properties | StayDirectly'}
         description={`Browse ${totalItems} properties ${hasSearchCriteria ? (query ? `matching "${query}"` : 'with your selected filters') : 'available for booking'} - book directly with hosts and save on fees.`}
         canonical={`/search${hasSearchCriteria ? (query ? `?q=${query}` : '') : ''}`}
       />
-      
+
       {properties && properties.length > 0 && (
-        <SearchResultsStructuredData 
+        <SearchResultsStructuredData
           query={hasSearchCriteria ? (query || 'Filtered Properties') : 'All Properties'}
           resultCount={properties.length}
           properties={properties.map(property => ({
@@ -169,40 +183,40 @@ function getLocationLabel(properties: Property[]): string {
           <h1 className="text-3xl font-bold">
             {hasSearchCriteria ? (query ? `Properties matching "${query}"` : 'Filtered Properties') : 'All Properties'}
           </h1>
-          
+
           {/* View toggle */}
           <div className="flex items-center space-x-2 bg-white rounded-lg shadow-sm p-1">
-            <Button 
-              variant={viewMode === 'grid' ? 'default' : 'ghost'} 
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setViewMode('grid')}
               className="w-10 h-10 p-0"
             >
               <Grid className="h-4 w-4" />
             </Button>
-            <Button 
-              variant={viewMode === 'map' ? 'default' : 'ghost'} 
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setViewMode('map')}
-              className="w-10 h-10 p-0"
+              className="w-10 h-10 p-0 md:flex hidden"
             >
               <Map className="h-4 w-4" />
             </Button>
           </div>
         </div>
-        
+
         {/* Filter Section */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
           <FilterList onFilterChange={handleFilterChange} currentFilters={filters} />
         </div>
-        
+
         {/* Results Count */}
         <p className="text-gray-600 mb-4">
-          {isReallyLoading ? 'Searching...' : 
-           isError ? 'Error loading results' :
-           `Showing ${startIndex + 1}-${endIndex} of ${totalItems} properties`}
+          {isReallyLoading ? 'Searching...' :
+            isError ? 'Error loading results' :
+              `Showing ${startIndex + 1}-${endIndex} of ${totalItems} properties`}
         </p>
-        
+
         {/* Map and results container - responsive layout for all screen sizes */}
         <div className={`flex flex-col ${viewMode === 'map' ? 'lg:flex-row' : ''} gap-6 mb-12`}>
           {/* Properties grid - either full width or left side depending on view mode */}
@@ -233,32 +247,39 @@ function getLocationLabel(properties: Property[]): string {
                 <p className="text-gray-600">Try adjusting your search or filters</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${viewMode === 'map' ? '' : 'lg:grid-cols-5'} gap-6`}>
                 {currentItems.map((property) => (
-                  <PropertyCard 
-                    key={property.id} 
-                    property={property} 
-                    totalPrice 
+                  <PropertyCard
+                    key={property.id}
+                    property={property}
+                    totalPrice
                   />
                 ))}
               </div>
             )}
-            
+
             {/* Pagination */}
             {!isReallyLoading && !isError && properties && properties.length > 0 && (
-              <div className="mt-8">
-                <SearchPagination 
-                  currentPage={currentPage} 
-                  totalPages={totalPages} 
-                  onPageChange={handlePageChange} 
-                />
+              <div className="mt-8 pt-6 border-t border-gray-200 w-full">
+                
+                {totalPages > 1 ? (
+                  <SearchPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                ) : (
+                  <div className="text-center text-gray-500 text-sm">
+                    Showing all {totalItems} properties
+                  </div>
+                )}
               </div>
             )}
           </div>
-          
-          {/* Map view - either hidden, full width on mobile or right side on desktop */}
+
+          {/* Map view - hidden on small screens, full width on mobile or right side on desktop */}
           {viewMode === 'map' && (
-            <div className="order-1 lg:order-2 lg:w-2/5 h-[400px] lg:h-[calc(100vh-240px)] lg:min-h-[600px] lg:sticky lg:top-6 bg-gray-100 rounded-lg shadow-sm overflow-hidden">
+            <div className="hidden md:block order-1 lg:order-2 lg:w-2/5 h-[400px] lg:h-[calc(100vh-240px)] lg:min-h-[600px] lg:sticky lg:top-6 bg-gray-100 rounded-lg shadow-sm overflow-hidden">
               {isReallyLoading ? (
                 <div className="flex items-center justify-center h-full bg-gray-100">
                   <div className="text-center">
@@ -271,22 +292,22 @@ function getLocationLabel(properties: Property[]): string {
                   <p className="text-red-500">Error loading map</p>
                 </div>
               ) : properties && properties.length > 0 ? (
-                <GoogleMapView 
+                <GoogleMapView
                   properties={properties}
                   height="100%"
                   center={
                     properties.length > 0
                       ? [
-                          properties.reduce((sum, p) => sum + (p.latitude || 0), 0) / properties.length,
-                          properties.reduce((sum, p) => sum + (p.longitude || 0), 0) / properties.length
-                        ]
+                        properties.reduce((sum, p) => sum + (p.latitude || 0), 0) / properties.length,
+                        properties.reduce((sum, p) => sum + (p.longitude || 0), 0) / properties.length
+                      ]
                       : [25.7617, -80.1918] // fallback to Miami
                   }
                   zoom={12}
                   onMarkerClick={(property) => {
                     // Set the selected property
                     setSelectedProperty(property.id);
-                    
+
                     // Find the element and scroll to it
                     const element = document.getElementById(`property-${property.id}`);
                     if (element) {
@@ -294,20 +315,20 @@ function getLocationLabel(properties: Property[]): string {
                       document.querySelectorAll('.property-highlight').forEach(el => {
                         el.classList.remove('property-highlight');
                       });
-                      
+
                       // Add highlight class to the selected property card
                       const card = element.querySelector('.card-hover');
                       if (card) {
                         card.classList.add('property-highlight');
                       }
-                      
+
                       // Scroll to the element
-                      element.scrollIntoView({ 
-                        behavior: 'smooth', 
+                      element.scrollIntoView({
+                        behavior: 'smooth',
                         block: 'center'
                       });
                     }
-                    
+
                     // Auto-clear the highlight after 3 seconds
                     setTimeout(() => {
                       document.querySelectorAll('.property-highlight').forEach(el => {
@@ -322,7 +343,7 @@ function getLocationLabel(properties: Property[]): string {
                   <p className="text-gray-500">No properties to display on map</p>
                 </div>
               )}
-              
+
               {/* Info overlay */}
               <div className="absolute bottom-4 left-4 right-4 bg-white bg-opacity-90 p-3 rounded-lg shadow-sm z-[1000]">
                 <h3 className="font-medium text-sm md:text-base mb-1">

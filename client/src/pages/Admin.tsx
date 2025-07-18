@@ -22,16 +22,16 @@ const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   
   // Query properties for dashboard stats
-  const { data: properties } = useQuery({
+  const { data: properties } = useQuery<any[]>({
     queryKey: ['/api/properties'],
   });
 
   // Calculate dashboard stats
   const stats = {
     totalProperties: properties?.length || 0,
-    fullyConfigured: properties?.filter(p => p.bookingWidgetUrl && p.reviewWidgetCode).length || 0,
-    needsSetup: properties?.filter(p => !p.bookingWidgetUrl || !p.reviewWidgetCode).length || 0,
-    published: properties?.filter(p => p.publishedAt).length || 0,
+    fullyConfigured: properties?.filter((p: any) => p.bookingWidgetUrl && p.reviewWidgetCode).length || 0,
+    needsSetup: properties?.filter((p: any) => !p.bookingWidgetUrl || !p.reviewWidgetCode).length || 0,
+    published: properties?.filter((p: any) => p.publishedAt).length || 0,
   };
   
   return (

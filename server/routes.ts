@@ -195,7 +195,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
           .json({ error: "Places API error", details: text });
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
       res.json(data.places || []);
     } catch (err) {
       console.error("Server error fetching nearby places:", err);
@@ -402,8 +402,10 @@ Sitemap: https://staydirectly.com/sitemap.xml
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 4;
       const cities = await storage.getFeaturedCities(limit);
+      console.log(`Returning ${cities.length} cities with active properties`);
       res.json(cities);
     } catch (error) {
+      console.error("Error fetching featured cities:", error);
       res.status(500).json({ message: "Failed to fetch featured cities" });
     }
   });

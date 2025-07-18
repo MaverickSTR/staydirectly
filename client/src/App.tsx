@@ -61,7 +61,7 @@ function Router() {
   const isHomePage = location === "/";
   const mainClasses = isHomePage 
     ? "flex-grow " 
-    : "flex-grow w-[95%] md:w-[90%] mx-auto py-20";
+    : "flex-grow w-[95%] mx-auto py-20";
 
   return (
     <div className="flex flex-col min-h-screen">

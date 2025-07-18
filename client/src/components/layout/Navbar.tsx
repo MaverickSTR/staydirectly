@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
   const isHomePage = location === '/';
 
   return (
-    <header className="headerGlass fixed top-0 left-1/2 transform -translate-x-1/2 z-50  shadow-sm w-[90%] rounded-md mt-2">
+    <header className="headerGlass fixed top-0 left-1/2 transform -translate-x-1/2 z-50  shadow-sm w-[95%] rounded-md mt-2">
       <div className="container mx-auto px-4 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}

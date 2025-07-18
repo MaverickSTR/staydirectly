@@ -146,9 +146,11 @@ export class DatabaseStorage implements IStorage {
     externalId: string,
     propertyData: Partial<InsertProperty>
   ): Promise<Property | undefined> {
+    // Filter out bedroomDetails if it's not properly typed
+    const { bedroomDetails, ...filteredData } = propertyData;
     const [updatedProperty] = await db
       .update(properties)
-      .set({ ...propertyData, updatedAt: new Date() })
+      .set({ ...filteredData, updatedAt: new Date() })
       .where(eq(properties.externalId, externalId))
       .returning();
     return updatedProperty;
@@ -250,9 +252,12 @@ export class DatabaseStorage implements IStorage {
         .replace(/(^-|-$)/g, "");
     }
 
+    // Filter out bedroomDetails if it's not properly typed
+    const { bedroomDetails, ...filteredProperty } = property;
+
     const [createdProperty] = await db
       .insert(properties)
-      .values(property)
+      .values(filteredProperty)
       .returning();
 
     return createdProperty;
@@ -262,9 +267,12 @@ export class DatabaseStorage implements IStorage {
     id: number,
     property: Partial<InsertProperty>
   ): Promise<Property | undefined> {
+    // Filter out bedroomDetails if it's not properly typed
+    const { bedroomDetails, ...filteredProperty } = property;
+
     const [updatedProperty] = await db
       .update(properties)
-      .set(property)
+      .set(filteredProperty)
       .where(eq(properties.id, id))
       .returning();
 
@@ -290,11 +298,65 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getFeaturedCities(limit = 4): Promise<City[]> {
-    return await db
-      .select()
-      .from(cities)
-      .where(eq(cities.featured, true))
-      .limit(limit);
+    try {
+      // Get cities that have active properties, with property counts
+      const citiesWithPropertyCounts = await db
+        .select({
+          id: cities.id,
+          name: cities.name,
+          country: cities.country,
+          state: cities.state,
+          description: cities.description,
+          longDescription: cities.longDescription,
+          latitude: cities.latitude,
+          longitude: cities.longitude,
+          imageUrl: cities.imageUrl,
+          additionalImages: cities.additionalImages,
+          propertyCount: sql<number>`count(${properties.id})`.as(
+            "propertyCount"
+          ),
+          featured: cities.featured,
+          slug: cities.slug,
+          metaTitle: cities.metaTitle,
+          metaDescription: cities.metaDescription,
+          keywords: cities.keywords,
+          createdAt: cities.createdAt,
+          updatedAt: cities.updatedAt,
+        })
+        .from(cities)
+        .leftJoin(properties, eq(cities.name, properties.city))
+        .where(eq(properties.isActive, true))
+        .groupBy(
+          cities.id,
+          cities.name,
+          cities.country,
+          cities.state,
+          cities.description,
+          cities.longDescription,
+          cities.latitude,
+          cities.longitude,
+          cities.imageUrl,
+          cities.additionalImages,
+          cities.featured,
+          cities.slug,
+          cities.metaTitle,
+          cities.metaDescription,
+          cities.keywords,
+          cities.createdAt,
+          cities.updatedAt
+        )
+        .orderBy(desc(sql<number>`count(${properties.id})`))
+        .limit(limit);
+
+      console.log(
+        `Found ${citiesWithPropertyCounts.length} cities with active properties`
+      );
+      return citiesWithPropertyCounts;
+    } catch (error) {
+      console.error("Error in getFeaturedCities:", error);
+      // Fallback: return empty array instead of crashing
+      return [];
+    }
   }
 
   async getCity(id: number): Promise<City | undefined> {

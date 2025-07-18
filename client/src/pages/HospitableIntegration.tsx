@@ -3,7 +3,7 @@ import { Link } from 'wouter';
 import { HospitableListingImporter } from '@/components/hospitable';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Property } from '@/types';
+import { Property } from '@shared/schema';
 
 export default function HospitableIntegration() {
   const [importedProperties, setImportedProperties] = useState<Property[]>([]);

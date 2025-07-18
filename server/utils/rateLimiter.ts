@@ -2,15 +2,23 @@
 
 import rateLimit, { Options as RateLimitOptions } from "express-rate-limit";
 import slowDown from "express-slow-down";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import fs from "fs";
 import path from "path";
 
 // Extend Express Request type to include 'user' property
 declare module "express-serve-static-core" {
   interface Request {
-    user?: { id?: string };
+    user?: {
+      id?: string;
+      email?: string;
+      role?: string;
+      permissions?: string[];
+      apiKey?: string;
+    };
     suspiciousActivity?: boolean;
+    isAuthenticated?: boolean;
+    authMethod?: "jwt" | "apikey" | "session";
   }
 }
 
@@ -79,7 +87,7 @@ setInterval(() => {
 export const ipBlacklistMiddleware = (
   req: Request,
   res: Response,
-  next: Function
+  next: NextFunction
 ) => {
   const clientIP = req.ip || req.connection.remoteAddress || "unknown";
 
@@ -237,7 +245,7 @@ export const createEnhancedRateLimiter = (config: {
 export const suspiciousActivityMiddleware = (
   req: Request,
   res: Response,
-  next: Function
+  next: NextFunction
 ) => {
   const isSuspicious = detectSuspiciousActivity(req);
 
@@ -329,7 +337,7 @@ export function createCustomRateLimiter(options: {
       })
     : null;
 
-  return (req: Request, res: Response, next: Function) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     // Skip certain paths if specified
     if (
       options.skipPaths &&

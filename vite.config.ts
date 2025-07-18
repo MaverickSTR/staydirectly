@@ -21,6 +21,8 @@ export default defineConfig(async ({ mode }) => {
           ]
         : []),
     ],
+    // Enable Turbo Pack for faster development builds
+    bundler: "turbopack",
     resolve: {
       alias: {
         // Client paths - matching TypeScript paths

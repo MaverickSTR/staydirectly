@@ -1,18 +1,24 @@
-import { useState, useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { onboardingFlow, OnboardingFlowStatus } from '@/lib/hospitable/onboarding-flow';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useCallback } from "react";
+import { useMutation } from "@tanstack/react-query";
+import {
+  onboardingFlow,
+  OnboardingFlowStatus,
+} from "@/lib/hospitable/onboarding-flow";
+import { useToast } from "@/hooks/use-toast";
 
 const STEP_DESCRIPTIONS = {
-  [OnboardingFlowStatus.NOT_STARTED]: 'Starting the onboarding flow...',
-  [OnboardingFlowStatus.CUSTOMER_CREATED]: 'Customer account created in Hospitable',
-  [OnboardingFlowStatus.AUTH_LINK_GENERATED]: 'Authorization link generated',
-  [OnboardingFlowStatus.AUTHORIZED]: 'Successfully authorized with Hospitable',
-  [OnboardingFlowStatus.LISTINGS_FETCHED]: 'Property listings fetched from Hospitable',
-  [OnboardingFlowStatus.LISTINGS_STORED]: 'Property listings stored in database',
-  [OnboardingFlowStatus.IMAGES_FETCHED]: 'Property images fetched and stored',
-  [OnboardingFlowStatus.COMPLETED]: 'Onboarding process completed successfully',
-  [OnboardingFlowStatus.ERROR]: 'An error occurred during onboarding'
+  [OnboardingFlowStatus.NOT_STARTED]: "Starting the onboarding flow...",
+  [OnboardingFlowStatus.CUSTOMER_CREATED]:
+    "Customer account created in Hospitable",
+  [OnboardingFlowStatus.AUTH_LINK_GENERATED]: "Authorization link generated",
+  [OnboardingFlowStatus.AUTHORIZED]: "Successfully authorized with Hospitable",
+  [OnboardingFlowStatus.LISTINGS_FETCHED]:
+    "Property listings fetched from Hospitable",
+  [OnboardingFlowStatus.LISTINGS_STORED]:
+    "Property listings stored in database",
+  [OnboardingFlowStatus.IMAGES_FETCHED]: "Property images fetched and stored",
+  [OnboardingFlowStatus.COMPLETED]: "Onboarding process completed successfully",
+  [OnboardingFlowStatus.ERROR]: "An error occurred during onboarding",
 };
 
 export function useOnboardingFlow() {
@@ -20,10 +26,10 @@ export function useOnboardingFlow() {
   const [currentStep, setCurrentStep] = useState<OnboardingFlowStatus>(
     onboardingFlow.getState().status
   );
-  
+
   // Load the current state from localStorage on mount
   const flowState = onboardingFlow.getState();
-  
+
   // Create customer mutation
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
@@ -34,20 +40,20 @@ export function useOnboardingFlow() {
     },
     onSuccess: (customerId) => {
       toast({
-        title: 'Customer Created',
+        title: "Customer Created",
         description: `Customer created with ID: ${customerId}`,
       });
     },
     onError: (error: Error) => {
       setCurrentStep(OnboardingFlowStatus.ERROR);
       toast({
-        title: 'Error Creating Customer',
+        title: "Error Creating Customer",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Generate authorization link mutation
   const generateAuthLinkMutation = useMutation({
     mutationFn: async (customerId: string) => {
@@ -58,20 +64,20 @@ export function useOnboardingFlow() {
     },
     onSuccess: (authLink) => {
       toast({
-        title: 'Auth Link Generated',
-        description: 'Authorization link generated successfully',
+        title: "Auth Link Generated",
+        description: "Authorization link generated successfully",
       });
     },
     onError: (error: Error) => {
       setCurrentStep(OnboardingFlowStatus.ERROR);
       toast({
-        title: 'Error Generating Auth Link',
+        title: "Error Generating Auth Link",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Fetch listings mutation
   const fetchListingsMutation = useMutation({
     mutationFn: async (customerId: string) => {
@@ -82,20 +88,20 @@ export function useOnboardingFlow() {
     },
     onSuccess: (listings) => {
       toast({
-        title: 'Listings Fetched',
+        title: "Listings Fetched",
         description: `Successfully fetched ${listings.length} listings`,
       });
     },
     onError: (error: Error) => {
       setCurrentStep(OnboardingFlowStatus.ERROR);
       toast({
-        title: 'Error Fetching Listings',
+        title: "Error Fetching Listings",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Store listings mutation
   const storeListingsMutation = useMutation({
     mutationFn: async (customerId: string) => {
@@ -106,20 +112,20 @@ export function useOnboardingFlow() {
     },
     onSuccess: (properties) => {
       toast({
-        title: 'Listings Stored',
+        title: "Listings Stored",
         description: `Successfully stored ${properties.length} properties`,
       });
     },
     onError: (error: Error) => {
       setCurrentStep(OnboardingFlowStatus.ERROR);
       toast({
-        title: 'Error Storing Listings',
+        title: "Error Storing Listings",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Fetch images mutation
   const fetchImagesMutation = useMutation({
     mutationFn: async (customerId: string) => {
@@ -131,27 +137,27 @@ export function useOnboardingFlow() {
     onSuccess: (success) => {
       if (success) {
         toast({
-          title: 'Images Fetched',
-          description: 'Successfully fetched property images',
+          title: "Images Fetched",
+          description: "Successfully fetched property images",
         });
       } else {
         toast({
-          title: 'Image Fetch Incomplete',
-          description: 'Some images could not be fetched',
-          variant: 'warning',
+          title: "Image Fetch Incomplete",
+          description: "Some images could not be fetched",
+          variant: "destructive",
         });
       }
     },
     onError: (error: Error) => {
       setCurrentStep(OnboardingFlowStatus.ERROR);
       toast({
-        title: 'Error Fetching Images',
+        title: "Error Fetching Images",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Publish properties mutation
   const publishPropertiesMutation = useMutation({
     mutationFn: async (customerId: string) => {
@@ -163,21 +169,21 @@ export function useOnboardingFlow() {
     onSuccess: (success) => {
       if (success) {
         toast({
-          title: 'Properties Published',
-          description: 'Properties are now live on the site',
+          title: "Properties Published",
+          description: "Properties are now live on the site",
         });
       }
     },
     onError: (error: Error) => {
       setCurrentStep(OnboardingFlowStatus.ERROR);
       toast({
-        title: 'Error Publishing Properties',
+        title: "Error Publishing Properties",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Run full flow mutation
   const runFullFlowMutation = useMutation({
     mutationFn: async (customerData: any) => {
@@ -188,44 +194,44 @@ export function useOnboardingFlow() {
       if (success) {
         setCurrentStep(OnboardingFlowStatus.COMPLETED);
         toast({
-          title: 'Onboarding Completed',
-          description: 'The onboarding process completed successfully',
+          title: "Onboarding Completed",
+          description: "The onboarding process completed successfully",
         });
       } else {
         setCurrentStep(OnboardingFlowStatus.ERROR);
         toast({
-          title: 'Onboarding Failed',
-          description: 'The onboarding process could not be completed',
-          variant: 'destructive',
+          title: "Onboarding Failed",
+          description: "The onboarding process could not be completed",
+          variant: "destructive",
         });
       }
     },
     onError: (error: Error) => {
       setCurrentStep(OnboardingFlowStatus.ERROR);
       toast({
-        title: 'Onboarding Error',
+        title: "Onboarding Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Reset the flow
   const resetFlow = useCallback(() => {
     onboardingFlow.reset();
     setCurrentStep(OnboardingFlowStatus.NOT_STARTED);
     toast({
-      title: 'Flow Reset',
-      description: 'The onboarding flow has been reset',
+      title: "Flow Reset",
+      description: "The onboarding flow has been reset",
     });
   }, [toast]);
-  
+
   return {
     // Current state
     currentStep,
     currentStepDescription: STEP_DESCRIPTIONS[currentStep],
     flowState,
-    
+
     // Mutations for individual steps
     createCustomerMutation,
     generateAuthLinkMutation,
@@ -233,42 +239,42 @@ export function useOnboardingFlow() {
     storeListingsMutation,
     fetchImagesMutation,
     publishPropertiesMutation,
-    
+
     // Full flow mutation
     runFullFlowMutation,
-    
+
     // Other utilities
     resetFlow,
-    
+
     // Progress indicators
-    isLoading: 
-      createCustomerMutation.isPending || 
-      generateAuthLinkMutation.isPending || 
+    isLoading:
+      createCustomerMutation.isPending ||
+      generateAuthLinkMutation.isPending ||
       fetchListingsMutation.isPending ||
       storeListingsMutation.isPending ||
       fetchImagesMutation.isPending ||
       publishPropertiesMutation.isPending ||
       runFullFlowMutation.isPending,
-      
+
     isError:
-      createCustomerMutation.isError || 
-      generateAuthLinkMutation.isError || 
+      createCustomerMutation.isError ||
+      generateAuthLinkMutation.isError ||
       fetchListingsMutation.isError ||
       storeListingsMutation.isError ||
       fetchImagesMutation.isError ||
       publishPropertiesMutation.isError ||
       runFullFlowMutation.isError ||
       currentStep === OnboardingFlowStatus.ERROR,
-      
+
     error:
-      createCustomerMutation.error || 
-      generateAuthLinkMutation.error || 
+      createCustomerMutation.error ||
+      generateAuthLinkMutation.error ||
       fetchListingsMutation.error ||
       storeListingsMutation.error ||
       fetchImagesMutation.error ||
       publishPropertiesMutation.error ||
       runFullFlowMutation.error,
-      
-    isComplete: currentStep === OnboardingFlowStatus.COMPLETED
+
+    isComplete: currentStep === OnboardingFlowStatus.COMPLETED,
   };
 }

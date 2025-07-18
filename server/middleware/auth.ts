@@ -17,6 +17,7 @@ declare module "express-serve-static-core" {
     };
     isAuthenticated?: boolean;
     authMethod?: "jwt" | "apikey" | "session";
+    suspiciousActivity?: boolean;
   }
 }
 
@@ -79,7 +80,7 @@ const apiKeys = new Map<
 >();
 
 // JWT secret
-const JWT_SECRET =
+const JWT_SECRET: string =
   process.env.JWT_SECRET || "your-super-secret-jwt-key-change-in-production";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 
@@ -159,7 +160,7 @@ export const generateJWT = (payload: {
     expiresIn: JWT_EXPIRES_IN,
     issuer: "staydirectly-api",
     audience: "staydirectly-client",
-  });
+  } as jwt.SignOptions);
 };
 
 export const verifyJWT = (token: string): any => {
@@ -504,4 +505,4 @@ export const loginSchema = z.object({
   password: z.string().min(8),
 });
 
-export { UserRole, Permission, ROLE_PERMISSIONS };
+// UserRole and Permission are already exported above

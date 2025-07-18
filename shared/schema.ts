@@ -1,4 +1,15 @@
-import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision, jsonb, varchar, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  timestamp,
+  doublePrecision,
+  jsonb,
+  varchar,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -38,7 +49,7 @@ export const properties = pgTable("properties", {
   neighborhood: text("neighborhood"),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),
-  
+
   // Property details
   price: integer("price").notNull(), // price per night
   weekendPrice: integer("weekend_price"),
@@ -49,11 +60,11 @@ export const properties = pgTable("properties", {
   taxRate: doublePrecision("tax_rate"),
   minStay: integer("min_stay").default(1),
   maxStay: integer("max_stay"),
-  
+
   // Ratings and reviews
   rating: doublePrecision("rating"), // average rating
   reviewCount: integer("review_count").default(0),
-  
+
   // Property characteristics
   type: text("type").default("Apartment"), // Type of property (Apartment, Villa, House, etc.)
   propertySize: integer("property_size"), // in square feet
@@ -64,61 +75,60 @@ export const properties = pgTable("properties", {
   amenities: text("amenities").array(),
   featuredAmenities: text("featured_amenities").array(),
   capacity: jsonb("capacity").$type<{
-    max: number;      // Maximum number of guests
-    beds: number;     // Total number of beds
+    max: number; // Maximum number of guests
+    beds: number; // Total number of beds
     bedrooms: number; // Number of bedrooms
     bathrooms: number; // Number of bathrooms
   }>(),
   bedroomDetails: jsonb("bedroom_details").$type<Array<{
     id: number;
     name: string;
-    beds: Array<{type: string; count: number}>;
+    beds: Array<{ type: string; count: number }>;
     image: string;
-  }>>(),
-  
+  }> | null>(),
+
   // Media
   imageUrl: text("image_url").notNull(),
   additionalImages: text("additional_images").array(), // array of image URLs
   videoUrl: text("video_url"),
   virtualTourUrl: text("virtual_tour_url"),
   imagesStoredAt: timestamp("images_stored_at"), // When images were last downloaded and stored
-  
+
   // Host information
   hostId: integer("host_id").notNull(),
   hostName: text("host_name").notNull(),
   hostImage: text("host_image"),
-  
+
   // Widgets and integrations
   bookingWidgetUrl: text("booking_widget_url"), // URL for property-specific booking widget
   reviewWidgetCode: text("review_widget_code"), // Widget code for Revyoos
   calendarSyncUrl: text("calendar_sync_url"), // iCal feed URL
   propertyManagementSystemId: text("pms_id"), // ID in external property management system
   channelManagerId: text("channel_manager_id"), // ID in external channel manager
-  
+
   // External API data
   externalId: text("external_id"), // ID from the external API
   externalSource: text("external_source"), // Source of the external data (e.g., "airbnb", "vrbo")
   platformId: text("platform_id"), // Combined ID format: "customerId:listingId" for Hospitable API
   lastSyncedAt: timestamp("last_synced_at"),
-  
+
   // SEO fields
   slug: text("slug").unique(), // URL-friendly version of the name
   metaTitle: text("meta_title"), // Custom SEO title
   metaDescription: text("meta_description"), // Custom SEO description
   canonicalUrl: text("canonical_url"), // Custom canonical URL
   keywords: text("keywords").array(), // SEO keywords
-  
+
   // Flags and status
   isFeatured: boolean("is_featured").default(false),
   isActive: boolean("is_active").default(true),
   isVerified: boolean("is_verified").default(false),
   status: text("status").default("active"), // active, pending, inactive
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   publishedAt: timestamp("published_at"),
-  
 });
 
 // Define relations for properties
@@ -145,13 +155,13 @@ export const cities = pgTable("cities", {
   additionalImages: text("additional_images").array(),
   propertyCount: integer("property_count").default(0),
   featured: boolean("featured").default(false),
-  
+
   // SEO fields
   slug: text("slug").unique(),
   metaTitle: text("meta_title"),
   metaDescription: text("meta_description"),
   keywords: text("keywords").array(),
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -201,12 +211,12 @@ export const neighborhoods = pgTable("neighborhoods", {
   imageUrl: text("image_url").notNull(),
   additionalImages: text("additional_images").array(),
   propertyCount: integer("property_count").default(0),
-  
+
   // SEO fields
   slug: text("slug").unique(),
   metaTitle: text("meta_title"),
   metaDescription: text("meta_description"),
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -250,7 +260,9 @@ export const apiIntegrations = pgTable("api_integrations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertApiIntegrationSchema = createInsertSchema(apiIntegrations).omit({
+export const insertApiIntegrationSchema = createInsertSchema(
+  apiIntegrations
+).omit({
   id: true,
   createdAt: true,
   updatedAt: true,

@@ -390,8 +390,28 @@ export class MemStorage implements IStorage {
   }
 
   async getFeaturedCities(limit = 4): Promise<City[]> {
+    // Get cities that have active properties, with property counts
+    const cityPropertyCounts = new Map<string, number>();
+
+    // Count properties per city
+    Array.from(this.properties.values())
+      .filter((property) => property.isActive)
+      .forEach((property) => {
+        const cityName = property.city;
+        cityPropertyCounts.set(
+          cityName,
+          (cityPropertyCounts.get(cityName) || 0) + 1
+        );
+      });
+
+    // Get cities that have properties, sorted by property count
     return Array.from(this.cities.values())
-      .filter((city) => city.featured)
+      .filter((city) => cityPropertyCounts.has(city.name))
+      .map((city) => ({
+        ...city,
+        propertyCount: cityPropertyCounts.get(city.name) || 0,
+      }))
+      .sort((a, b) => (b.propertyCount || 0) - (a.propertyCount || 0))
       .slice(0, limit);
   }
 
