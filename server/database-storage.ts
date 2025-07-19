@@ -320,10 +320,11 @@ export class DatabaseStorage implements IStorage {
 
       if (existingCity) {
         // City exists, increment property count
+        const currentPropertyCount = existingCity.propertyCount ?? 0;
         await db
           .update(cities)
           .set({
-            propertyCount: existingCity.propertyCount + 1,
+            propertyCount: currentPropertyCount + 1,
             updatedAt: new Date(),
           })
           .where(eq(cities.id, existingCity.id));
@@ -331,7 +332,7 @@ export class DatabaseStorage implements IStorage {
         console.log(
           `[handleCityForProperty] Updated property count for ${
             property.city
-          }: ${existingCity.propertyCount + 1}`
+          }: ${currentPropertyCount + 1}`
         );
       } else {
         // City doesn't exist, create it

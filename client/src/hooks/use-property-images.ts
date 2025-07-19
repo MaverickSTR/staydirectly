@@ -7,6 +7,10 @@ import {
 } from "@/lib/hospitable/property-utils";
 import { PropertyImage } from "@/lib/hospitable/types";
 
+function isStringArray(arr: unknown): arr is string[] {
+  return Array.isArray(arr) && arr.every((item) => typeof item === "string");
+}
+
 /**
  * Hook to fetch images for a property from Hospitable
  * @param platformId The platform ID from the property (e.g., "customerId/listingId" or just "listingId")
@@ -33,49 +37,6 @@ export function usePropertyImages(
   return useQuery<PropertyImage[]>({
     queryKey: ["propertyImages", customerId, listingId, !!storedImages],
     queryFn: async () => {
-      // We'll now completely skip the database cache when we have platform ID
-      if (false && (!platformId || !customerId || !listingId)) {
-        // Completely disable DB cache for testing
-        console.log("Using complete stored images from database");
-        const images: PropertyImage[] = [];
-
-        // Add main image if it exists
-        if (storedImages && storedImages.mainImage) {
-          images.push({
-            id: "main-image",
-            url: storedImages.mainImage as string,
-            isPrimary: true,
-            position: 0,
-            caption: "",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          });
-        }
-
-        // Add additional images if they exist
-        if (
-          storedImages &&
-          storedImages.additionalImages &&
-          storedImages.additionalImages.length > 0
-        ) {
-          const additionalImageObjects = storedImages.additionalImages.map(
-            (url: string, index: number) => ({
-              id: `additional-${index}`,
-              url,
-              isPrimary: false,
-              position: index + 1,
-              caption: "",
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            })
-          );
-
-          images.push(...additionalImageObjects);
-        }
-
-        return images;
-      }
-
       // If no stored images or we need fresh data, fetch from API
       if (!customerId || !listingId) {
         console.warn("Missing customerId or listingId in usePropertyImages");

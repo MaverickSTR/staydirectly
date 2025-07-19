@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import FilterButton from '@/components/ui/FilterButton';
@@ -28,15 +28,18 @@ interface FilterListProps {
 const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters }) => {
   const [location, setLocation] = useLocation();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  
+  const [isPricePopoverOpen, setIsPricePopoverOpen] = useState(false);
+
   // Add console log to see current filters
   console.log('FilterList - Current filters:', currentFilters);
-  
+
   // Price range filter
   const [priceRange, setPriceRange] = useState<[number, number]>([
     currentFilters.minPrice || 0,
     currentFilters.maxPrice || 1000
   ]);
+
+  const [tempPriceRange, setTempPriceRange] = useState<[number, number]>(priceRange);
 
   // City filter
   const [city, setCity] = useState<string>(
@@ -73,12 +76,12 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
     console.log('FilterList - Applying new filters:', newFilters);
     const filters = { ...currentFilters, ...newFilters };
     console.log('FilterList - Combined filters:', filters);
-    
+
     onFilterChange(filters);
-    
+
     // Update URL with filters
     const params = new URLSearchParams(location.split('?')[1] || '');
-    
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params.set(key, String(value));
@@ -86,11 +89,11 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
         params.delete(key);
       }
     });
-    
+
     const newLocation = location.split('?')[0] + (params.toString() ? `?${params.toString()}` : '');
     console.log('FilterList - New location:', newLocation);
     setLocation(newLocation);
-    
+
     // Close mobile sheet on filter apply (slight delay for better UX)
     setTimeout(() => setIsSheetOpen(false), 300);
   };
@@ -118,13 +121,13 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
     setBedrooms(0);
     setBathrooms(0);
     setSelectedAmenities([]);
-    
+
     // Clear ALL parameters including the search query
     const newLocation = location.split('?')[0]; // Remove all query parameters
     setLocation(newLocation);
-    
+
     onFilterChange({});
-    
+
     // Close mobile sheet when clearing filters
     setIsSheetOpen(false);
   };
@@ -136,22 +139,38 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       <Popover>
         <PopoverTrigger asChild>
           <div className="relative">
-            <FilterButton 
+            <FilterButton
               label={city || "City"}
               active={!!currentFilters.city}
               className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-2">
-          <div className="space-y-1">
+        <PopoverContent
+          className="w-56 p-2"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <div className="space-y-1" onPointerDown={(e) => e.stopPropagation()}>
+            <Button
+              variant="ghost"
+              className={`w-full justify-start text-left ${city === '' ? 'bg-gray-100 text-black' : ''
+                }`}
+              onClick={() => {
+                console.log('FilterList - Setting city: Any');
+                setCity('');
+                applyFilters({ city: undefined });
+              }}
+            >
+              Any City
+            </Button>
             {['Miami', 'New York', 'Los Angeles', 'Nashville', 'Chicago', 'San Francisco'].map((c) => (
               <Button
                 key={c}
                 variant="ghost"
-                className={`w-full justify-start text-left ${
-                  city === c ? 'bg-gray-100 text-black' : ''
-                }`}
+                className={`w-full justify-start text-left ${city === c ? 'bg-gray-100 text-black' : ''
+                  }`}
                 onClick={() => {
                   console.log('FilterList - Setting city:', c);
                   setCity(c);
@@ -169,22 +188,26 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       <Popover>
         <PopoverTrigger asChild>
           <div className="relative">
-            <FilterButton 
+            <FilterButton
               label={guests > 0 ? `${guests} Guests` : "Guests"}
               active={currentFilters.guests !== undefined && currentFilters.guests > 0}
               className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-2">
-          <div className="space-y-1">
+        <PopoverContent
+          className="w-56 p-2"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <div className="space-y-1" onPointerDown={(e) => e.stopPropagation()}>
             {[0, 1, 2, 3, 4, 5, 6, 8, 10, 12].map((num) => (
               <Button
                 key={num}
                 variant="ghost"
-                className={`w-full justify-start text-left ${
-                  guests === num ? 'bg-gray-100 text-black' : ''
-                }`}
+                className={`w-full justify-start text-left ${guests === num ? 'bg-gray-100 text-black' : ''
+                  }`}
                 onClick={() => {
                   console.log('FilterList - Setting guests:', num);
                   setGuests(num);
@@ -197,27 +220,31 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
           </div>
         </PopoverContent>
       </Popover>
-      
+
       {/* Bedrooms Filter */}
       <Popover>
         <PopoverTrigger asChild>
           <div className="relative">
-            <FilterButton 
+            <FilterButton
               label={bedrooms > 0 ? `${bedrooms}+ Bedrooms` : "Bedrooms"}
               active={currentFilters.bedrooms !== undefined && currentFilters.bedrooms > 0}
               className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-2">
-          <div className="space-y-1">
+        <PopoverContent
+          className="w-56 p-2"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <div className="space-y-1" onPointerDown={(e) => e.stopPropagation()}>
             {[0, 1, 2, 3, 4, 5].map((num) => (
               <Button
                 key={num}
                 variant="ghost"
-                className={`w-full justify-start text-left ${
-                  bedrooms === num ? 'bg-gray-100 text-black' : ''
-                }`}
+                className={`w-full justify-start text-left ${bedrooms === num ? 'bg-gray-100 text-black' : ''
+                  }`}
                 onClick={() => {
                   console.log('FilterList - Setting bedrooms:', num);
                   setBedrooms(num);
@@ -235,22 +262,26 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       <Popover>
         <PopoverTrigger asChild>
           <div className="relative">
-            <FilterButton 
+            <FilterButton
               label={bathrooms > 0 ? `${bathrooms}+ Bathrooms` : "Bathrooms"}
               active={currentFilters.bathrooms !== undefined && currentFilters.bathrooms > 0}
               className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-2">
-          <div className="space-y-1">
+        <PopoverContent
+          className="w-56 p-2"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <div className="space-y-1" onPointerDown={(e) => e.stopPropagation()}>
             {[0, 1, 1.5, 2, 2.5, 3, 4].map((num) => (
               <Button
                 key={num.toString()}
                 variant="ghost"
-                className={`w-full justify-start text-left ${
-                  bathrooms === num ? 'bg-gray-100 text-black' : ''
-                }`}
+                className={`w-full justify-start text-left ${bathrooms === num ? 'bg-gray-100 text-black' : ''
+                  }`}
                 onClick={() => {
                   console.log('FilterList - Setting bathrooms:', num);
                   setBathrooms(num);
@@ -265,56 +296,75 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       </Popover>
 
       {/* Price Range Filter */}
-      <Popover>
+              <Popover open={isPricePopoverOpen} onOpenChange={setIsPricePopoverOpen}>
         <PopoverTrigger asChild>
           <div className="relative">
-            <FilterButton 
+            <FilterButton
               label={
                 priceRange[0] === 0 && priceRange[1] === 1000
                   ? "Price Range"
                   : `${formatPrice(priceRange[0])} - ${formatPrice(priceRange[1])}`
               }
-              active={currentFilters.minPrice !== undefined || currentFilters.maxPrice !== undefined}
+              active={
+                currentFilters.minPrice !== undefined ||
+                currentFilters.maxPrice !== undefined
+              }
               className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-4">
-          <div className="space-y-4">
+
+                <PopoverContent
+          className="w-80 p-4"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onFocusOutside={(e) => e.preventDefault()}
+        >
+          <div
+            className="space-y-4"
+            style={{
+              willChange: "transform",
+              touchAction: "manipulation",
+            }}
+          >
             <h4 className="font-medium">Price Range</h4>
+
             <div className="pt-4">
               <Slider
-                defaultValue={priceRange}
                 min={0}
                 max={1000}
                 step={10}
-                value={priceRange}
-                onValueChange={(value: [number, number]) => {
-                  console.log('FilterList - Price range changing:', value);
-                  setPriceRange(value);
-                }}
+                value={tempPriceRange}
+                onValueChange={(value: number[]) => setTempPriceRange([value[0], value[1]])}
+                className="transition-all duration-150 ease-out"
+                style={{ touchAction: "pan-y", willChange: "transform" }}
               />
             </div>
-            <div className="flex justify-between">
-              <span>{formatPrice(priceRange[0])}</span>
-              <span>{formatPrice(priceRange[1])}</span>
+
+            <div className="flex justify-between text-sm">
+              <span>{formatPrice(tempPriceRange[0])}</span>
+              <span>{formatPrice(tempPriceRange[1])}</span>
             </div>
+
             <div className="flex justify-end space-x-2 pt-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="text-sm"
                 onClick={() => {
-                  console.log('FilterList - Resetting price range');
-                  setPriceRange([0, 1000]);
+                  console.log("FilterList - Resetting price range");
+                  setTempPriceRange([0, 1000]);
                 }}
               >
                 Reset
               </Button>
-              <Button 
+              <Button
                 className="text-sm"
                 onClick={() => {
-                  console.log('FilterList - Applying price range:', priceRange);
-                  applyFilters({ minPrice: priceRange[0], maxPrice: priceRange[1] });
+                  console.log("FilterList - Applying price range:", tempPriceRange);
+                  setPriceRange(tempPriceRange);
+                  applyFilters({ minPrice: tempPriceRange[0], maxPrice: tempPriceRange[1] });
+                  setIsPricePopoverOpen(false);
                 }}
               >
                 Apply
@@ -324,37 +374,43 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
         </PopoverContent>
       </Popover>
 
+
       {/* Amenities Filter */}
       <Popover>
         <PopoverTrigger asChild>
           <div className="relative">
-            <FilterButton 
+            <FilterButton
               label={selectedAmenities.length > 0 ? `Amenities (${selectedAmenities.length})` : "Amenities"}
               active={selectedAmenities.length > 0}
               className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-64 p-4">
-          <div className="space-y-4">
+        <PopoverContent
+          className="w-64 p-4"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <div className="space-y-4" onPointerDown={(e) => e.stopPropagation()}>
             <h4 className="font-medium">Amenities</h4>
             <div className="grid grid-cols-1 gap-2">
-              {['WiFi', 'Pool', 'Kitchen', 'Air Conditioning', 'Washer/Dryer', 'Free Parking', 
+              {['WiFi', 'Pool', 'Kitchen', 'Air Conditioning', 'Washer/Dryer', 'Free Parking',
                 'TV', 'Hot Tub', 'Gym', 'Pets Allowed', 'Workspace'].map((amenity) => (
-                <div key={amenity} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={`amenity-${amenity}`} 
-                    checked={selectedAmenities.includes(amenity)}
-                    onCheckedChange={() => toggleAmenity(amenity)}
-                  />
-                  <Label 
-                    htmlFor={`amenity-${amenity}`} 
-                    className="text-sm cursor-pointer"
-                  >
-                    {amenity}
-                  </Label>
-                </div>
-              ))}
+                  <div key={amenity} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`amenity-${amenity}`}
+                      checked={selectedAmenities.includes(amenity)}
+                      onCheckedChange={() => toggleAmenity(amenity)}
+                    />
+                    <Label
+                      htmlFor={`amenity-${amenity}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {amenity}
+                    </Label>
+                  </div>
+                ))}
             </div>
           </div>
         </PopoverContent>
@@ -364,22 +420,38 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       <Popover>
         <PopoverTrigger asChild>
           <div className="relative">
-            <FilterButton 
+            <FilterButton
               label={propertyType || "Property Type"}
               active={!!currentFilters.propertyType}
               className={isMobile ? "w-full" : ""}
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-2">
-          <div className="space-y-1">
+        <PopoverContent
+          className="w-56 p-2"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <div className="space-y-1" onPointerDown={(e) => e.stopPropagation()}>
+            <Button
+              variant="ghost"
+              className={`w-full justify-start text-left ${propertyType === '' ? 'bg-gray-100 text-black' : ''
+                }`}
+              onClick={() => {
+                console.log('FilterList - Setting property type: Any');
+                setPropertyType('');
+                applyFilters({ propertyType: undefined });
+              }}
+            >
+              Any Property Type
+            </Button>
             {['Apartment', 'House', 'Villa', 'Condo', 'Cabin', 'Cottage'].map((type) => (
               <Button
                 key={type}
                 variant="ghost"
-                className={`w-full justify-start text-left ${
-                  propertyType === type ? 'bg-gray-100 text-black' : ''
-                }`}
+                className={`w-full justify-start text-left ${propertyType === type ? 'bg-gray-100 text-black' : ''
+                  }`}
                 onClick={() => {
                   console.log('FilterList - Setting property type:', type);
                   setPropertyType(type);
@@ -395,8 +467,8 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
 
       {/* Clear Filters Button (only show if filters are applied) */}
       {Object.keys(currentFilters).length > 0 && (
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className={`text-black hover:text-gray-700 ${isMobile ? 'w-full' : ''}`}
           onClick={clearFilters}
         >
@@ -412,8 +484,8 @@ const FilterList: React.FC<FilterListProps> = ({ onFilterChange, currentFilters 
       <div className="lg:hidden">
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full mb-4 flex items-center gap-2"
             >
               <Filter className="h-4 w-4" />
