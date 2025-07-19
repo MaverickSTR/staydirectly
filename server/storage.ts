@@ -59,6 +59,7 @@ export interface IStorage {
   getFeaturedCities(limit?: number): Promise<City[]>;
   getCity(id: number): Promise<City | undefined>;
   getCityByName(name: string): Promise<City | undefined>;
+  getCityByNameWithPropertyCount(name: string): Promise<City | undefined>;
   createCity(city: InsertCity): Promise<City>;
   updateCity(id: number, city: Partial<InsertCity>): Promise<City | undefined>;
   deleteCity(id: number): Promise<boolean>;
@@ -344,6 +345,10 @@ export class MemStorage implements IStorage {
       lastSyncedAt: property.lastSyncedAt ?? null,
     };
     this.properties.set(id, newProperty);
+
+    // Handle city creation/update after property is created
+    await this.handleCityForProperty(newProperty);
+
     return newProperty;
   }
 
@@ -365,6 +370,10 @@ export class MemStorage implements IStorage {
       bedroomDetails: updatedBedroomDetails,
     };
     this.properties.set(id, updatedProperty);
+
+    // Handle city creation/update after property is updated
+    await this.handleCityForProperty(updatedProperty);
+
     return updatedProperty;
   }
 
@@ -377,7 +386,60 @@ export class MemStorage implements IStorage {
     );
     if (!existingProperty) return undefined;
 
-    return this.updateProperty(existingProperty.id, property);
+    const updatedProperty = await this.updateProperty(
+      existingProperty.id,
+      property
+    );
+
+    // Handle city creation/update after property is updated
+    if (updatedProperty) {
+      await this.handleCityForProperty(updatedProperty);
+    }
+
+    return updatedProperty;
+  }
+
+  /**
+   * Handle city creation or property count update when a property is created/updated
+   */
+  private async handleCityForProperty(property: Property): Promise<void> {
+    try {
+      // Check if city exists
+      const existingCity = Array.from(this.cities.values()).find(
+        (city) => city.name.toLowerCase() === property.city.toLowerCase()
+      );
+
+      if (existingCity) {
+        // City exists, increment property count
+        existingCity.propertyCount = (existingCity.propertyCount || 0) + 1;
+        existingCity.updatedAt = new Date();
+        this.cities.set(existingCity.id, existingCity);
+
+        console.log(
+          `Updated property count for ${property.city}: ${existingCity.propertyCount}`
+        );
+      } else {
+        // City doesn't exist, create it
+        const newCity: InsertCity = {
+          name: property.city,
+          country: property.country,
+          state: property.state || null,
+          description: `Properties in ${property.city}`,
+          longDescription: `Discover amazing properties in ${property.city}`,
+          imageUrl: property.imageUrl, // Use property image as city image
+          propertyCount: 1,
+          featured: false,
+          slug: property.city.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          latitude: property.latitude,
+          longitude: property.longitude,
+        };
+
+        await this.createCity(newCity);
+        console.log(`Created new city: ${property.city}`);
+      }
+    } catch (error) {
+      console.error(`Error handling city for property ${property.id}:`, error);
+    }
   }
 
   async deleteProperty(id: number): Promise<boolean> {
@@ -423,6 +485,26 @@ export class MemStorage implements IStorage {
     return Array.from(this.cities.values()).find(
       (city) => city.name.toLowerCase() === name.toLowerCase()
     );
+  }
+
+  async getCityByNameWithPropertyCount(
+    name: string
+  ): Promise<City | undefined> {
+    const city = Array.from(this.cities.values()).find(
+      (city) => city.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (!city) return undefined;
+
+    // Count properties for this city
+    const propertyCount = Array.from(this.properties.values()).filter(
+      (property) => property.city.toLowerCase() === name.toLowerCase()
+    ).length;
+
+    return {
+      ...city,
+      propertyCount,
+    };
   }
 
   async createCity(city: InsertCity): Promise<City> {
@@ -654,6 +736,28 @@ export class MemStorage implements IStorage {
         imageUrl:
           "https://images.unsplash.com/photo-1568681731043-805a5720be6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
         propertyCount: 1054,
+        featured: true,
+      },
+      {
+        name: "Miami",
+        country: "United States",
+        description: "Vibrant coastal city with beautiful beaches",
+        longDescription:
+          "Miami is a vibrant international city at Florida's southern tip. Its Cuban influence is reflected in the cafes and cigar shops that line Calle Ocho in Little Havana. On barrier islands across the turquoise waters of Biscayne Bay is Miami Beach, home to South Beach. This glamorous neighborhood is famed for its colorful art deco buildings, white sand, surfside hotels and trendsetting nightclubs.",
+        imageUrl:
+          "https://images.unsplash.com/photo-1535498730771-e735b998cd64?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWlhbWl8ZW58MHx8MHx8fDA%3D",
+        propertyCount: 0,
+        featured: true,
+      },
+      {
+        name: "Nashville",
+        country: "United States",
+        description: "Music City with southern charm and vibrant culture",
+        longDescription:
+          "Nashville, Tennessee's capital, is known as 'Music City' for its rich musical heritage. The city is home to the Grand Ole Opry, the Country Music Hall of Fame, and the famous Broadway strip lined with honky-tonks. Beyond music, Nashville offers southern hospitality, delicious hot chicken, and a growing food scene. The city combines historic charm with modern amenities.",
+        imageUrl:
+          "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
+        propertyCount: 0,
         featured: true,
       },
     ];

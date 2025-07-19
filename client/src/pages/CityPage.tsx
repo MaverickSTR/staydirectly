@@ -97,13 +97,13 @@ const CityPage: React.FC = () => {
 
   return (
     <>
-      <Meta 
+      <Meta
         title={`${city.name}, ${city.country} | StayDirectly`}
         description={city.description || `Book your stay in ${city.name} directly with hosts and avoid booking fees. Find apartments, houses, and unique accommodations in ${city.name}.`}
         canonical={getCityUrl(city.name)}
         image={city.imageUrl}
       />
-      
+
       <CityStructuredData
         name={city.name}
         description={city.description || `Explore ${city.name} vacation rentals`}
@@ -112,17 +112,17 @@ const CityPage: React.FC = () => {
         region={city.region || ''}
         propertyCount={city.propertyCount || 0}
       />
-      
+
       <div className="container mx-auto px-4 pt-6">
         {/* Breadcrumbs */}
         <Breadcrumb items={breadcrumbItems} className="mb-4" />
 
         {/* City Header */}
         <div className="relative h-[50vh] rounded-xl overflow-hidden mb-8">
-          <img 
-            src={city.imageUrl} 
-            alt={`${city.name} Skyline`} 
-            className="w-full h-full object-cover" 
+          <img
+            src={city.imageUrl}
+            alt={`${city.name} Skyline`}
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           <div className="absolute bottom-0 left-0 p-6 text-white">
@@ -155,26 +155,7 @@ const CityPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Neighborhoods */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Popular Neighborhoods</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {isLoadingNeighborhoods ? (
-              // Skeleton loading state
-              Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="relative h-48 rounded-lg bg-gray-200 animate-pulse"></div>
-              ))
-            ) : neighborhoods?.length === 0 ? (
-              <div className="col-span-3 text-center py-8 bg-gray-50 rounded-lg">
-                <p className="text-gray-600">No neighborhoods available for this city yet.</p>
-              </div>
-            ) : (
-              neighborhoods?.map((neighborhood: any) => (
-                <NeighborhoodCard key={neighborhood.id} neighborhood={neighborhood} />
-              ))
-            )}
-          </div>
-        </div>
+
 
         {/* Featured Properties */}
         <div className="mb-12">
@@ -203,15 +184,34 @@ const CityPage: React.FC = () => {
               ))
             )}
           </div>
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center mx-auto w-fit">
             <Link href={`/search?q=${cityName}`}>
-              <Button variant="outline" className="inline-block bg-white hover:bg-gray-100 text-black font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-colors">
+              <Button variant="outline" className="flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-black font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-colors">
                 View All Properties <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>
           </div>
         </div>
-        
+        {/* Neighborhoods */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Popular Neighborhoods</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {isLoadingNeighborhoods ? (
+              // Skeleton loading state
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="relative h-48 rounded-lg bg-gray-200 animate-pulse"></div>
+              ))
+            ) : neighborhoods?.length === 0 ? (
+              <div className="col-span-3 text-center py-8 bg-gray-50 rounded-lg">
+                <p className="text-gray-600">No neighborhoods available for this city yet.</p>
+              </div>
+            ) : (
+              neighborhoods?.map((neighborhood: any) => (
+                <NeighborhoodCard key={neighborhood.id} neighborhood={neighborhood} />
+              ))
+            )}
+          </div>
+        </div>
         {/* Travel Guides */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">{city.name} Travel Guides</h2>

@@ -14,9 +14,10 @@ import {
   insertReviewSchema,
   insertFavoriteSchema,
   properties,
+  cities,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
 import { setupSitemapRoutes } from "./sitemap";
 import { registerHospitableAuthRoutes } from "./hospitable-auth";
@@ -412,14 +413,19 @@ Sitemap: https://staydirectly.com/sitemap.xml
 
   app.get("/api/cities/:name", async (req: Request, res: Response) => {
     try {
-      const city = await storage.getCityByName(req.params.name);
+      const cityName = req.params.name;
+      const city = await storage.getCityByNameWithPropertyCount(cityName);
 
       if (!city) {
         return res.status(404).json({ message: "City not found" });
       }
 
+      console.log(
+        `Returning city ${city.name} with ${city.propertyCount} total properties`
+      );
       res.json(city);
     } catch (error) {
+      console.error("Error fetching city:", error);
       res.status(500).json({ message: "Failed to fetch city" });
     }
   });

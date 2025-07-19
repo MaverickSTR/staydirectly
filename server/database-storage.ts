@@ -153,6 +153,12 @@ export class DatabaseStorage implements IStorage {
       .set({ ...filteredData, updatedAt: new Date() })
       .where(eq(properties.externalId, externalId))
       .returning();
+
+    // Handle city creation/update after property is updated
+    if (updatedProperty) {
+      await this.handleCityForProperty(updatedProperty);
+    }
+
     return updatedProperty;
   }
 
@@ -260,6 +266,9 @@ export class DatabaseStorage implements IStorage {
       .values(filteredProperty)
       .returning();
 
+    // Handle city creation/update after property is created
+    await this.handleCityForProperty(createdProperty);
+
     return createdProperty;
   }
 
@@ -276,6 +285,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(properties.id, id))
       .returning();
 
+    // Handle city creation/update after property is updated
+    if (updatedProperty) {
+      await this.handleCityForProperty(updatedProperty);
+    }
+
     return updatedProperty;
   }
 
@@ -290,6 +304,62 @@ export class DatabaseStorage implements IStorage {
       .returning();
 
     return !!updatedProperty;
+  }
+
+  /**
+   * Handle city creation or property count update when a property is created/updated
+   */
+  private async handleCityForProperty(property: Property): Promise<void> {
+    try {
+      console.log(
+        `[handleCityForProperty] Processing city for property ${property.id}: ${property.city}`
+      );
+
+      // Check if city exists
+      const existingCity = await this.getCityByName(property.city);
+
+      if (existingCity) {
+        // City exists, increment property count
+        await db
+          .update(cities)
+          .set({
+            propertyCount: existingCity.propertyCount + 1,
+            updatedAt: new Date(),
+          })
+          .where(eq(cities.id, existingCity.id));
+
+        console.log(
+          `[handleCityForProperty] Updated property count for ${
+            property.city
+          }: ${existingCity.propertyCount + 1}`
+        );
+      } else {
+        // City doesn't exist, create it
+        const newCity: InsertCity = {
+          name: property.city,
+          country: property.country,
+          state: property.state || null,
+          description: `Properties in ${property.city}`,
+          longDescription: `Discover amazing properties in ${property.city}`,
+          imageUrl: property.imageUrl, // Use property image as city image
+          propertyCount: 1,
+          featured: false,
+          slug: property.city.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          latitude: property.latitude,
+          longitude: property.longitude,
+        };
+
+        await this.createCity(newCity);
+        console.log(
+          `[handleCityForProperty] Created new city: ${property.city}`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `[handleCityForProperty] Error handling city for property ${property.id}:`,
+        error
+      );
+    }
   }
 
   // Cities
@@ -370,6 +440,71 @@ export class DatabaseStorage implements IStorage {
       .from(cities)
       .where(ilike(cities.name, name));
     return city;
+  }
+
+  async getCityByNameWithPropertyCount(
+    name: string
+  ): Promise<City | undefined> {
+    try {
+      // Get city with property count like featured cities
+      const citiesWithPropertyCounts = await db
+        .select({
+          id: cities.id,
+          name: cities.name,
+          country: cities.country,
+          state: cities.state,
+          description: cities.description,
+          longDescription: cities.longDescription,
+          latitude: cities.latitude,
+          longitude: cities.longitude,
+          imageUrl: cities.imageUrl,
+          additionalImages: cities.additionalImages,
+          propertyCount: sql<number>`count(${properties.id})`.as(
+            "propertyCount"
+          ),
+          featured: cities.featured,
+          slug: cities.slug,
+          metaTitle: cities.metaTitle,
+          metaDescription: cities.metaDescription,
+          keywords: cities.keywords,
+          createdAt: cities.createdAt,
+          updatedAt: cities.updatedAt,
+        })
+        .from(cities)
+        .leftJoin(properties, eq(cities.name, properties.city))
+        .where(ilike(cities.name, name))
+        .groupBy(
+          cities.id,
+          cities.name,
+          cities.country,
+          cities.state,
+          cities.description,
+          cities.longDescription,
+          cities.latitude,
+          cities.longitude,
+          cities.imageUrl,
+          cities.additionalImages,
+          cities.featured,
+          cities.slug,
+          cities.metaTitle,
+          cities.metaDescription,
+          cities.keywords,
+          cities.createdAt,
+          cities.updatedAt
+        );
+
+      if (citiesWithPropertyCounts.length === 0) {
+        return undefined;
+      }
+
+      console.log(
+        `Found city ${citiesWithPropertyCounts[0].name} with ${citiesWithPropertyCounts[0].propertyCount} total properties`
+      );
+      return citiesWithPropertyCounts[0];
+    } catch (error) {
+      console.error("Error in getCityByNameWithPropertyCount:", error);
+      return undefined;
+    }
   }
 
   async createCity(city: InsertCity): Promise<City> {

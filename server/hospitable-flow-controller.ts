@@ -603,8 +603,13 @@ export async function markPropertiesForPublishing(
             status: "active",
           };
           // Create new property
+          console.log(
+            `[markPropertiesForPublishing] Creating property for city: ${propertyData.city}`
+          );
           property = await storage.createProperty(propertyData);
-          // console.log("Created new property for", platformId);
+          console.log(
+            `[markPropertiesForPublishing] Created property with ID: ${property.id} for city: ${property.city}`
+          );
         } else {
           // Mark as published
           property = await storage.updateProperty(property.id, {
