@@ -4,7 +4,6 @@ import { useProperty, usePropertyReviews } from '@/lib/api';
 import { getIdFromSlug, slugify } from '@/lib/slugify';
 import { RevyoosDirectEmbed } from '@/components/reviews';
 import { PropertyGallery, AirbnbImageOptimizer, NearbyPlaces } from '@/components/property';
-import BookingWidget from '@/components/property/BookingWidget';
 import { GoogleMapView } from '@/components/map';
 import { Meta, PropertyStructuredData } from '@/lib/seo';
 import Breadcrumb from '@/components/ui/Breadcrumb';
@@ -305,23 +304,19 @@ const PropertyDetail: React.FC = () => {
           </div>
 
           {/* Booking Column */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <div className="bg-white p-6 rounded-lg shadow-sm mb-4">
-                <div className="booking-widget-container w-full overflow-hidden">
-                  <BookingWidget
-                    url={property.bookingWidgetUrl}
-                    propertyName={property.name}
-                    propertyId={property.id}
-                  />
-                </div>
-              </div>
-            </div>
+          <div className="sticky top-24 h-fit">
+            <iframe
+              id="booking-iframe"
+              sandbox="allow-top-navigation allow-scripts allow-same-origin allow-forms"
+              className="w-full h-[800px] border-1 border-gray-200 rounded-lg shadow-sm"
+              scrolling="no"
+              src={property.bookingWidgetUrl || "https://booking.hospitable.com/widget/55ea1cea-3c99-40f7-b98b-3de392f74a36/1080590"}
+            ></iframe>
           </div>
         </div>
       </div>
     </>
   );
-};
+}
 
 export default PropertyDetail;
