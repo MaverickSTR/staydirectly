@@ -6,6 +6,7 @@ import https from "https";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import session from "express-session";
+import path from "path";
 import {
   securityHeaders,
   corsConfig,
@@ -36,6 +37,13 @@ if (appConfig.isProduction) {
 }
 
 const app = express();
+
+// Debug environment detection
+console.log("🔍 Environment detection:");
+console.log("   - NODE_ENV:", process.env.NODE_ENV);
+console.log("   - appConfig.isDevelopment:", appConfig.isDevelopment);
+console.log("   - appConfig.isProduction:", appConfig.isProduction);
+console.log("   - app.get('env'):", app.get("env"));
 
 // Security configuration already loaded as appConfig
 
@@ -232,88 +240,117 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    console.log("🚀 Starting server initialization...");
 
-  // Apply secure error handler at the end
-  app.use(secureErrorHandler);
+    const server = await registerRoutes(app);
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+    // Apply secure error handler at the end
+    app.use(secureErrorHandler);
 
-  if (app.get("env") === "development") {
-    // Check if running in separated development mode
-    const separatedDev =
-      process.env.NODE_ENV === "development" && !process.env.INTEGRATED_DEV;
+    // importantly only setup vite in development and after
+    // setting up all the other routes so the catch-all route
+    // doesn't interfere with the other routes
 
-    if (separatedDev) {
-      log("Running in separated development mode - API server only", "server");
-      // Don't setup Vite, just run as API server
-    } else {
-      log(
-        "Running in integrated development mode - API server + Vite",
-        "server"
-      );
-      await setupVite(app, server);
-    }
-  } else {
-    serveStatic(app);
-  }
+    // Explicitly check environment instead of relying on app.get("env")
+    if (appConfig.isDevelopment) {
+      // Check if running in separated development mode
+      const separatedDev =
+        process.env.NODE_ENV === "development" && !process.env.INTEGRATED_DEV;
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || "5000", 10);
-
-  server
-    .listen(
-      {
-        port,
-        host: "0.0.0.0",
-        // reusePort: true,
-      },
-      () => {
-        log(`🚀 Server running on port ${port}`);
+      if (separatedDev) {
         log(
-          `🔒 Security features enabled: ${
-            !appConfig.isDevelopment ? "PRODUCTION" : "DEVELOPMENT"
-          } mode`
+          "Running in separated development mode - API server only",
+          "server"
         );
-        log(`🌐 CORS origins: ${appConfig.cors.origins.join(", ")}`);
+        // Don't setup Vite, just run as API server
+      } else {
+        log(
+          "Running in integrated development mode - API server + Vite",
+          "server"
+        );
+        await setupVite(app, server);
       }
-    )
-    .on("error", (err) => {
-      console.error(`❌ Failed to start server on port ${port}:`, err.message);
-      console.error(err);
+    } else {
+      log("Running in production mode - serving static files", "server");
+      serveStatic(app);
+    }
+
+    // ALWAYS serve the app on port 5000
+    // this serves both the API and the client.
+    // It is the only port that is not firewalled.
+    const port = parseInt(process.env.PORT || "5000", 10);
+
+    server
+      .listen(
+        {
+          port,
+          host: "0.0.0.0",
+          // reusePort: true,
+        },
+        () => {
+          log(`🚀 Server running on port ${port}`);
+          log(
+            `🔒 Security features enabled: ${
+              !appConfig.isDevelopment ? "PRODUCTION" : "DEVELOPMENT"
+            } mode`
+          );
+          log(`🌐 CORS origins: ${appConfig.cors.origins.join(", ")}`);
+          log(
+            `📁 Static files will be served from: ${path.resolve(
+              import.meta.dirname,
+              "..",
+              "dist",
+              "public"
+            )}`
+          );
+        }
+      )
+      .on("error", (err) => {
+        console.error(
+          `❌ Failed to start server on port ${port}:`,
+          err.message
+        );
+        console.error(err);
+        console.error(
+          "💥 Server startup failed - this might cause the deployment platform to serve static files instead"
+        );
+        process.exit(1);
+      });
+
+    // Graceful shutdown handling
+    process.on("SIGTERM", () => {
+      console.log("🛑 SIGTERM received, shutting down gracefully");
+      server.close(() => {
+        console.log("💤 Process terminated");
+        process.exit(0);
+      });
+    });
+
+    process.on("SIGINT", () => {
+      console.log("🛑 SIGINT received, shutting down gracefully");
+      server.close(() => {
+        console.log("💤 Process terminated");
+        process.exit(0);
+      });
+    });
+
+    // Handle uncaught exceptions
+    process.on("uncaughtException", (err) => {
+      console.error("💥 Uncaught Exception:", err);
       process.exit(1);
     });
 
-  // Graceful shutdown handling
-  process.on("SIGTERM", () => {
-    console.log("🛑 SIGTERM received, shutting down gracefully");
-    server.close(() => {
-      console.log("💤 Process terminated");
-      process.exit(0);
+    // Handle unhandled promise rejections
+    process.on("unhandledRejection", (reason, promise) => {
+      console.error("💥 Unhandled Rejection at:", promise, "reason:", reason);
+      process.exit(1);
     });
-  });
-
-  process.on("SIGINT", () => {
-    console.log("🛑 SIGINT received, shutting down gracefully");
-    server.close(() => {
-      console.log("💤 Process terminated");
-      process.exit(0);
-    });
-  });
-
-  // Handle uncaught exceptions
-  process.on("uncaughtException", (err) => {
-    console.error("💥 Uncaught Exception:", err);
+  } catch (error) {
+    console.error("💥 Failed to initialize server:", error);
+    console.error(
+      "💥 This might cause the deployment platform to serve static files instead"
+    );
     process.exit(1);
-  });
-
-  // Handle unhandled promise rejections
-  process.on("unhandledRejection", (reason, promise) => {
-    console.error("💥 Unhandled Rejection at:", promise, "reason:", reason);
-    process.exit(1);
-  });
+  }
 })();

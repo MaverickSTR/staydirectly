@@ -6,7 +6,7 @@ const result = await build({
   platform: "node",
   target: "node18",
   format: "esm",
-  outfile: "dist/index.js",
+  outdir: "dist",
   external: [
     // Node.js built-ins
     "fs",
@@ -207,11 +207,13 @@ const result = await build({
     "puppeteer",
     "selenium-webdriver",
 
-    // All other packages
-    "*",
+    // All other packages - but NOT local server files
+    // "*", // This was causing local files to be externalized
   ],
+  // Only externalize npm packages, not local files
+  packages: "external",
   sourcemap: false,
-  minify: true,
+  minify: false, // Temporarily disable minification for debugging
   treeShaking: true,
   define: {
     "process.env.NODE_ENV": '"production"',

@@ -103,11 +103,41 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  const serverBundlePath = path.resolve(
+    import.meta.dirname,
+    "..",
+    "dist",
+    "index.js"
+  );
+
+  console.log("🔍 Static file serving debug:");
+  console.log("   - Looking for dist path:", distPath);
+  console.log("   - Path exists:", fs.existsSync(distPath));
+  console.log("   - Server bundle path:", serverBundlePath);
+  console.log("   - Server bundle exists:", fs.existsSync(serverBundlePath));
 
   if (!fs.existsSync(distPath)) {
+    console.error("❌ Static files not found at:", distPath);
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`
     );
+  }
+
+  // List contents of the dist/public directory
+  const files = fs.readdirSync(distPath);
+  console.log("   - Files in dist/public:", files);
+
+  // Check if index.html exists and is readable
+  const indexPath = path.resolve(distPath, "index.html");
+  if (fs.existsSync(indexPath)) {
+    const indexContent = fs.readFileSync(indexPath, "utf8");
+    console.log("   - index.html exists and is readable");
+    console.log(
+      "   - index.html first 100 chars:",
+      indexContent.substring(0, 100)
+    );
+  } else {
+    console.error("❌ index.html not found in dist/public");
   }
 
   app.use(express.static(distPath));
@@ -118,6 +148,12 @@ export function serveStatic(app: Express) {
     if (req.originalUrl.startsWith("/api")) {
       return next();
     }
+
+    console.log("🔍 Serving static file for:", req.originalUrl);
+    console.log(
+      "   - Sending index.html from:",
+      path.resolve(distPath, "index.html")
+    );
 
     res.sendFile(path.resolve(distPath, "index.html"));
   });

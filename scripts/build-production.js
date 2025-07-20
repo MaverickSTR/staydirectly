@@ -5,6 +5,8 @@ import path from "path";
 
 async function buildProduction() {
   console.log("🚀 Starting production build...");
+  console.log("📁 Current directory:", process.cwd());
+  console.log("📁 Script directory:", import.meta.dirname);
 
   // Clean dist directory
   if (existsSync("dist")) {
