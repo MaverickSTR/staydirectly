@@ -4,8 +4,14 @@ import {
   getCacheConfig,
   createDedupedRequest,
   createCacheKey,
+  optimisticUpdates,
 } from "./queryClient";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useQueryClient,
+  useMutation,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 
 // Configure axios with request deduplication and caching
 const axiosRequestMap = new Map<string, Promise<any>>();
@@ -268,33 +274,36 @@ class HospitableApiClient {
 export const hospitable = new HospitableApiClient();
 
 // ============================================
-// OPTIMIZED HOOKS FOR CACHING
+// ENHANCED HOOKS WITH OPTIMISTIC UPDATES
 // ============================================
 
 /**
- * Hook for fetching all properties with optimized caching
+ * Enhanced hook for fetching all properties with optimistic updates
  */
 export function useProperties() {
   return useQuery({
     queryKey: ["/api/properties"],
     queryFn: getAllProperties,
     ...getCacheConfig.static,
+    // Add placeholder data for better UX
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for fetching featured properties with optimized caching
+ * Enhanced hook for fetching featured properties with optimistic updates
  */
 export function useFeaturedProperties() {
   return useQuery({
     queryKey: ["/api/properties/featured"],
     queryFn: getFeaturedProperties,
-    ...getCacheConfig.static,
+    ...getCacheConfig.semiStatic,
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for fetching a single property with optimized caching
+ * Enhanced hook for fetching a single property with optimistic updates
  */
 export function useProperty(id: number) {
   return useQuery({
@@ -302,11 +311,41 @@ export function useProperty(id: number) {
     queryFn: () => getProperty(id),
     enabled: !!id,
     ...getCacheConfig.static,
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for searching properties with dynamic caching
+ * Enhanced hook for searching properties with infinite scrolling
+ */
+export function useInfiniteSearchProperties(query: string, filters?: any) {
+  return useInfiniteQuery({
+    queryKey: ["/api/properties/search", query, filters],
+    queryFn: async ({ pageParam = 1 }: { pageParam: number }) => {
+      const params = new URLSearchParams();
+      if (query && query.trim()) params.append("q", query);
+      if (filters && Object.keys(filters).length > 0) {
+        params.append("filters", JSON.stringify(filters));
+      }
+      params.append("page", pageParam.toString());
+      params.append("limit", "20");
+
+      const response = await axios.get(
+        `/api/properties/search?${params.toString()}`
+      );
+      return response.data;
+    },
+    initialPageParam: 1,
+    enabled: !!query || (filters && Object.keys(filters).length > 0),
+    getNextPageParam: (lastPage: any, allPages) => {
+      return lastPage.hasMore ? allPages.length + 1 : undefined;
+    },
+    ...getCacheConfig.dynamic,
+  });
+}
+
+/**
+ * Enhanced hook for searching properties with dynamic caching
  */
 export function useSearchProperties(query: string, filters?: any) {
   return useQuery({
@@ -314,33 +353,36 @@ export function useSearchProperties(query: string, filters?: any) {
     queryFn: () => searchProperties(query, filters),
     enabled: !!query || (filters && Object.keys(filters).length > 0),
     ...getCacheConfig.dynamic,
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for fetching cities with static caching
+ * Enhanced hook for fetching cities with static caching
  */
 export function useCities() {
   return useQuery({
     queryKey: ["/api/cities"],
     queryFn: getAllCities,
     ...getCacheConfig.static,
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for fetching featured cities with static caching
+ * Enhanced hook for fetching featured cities with static caching
  */
 export function useFeaturedCities() {
   return useQuery({
     queryKey: ["/api/cities/featured"],
     queryFn: getFeaturedCities,
     ...getCacheConfig.static,
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for fetching a single city with static caching
+ * Enhanced hook for fetching a single city with static caching
  */
 export function useCity(name: string) {
   return useQuery({
@@ -348,11 +390,12 @@ export function useCity(name: string) {
     queryFn: () => getCity(name),
     enabled: !!name,
     ...getCacheConfig.static,
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for fetching city properties with static caching
+ * Enhanced hook for fetching city properties with static caching
  */
 export function useCityProperties(cityName: string) {
   return useQuery({
@@ -360,18 +403,208 @@ export function useCityProperties(cityName: string) {
     queryFn: () => getCityProperties(cityName),
     enabled: !!cityName,
     ...getCacheConfig.static,
+    placeholderData: (previousData) => previousData,
   });
 }
 
 /**
- * Hook for fetching property reviews with real-time caching
+ * Enhanced hook for fetching property reviews with real-time caching
  */
 export function usePropertyReviews(propertyId: number) {
   return useQuery({
     queryKey: [`/api/properties/${propertyId}/reviews`],
     queryFn: () => getPropertyReviews(propertyId),
     enabled: !!propertyId,
-    ...getCacheConfig.realtime,
+    ...getCacheConfig.reviews,
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+/**
+ * Enhanced mutation for creating properties with optimistic updates
+ */
+export function useCreateProperty() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createProperty,
+    onMutate: async (newProperty) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/properties"] });
+
+      // Snapshot the previous value
+      const previousProperties = queryClient.getQueryData(["/api/properties"]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["/api/properties"], (old: any) => {
+        if (!old) return [newProperty];
+        return [newProperty, ...old];
+      });
+
+      return { previousProperties };
+    },
+    onError: (err, newProperty, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousProperties) {
+        queryClient.setQueryData(
+          ["/api/properties"],
+          context.previousProperties
+        );
+      }
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+    },
+  });
+}
+
+/**
+ * Enhanced mutation for updating properties with optimistic updates
+ */
+export function useUpdateProperty() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, updateData }: { id: number; updateData: any }) =>
+      updateProperty(id, updateData),
+    onMutate: async ({ id, updateData }) => {
+      await queryClient.cancelQueries({ queryKey: ["/api/properties"] });
+      await queryClient.cancelQueries({ queryKey: [`/api/properties/${id}`] });
+
+      const previousProperties = queryClient.getQueryData(["/api/properties"]);
+      const previousProperty = queryClient.getQueryData([
+        `/api/properties/${id}`,
+      ]);
+
+      // Optimistically update
+      optimisticUpdates.updatePropertyOptimistically(
+        id,
+        updateData,
+        queryClient
+      );
+
+      return { previousProperties, previousProperty };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousProperties) {
+        queryClient.setQueryData(
+          ["/api/properties"],
+          context.previousProperties
+        );
+      }
+      if (context?.previousProperty) {
+        queryClient.setQueryData(
+          [`/api/properties/${variables.id}`],
+          context.previousProperty
+        );
+      }
+    },
+    onSettled: (data, error, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/properties/${variables.id}`],
+      });
+    },
+  });
+}
+
+/**
+ * Enhanced mutation for deleting properties with optimistic updates
+ */
+export function useDeleteProperty() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteProperty,
+    onMutate: async (propertyId) => {
+      await queryClient.cancelQueries({ queryKey: ["/api/properties"] });
+
+      const previousProperties = queryClient.getQueryData(["/api/properties"]);
+
+      queryClient.setQueryData(["/api/properties"], (old: any) => {
+        if (!old) return old;
+        return old.filter((property: any) => property.id !== propertyId);
+      });
+
+      return { previousProperties };
+    },
+    onError: (err, propertyId, context) => {
+      if (context?.previousProperties) {
+        queryClient.setQueryData(
+          ["/api/properties"],
+          context.previousProperties
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+    },
+  });
+}
+
+/**
+ * Enhanced mutation for managing favorites with optimistic updates
+ */
+export function useToggleFavorite() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      propertyId,
+      isFavorite,
+    }: {
+      userId: number;
+      propertyId: number;
+      isFavorite: boolean;
+    }) => {
+      if (isFavorite) {
+        return addFavorite(userId, propertyId);
+      } else {
+        return removeFavorite(userId, propertyId);
+      }
+    },
+    onMutate: async ({ propertyId, isFavorite }) => {
+      await queryClient.cancelQueries({ queryKey: ["/api/properties"] });
+      await queryClient.cancelQueries({
+        queryKey: [`/api/properties/${propertyId}`],
+      });
+
+      const previousProperties = queryClient.getQueryData(["/api/properties"]);
+      const previousProperty = queryClient.getQueryData([
+        `/api/properties/${propertyId}`,
+      ]);
+
+      // Optimistically update
+      optimisticUpdates.updateFavoriteOptimistically(
+        propertyId,
+        isFavorite,
+        queryClient
+      );
+
+      return { previousProperties, previousProperty };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousProperties) {
+        queryClient.setQueryData(
+          ["/api/properties"],
+          context.previousProperties
+        );
+      }
+      if (context?.previousProperty) {
+        queryClient.setQueryData(
+          [`/api/properties/${variables.propertyId}`],
+          context.previousProperty
+        );
+      }
+    },
+    onSettled: (data, error, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/properties/${variables.propertyId}`],
+      });
+    },
   });
 }
 
@@ -386,7 +619,7 @@ export function usePrefetchCommonData() {
     queryClient.prefetchQuery({
       queryKey: ["/api/properties/featured"],
       queryFn: getFeaturedProperties,
-      ...getCacheConfig.static,
+      ...getCacheConfig.semiStatic,
     });
 
     // Prefetch featured cities
@@ -409,7 +642,7 @@ export function usePrefetchCommonData() {
     queryClient.prefetchQuery({
       queryKey: [`/api/properties/${propertyId}/reviews`],
       queryFn: () => getPropertyReviews(propertyId),
-      ...getCacheConfig.realtime,
+      ...getCacheConfig.reviews,
     });
   };
 

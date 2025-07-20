@@ -146,6 +146,29 @@ export const getCacheConfig = {
     refetchOnWindowFocus: false,
     refetchInterval: 1000 * 60 * 60 * 4, // Refresh every 4 hours
   },
+
+  // Review-specific caching with optimistic updates
+  reviews: {
+    staleTime: 1000 * 60 * 5, // 5 minutes - reviews change frequently
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnWindowFocus: true,
+    refetchInterval: 1000 * 60 * 5, // Refresh every 5 minutes
+    // Optimistic updates for better UX
+    placeholderData: (previousData: any) => previousData,
+  },
+
+  // Widget-specific caching for external review widgets
+  widgets: {
+    staleTime: 1000 * 60 * 15, // 15 minutes - widgets are expensive to load
+    gcTime: 1000 * 60 * 60, // 1 hour
+    refetchOnWindowFocus: false, // Don't refetch widgets on focus
+    refetchInterval: false as const, // Manual refresh only
+    retry: (failureCount: number, error: any) => {
+      // Retry widget loading more aggressively
+      if (error?.message?.includes("4")) return false;
+      return failureCount < 3;
+    },
+  },
 };
 
 // Utility function to create optimized cache keys
@@ -167,7 +190,7 @@ export function createCacheKey(
   return baseKey;
 }
 
-// Cache warming utilities
+// Enhanced cache warming utilities with review-specific optimizations
 export const cacheWarmers = {
   // Prefetch essential data on app startup
   async warmEssentialData() {
@@ -200,7 +223,7 @@ export const cacheWarmers = {
         queryClient.prefetchQuery({
           queryKey: [`/api/properties/${propertyId}/reviews`],
           queryFn: getQueryFn({ on401: "throw" }),
-          ...getCacheConfig.realtime,
+          ...getCacheConfig.reviews,
         })
       );
     }
@@ -221,5 +244,105 @@ export const cacheWarmers = {
     }
 
     await Promise.allSettled(prefetchPromises);
+  },
+
+  // Prefetch review widget data for better performance
+  async warmReviewWidgets(propertyIds: number[]) {
+    const prefetchPromises = propertyIds.map((propertyId) =>
+      queryClient.prefetchQuery({
+        queryKey: [`/api/properties/${propertyId}/reviews`],
+        queryFn: getQueryFn({ on401: "throw" }),
+        ...getCacheConfig.reviews,
+      })
+    );
+
+    await Promise.allSettled(prefetchPromises);
+  },
+};
+
+// Optimistic update utilities for better UX
+export const optimisticUpdates = {
+  // Optimistically update review data
+  updateReviewOptimistically(
+    propertyId: number,
+    newReview: any,
+    queryClient: any
+  ) {
+    queryClient.setQueryData(
+      [`/api/properties/${propertyId}/reviews`],
+      (oldData: any) => {
+        if (!oldData) return [newReview];
+        return [newReview, ...oldData];
+      }
+    );
+  },
+
+  // Optimistically update property data
+  updatePropertyOptimistically(
+    propertyId: number,
+    updates: any,
+    queryClient: any
+  ) {
+    queryClient.setQueryData(
+      [`/api/properties/${propertyId}`],
+      (oldData: any) => {
+        if (!oldData) return updates;
+        return { ...oldData, ...updates };
+      }
+    );
+  },
+
+  // Optimistically update favorites
+  updateFavoriteOptimistically(
+    propertyId: number,
+    isFavorite: boolean,
+    queryClient: any
+  ) {
+    // Update the property's favorite status
+    queryClient.setQueryData(
+      [`/api/properties/${propertyId}`],
+      (oldData: any) => {
+        if (!oldData) return { isFavorite };
+        return { ...oldData, isFavorite };
+      }
+    );
+
+    // Update favorites list if it exists
+    queryClient.setQueryData(["/api/favorites"], (oldData: any) => {
+      if (!oldData) return isFavorite ? [propertyId] : [];
+      if (isFavorite) {
+        return oldData.includes(propertyId)
+          ? oldData
+          : [...oldData, propertyId];
+      } else {
+        return oldData.filter((id: number) => id !== propertyId);
+      }
+    });
+  },
+};
+
+// Background sync utilities for offline support
+export const backgroundSync = {
+  // Queue mutations for when connection is restored
+  queueMutation: (mutation: any) => {
+    const queue = JSON.parse(localStorage.getItem("mutationQueue") || "[]");
+    queue.push(mutation);
+    localStorage.setItem("mutationQueue", JSON.stringify(queue));
+  },
+
+  // Process queued mutations when online
+  processQueuedMutations: async (queryClient: any) => {
+    const queue = JSON.parse(localStorage.getItem("mutationQueue") || "[]");
+    if (queue.length === 0) return;
+
+    for (const mutation of queue) {
+      try {
+        await queryClient.executeMutation(mutation);
+      } catch (error) {
+        console.error("Failed to process queued mutation:", error);
+      }
+    }
+
+    localStorage.setItem("mutationQueue", "[]");
   },
 };

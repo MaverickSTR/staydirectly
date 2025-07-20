@@ -9,7 +9,6 @@ import {
 import { ChevronRight, ChevronLeft, X, Grid, Loader2, ZoomIn, ZoomOut, ImagePlus } from 'lucide-react';
 import { usePropertyImages } from '@/hooks/use-property-images';
 import { extractPropertyIds } from '@/lib/hospitable/property-utils';
-import { useSwipeable } from 'react-swipeable';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import RefreshImagesButton from './RefreshImagesButton';
 
@@ -315,30 +314,48 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
     setCurrentIndex(index);
   };
   
-  // Configure swipe handlers with visual feedback
-  const [swipeDirection, setSwipeDirection] = useState<string | null>(null);
+  // Simple touch handler for mobile horizontal swiping
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => {
+  // Minimum swipe distance
+  const minSwipeDistance = 50;
+  
+  const onTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    console.log('Touch start:', e.targetTouches[0].clientX);
+  };
+  
+  const onTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    setTouchEnd(e.targetTouches[0].clientX);
+    console.log('Touch move:', e.targetTouches[0].clientX);
+  };
+  
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    console.log('Touch end - distance:', distance, 'left:', isLeftSwipe, 'right:', isRightSwipe);
+    
+    if (isLeftSwipe && displayImages.length > 1) {
+      console.log('Left swipe detected - going to next');
       goToNext();
-      setSwipeDirection(null);
-    },
-    onSwipedRight: () => {
+    }
+    
+    if (isRightSwipe && displayImages.length > 1) {
+      console.log('Right swipe detected - going to previous');
       goToPrevious();
-      setSwipeDirection(null);
-    },
-    onSwiping: (event) => {
-      setSwipeDirection(event.dir);
-    },
-    onSwiped: () => {
-      setSwipeDirection(null);
-    },
-    trackMouse: true,
-    preventScrollOnSwipe: true,
-    trackTouch: true,
-    delta: 10, // Minimum swipe distance
-    swipeDuration: 500, // Maximum time for swipe
-  });
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
   
   // If we're loading images from API, show a loading state
   if (platformId && loadingImages && displayImages.length <= 1) {
@@ -478,72 +495,111 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
         })}
       </div>
       
-      {/* Mobile-specific gallery view for non-fullscreen display */}
+      {/* Mobile-specific horizontal swipe carousel */}
       <div className="md:hidden relative mb-4">
         <div 
-          className={`relative h-[300px] w-full overflow-hidden rounded-lg swipe-area ${swipeDirection ? `swiping-${swipeDirection.toLowerCase()}` : ''}`} 
-          {...swipeHandlers}
+          className={`relative h-[300px] w-full overflow-hidden rounded-lg swipe-area ${touchStart || touchEnd ? 'swiping' : ''}`} 
+          style={{ 
+            touchAction: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
-          <img 
-            src={displayImages[0]} 
-            alt={`${propertyName} - main view`}
-            className="w-full h-full object-cover cursor-pointer"
-            onClick={() => setFullScreen(true)}
-            onError={(e) => {
-              // Try to fetch from Hospitable API if image fails to load
-              handleImageLoadError(0, e.currentTarget.src);
-              
-              // Check for rate limits before retrying
-              const retryAttempts = apiRetryLimits[0] || 0;
-              
-              if (retryAttempts < 2 && platformId) {
-                console.log(`Image load error, attempting to fetch from API using platformId: ${platformId}`);
-                const { customerId, listingId } = extractPropertyIds(platformId);
-                if (customerId && listingId) {
-                  console.log(`Fetching from API: customerId=${customerId}, listingId=${listingId}`);
-                  // Add backoff delay based on retry attempts (exponential backoff)
-                  const backoffDelay = Math.pow(2, retryAttempts) * 1000;
-                  const cacheParam = `&cb=${Date.now()}&retry=${retryAttempts}&backoff=${backoffDelay}`;
-                  
-                  setTimeout(() => {
-                    if (e.currentTarget) {
-                      e.currentTarget.src = `/api/hospitable/property-images/${customerId}/${listingId}?pos=0${cacheParam}`;
-                    }
-                  }, backoffDelay);
-                }
-              } else {
-                // After multiple failures or no platformId, use placeholder
-                e.currentTarget.src = '/placeholder-property.jpg';
-              }
-            }}
+          {/* Touch navigation overlay for mobile */}
+          <div 
+            className="absolute inset-0 z-20"
+            style={{ touchAction: 'none' }}
           />
+          
+          {/* Horizontal image carousel */}
+          <div 
+            className="flex h-full carousel-container"
+            style={{ 
+              transform: `translateX(-${currentIndex * 100}%)`,
+              width: `${displayImages.length * 100}%`
+            }}
+          >
+            {displayImages.map((image, index) => (
+              <div 
+                key={index}
+                className="relative flex-shrink-0 w-full h-full"
+                style={{ width: `${100 / displayImages.length}%` }}
+              >
+                <img 
+                  src={image} 
+                  alt={`${propertyName} - view ${index + 1}`}
+                  className="w-full h-full object-cover cursor-pointer"
+                  style={{ pointerEvents: 'none' }}
+                  onClick={() => setFullScreen(true)}
+                  onError={(e) => {
+                    // Try to fetch from Hospitable API if image fails to load
+                    handleImageLoadError(index, e.currentTarget.src);
+                    
+                    // Check for rate limits before retrying
+                    const retryAttempts = apiRetryLimits[index] || 0;
+                    
+                    if (retryAttempts < 2 && platformId) {
+                      console.log(`Image load error, attempting to fetch from API using platformId: ${platformId}`);
+                      const { customerId, listingId } = extractPropertyIds(platformId);
+                      if (customerId && listingId) {
+                        console.log(`Fetching from API: customerId=${customerId}, listingId=${listingId}`);
+                        // Add backoff delay based on retry attempts (exponential backoff)
+                        const backoffDelay = Math.pow(2, retryAttempts) * 1000;
+                        const cacheParam = `&cb=${Date.now()}&retry=${retryAttempts}&backoff=${backoffDelay}`;
+                        
+                        setTimeout(() => {
+                          if (e.currentTarget) {
+                            e.currentTarget.src = `/api/hospitable/property-images/${customerId}/${listingId}?pos=${index}${cacheParam}`;
+                          }
+                        }, backoffDelay);
+                      }
+                    } else {
+                      // After multiple failures or no platformId, use placeholder
+                      e.currentTarget.src = '/placeholder-property.jpg';
+                    }
+                  }}
+                />
+              </div>
+            ))}
+          </div>
           
           {displayImages.length > 1 && (
             <>
               {/* Photo counter indicator */}
-              <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-                1 / {displayImages.length}
+              <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm z-30">
+                {currentIndex + 1} / {displayImages.length}
               </div>
               
               {/* Show all photos button */}
               <Button 
                 variant="ghost"
                 onClick={() => setFullScreen(true)}
-                className="absolute right-4 bottom-4 bg-white/90 hover:bg-white text-gray-800 px-3 py-1 rounded-full text-sm shadow-sm"
+                className="absolute right-4 bottom-4 bg-white/90 hover:bg-white text-gray-800 px-3 py-1 rounded-full text-sm shadow-sm z-30"
               >
                 <Grid className="h-3.5 w-3.5 mr-1" /> All photos
               </Button>
               
-              {/* Swipe indicators for mobile */}
-              <div className="gallery-indicator left mobile-tap-area">
-                <ChevronLeft className="h-5 w-5 text-white" />
-              </div>
-              <div className="gallery-indicator right mobile-tap-area">
-                <ChevronRight className="h-5 w-5 text-white" />
+              {/* Touch debug indicator */}
+              <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs z-40">
+                Touch: {touchStart ? 'Active' : 'None'}
               </div>
               
               {/* Subtle swipe hint */}
-              <div className={`absolute inset-0 pointer-events-none bg-gradient-to-r from-black/5 via-transparent to-black/5 opacity-0 transition-opacity duration-300 ${swipeDirection ? 'opacity-30' : ''}`}></div>
+              <div className={`absolute inset-0 pointer-events-none bg-gradient-to-r from-black/5 via-transparent to-black/5 opacity-0 transition-opacity duration-300 ${touchStart ? 'opacity-30' : ''}`}></div>
+              
+              {/* Image dots indicator */}
+              <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
+                {displayImages.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
             </>
           )}
         </div>
@@ -569,8 +625,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           <div className="relative h-full flex flex-col">
             {/* Main image area with pinch zoom */}
             <div 
-              className={`flex-1 relative flex items-center justify-center bg-black swipe-area ${swipeDirection ? `swiping-${swipeDirection.toLowerCase()}` : ''}`}
-              {...swipeHandlers}
+              className={`flex-1 relative flex items-center justify-center bg-black swipe-area ${touchStart ? 'swiping' : ''}`}
             >
               {/* Swipe direction indicators */}
               <div className="gallery-indicator left">
@@ -579,6 +634,14 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
               <div className="gallery-indicator right">
                 <ChevronRight className="h-6 w-6 text-white" />
               </div>
+              
+              {/* Touch navigation overlay for mobile */}
+              {isMobile && (
+                <div 
+                  className="absolute inset-0 z-30"
+                />
+              )}
+              
               <TransformWrapper
                 initialScale={1}
                 minScale={0.5}
@@ -587,6 +650,8 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
                 wheel={{ step: 0.05 }}
                 doubleClick={{ mode: "reset" }}
                 panning={{ disabled: isMobile, velocityDisabled: true }}
+                limitToBounds={true}
+                smooth={true}
               >
                 {({ zoomIn, zoomOut, resetTransform }) => (
                   <>
@@ -706,6 +771,69 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
         
         .gallery-indicator {
           background-color: rgba(0, 0, 0, 0.3);
+          transition: opacity 0.2s ease;
+        }
+        
+        .swipe-area {
+          touch-action: pan-y pinch-zoom;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+        
+        .swipe-area img {
+          pointer-events: none;
+        }
+        
+        .swipe-area .gallery-indicator {
+          pointer-events: none;
+        }
+        
+        .mobile-tap-area {
+          pointer-events: auto;
+        }
+        
+        /* Horizontal carousel transitions */
+        .carousel-container {
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Swipe direction visual feedback */
+        .swiping-left {
+          transform: translateX(-10px);
+          transition: transform 0.1s ease;
+        }
+        
+        .swiping-right {
+          transform: translateX(10px);
+          transition: transform 0.1s ease;
+        }
+        
+        /* Prevent text selection during swipes */
+        .swipe-area * {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+        
+        /* Image dots indicator */
+        .carousel-dots {
+          transition: all 0.3s ease;
+        }
+        
+        .carousel-dots .dot {
+          transition: all 0.3s ease;
+        }
+        
+        /* Smooth image transitions */
+        .carousel-image {
+          transition: opacity 0.3s ease;
         }
       `}} />
     </>

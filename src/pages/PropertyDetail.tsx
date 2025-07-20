@@ -61,7 +61,7 @@ const PropertyDetail: React.FC = () => {
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
-    { label: state, href: `/search?q=${state}` },
+    // { label: state, href: `/search?q=${state}` },
     { label: property.city, href: `/city/${property.city}` },
     { label: property.name }
   ];
