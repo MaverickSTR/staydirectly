@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import ReviewFallback from './ReviewFallback';
 
 interface Props {
   embedCode?: string; // This is property.reviewWidgetCode
@@ -29,8 +28,25 @@ const DynamicReviewWidget: React.FC<Props> = ({ embedCode, className = "" }) => 
     }
   }, [embedCode]);
 
-  if (!embedCode || hasError) {
-    return <ReviewFallback className={className} />;
+  if (!embedCode) {
+    return (
+      <div className={`${className} flex items-center justify-center`}>
+        <div className="text-center">
+          <p className="text-gray-500">Reviews not available</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className={`${className} flex items-center justify-center`}>
+        <div className="text-center">
+          <p className="text-gray-500 mb-2">Unable to load reviews</p>
+          <p className="text-xs text-gray-400">Please try refreshing the page</p>
+        </div>
+      </div>
+    );
   }
 
   return <div id="dynamic-review-widget" className={className} />;

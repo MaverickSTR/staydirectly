@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '@/lib/revyoos.css';
-import ReviewFallback from './ReviewFallback';
-import { useToast } from '@/hooks/use-toast';
 
 interface RevyoosDirectEmbedProps {
   reviewWidgetCode?: string;
@@ -9,22 +7,20 @@ interface RevyoosDirectEmbedProps {
 }
 
 /**
- * Improved Revyoos review widget with better error handling and loading reliability.
- * Prevents script conflicts and provides better user feedback.
+ * Revyoos review widget - exclusively uses Revyoos for all reviews
  */
 const RevyoosDirectEmbed: React.FC<RevyoosDirectEmbedProps> = ({
   reviewWidgetCode,
   className = "w-full h-auto min-h-[600px]"
 }) => {
-  const [loadingState, setLoadingState] = useState<'loading' | 'loaded' | 'error' | 'fallback'>('loading');
+  const [loadingState, setLoadingState] = useState<'loading' | 'loaded' | 'error'>('loading');
   const containerRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
   const attemptsRef = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (!reviewWidgetCode || !containerRef.current) {
-      setLoadingState('fallback');
+      setLoadingState('error');
       return;
     }
 
@@ -65,7 +61,7 @@ const RevyoosDirectEmbed: React.FC<RevyoosDirectEmbedProps> = ({
         
         script.onerror = () => {
           console.error('Failed to load Revyoos script');
-          handleLoadError();
+          setLoadingState('error');
         };
         
         container.appendChild(script);
@@ -87,22 +83,9 @@ const RevyoosDirectEmbed: React.FC<RevyoosDirectEmbedProps> = ({
           loadWidget();
         } else {
           console.warn('Revyoos widget failed to load after 3 attempts');
-          handleLoadError();
+          setLoadingState('error');
         }
       }, 3000); // Give more time for the widget to load
-    };
-
-    const handleLoadError = () => {
-      setLoadingState('error');
-      // Show error toast only once
-      if (attemptsRef.current === 3) {
-        toast({
-          title: 'Reviews Widget Issue',
-          description: 'Having trouble loading reviews. Showing fallback content.',
-          variant: 'default',
-          duration: 3000,
-        });
-      }
     };
 
     loadWidget();
@@ -116,11 +99,17 @@ const RevyoosDirectEmbed: React.FC<RevyoosDirectEmbedProps> = ({
         container.innerHTML = '';
       }
     };
-  }, [reviewWidgetCode, toast]);
+  }, [reviewWidgetCode]);
 
-  // Show fallback immediately if no widget code
+  // Show error if no widget code
   if (!reviewWidgetCode) {
-    return <ReviewFallback className={className} />;
+    return (
+      <div className={`${className} flex items-center justify-center`}>
+        <div className="text-center">
+          <p className="text-gray-500">Reviews not available</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -128,21 +117,17 @@ const RevyoosDirectEmbed: React.FC<RevyoosDirectEmbedProps> = ({
       {loadingState === 'loading' && (
         <div className="w-full flex flex-col items-center justify-center py-12">
           <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-500">Loading guest reviews...</p>
+          <p className="text-gray-500">Loading Revyoos reviews...</p>
           <p className="text-xs text-gray-400 mt-2">This may take a few moments</p>
         </div>
       )}
 
-      {(loadingState === 'error' || loadingState === 'fallback') && (
-        <div className="space-y-4">
-          {loadingState === 'error' && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-              <p className="text-amber-800 text-sm">
-                <strong>Note:</strong> Reviews are temporarily unavailable. Here are some recent guest experiences:
-              </p>
-            </div>
-          )}
-          <ReviewFallback className="fade-in" />
+      {loadingState === 'error' && (
+        <div className="w-full flex flex-col items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-gray-500 mb-2">Unable to load reviews</p>
+            <p className="text-xs text-gray-400">Please try refreshing the page</p>
+          </div>
         </div>
       )}
     </div>

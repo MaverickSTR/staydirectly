@@ -104,62 +104,16 @@ const BookingWidget: React.FC<BookingWidgetProps> = ({
 
     return (
         <div className={`relative ${className}`}>
-            {/* Loading State */}
-            {loadingState === 'loading' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-90 z-10">
-                    <Loader2 className="h-8 w-8 animate-spin text-black mb-4" />
-                    <p className="text-gray-600">Loading booking widget...</p>
-                    <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
-                </div>
-            )}
-
-            {/* Error State */}
-            {loadingState === 'error' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-10">
-                    <div className="text-center p-8 max-w-md">
-                        <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-                        <h4 className="text-lg font-medium text-gray-700 mb-2">Booking Widget Unavailable</h4>
-                        <p className="text-gray-600 mb-4">{errorMessage}</p>
-
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                            <Button onClick={handleRetry} variant="outline" className="flex items-center gap-2">
-                                <RefreshCw className="h-4 w-4" />
-                                Try Again
-                            </Button>
-                            <Button onClick={openInNewTab} className="flex items-center gap-2">
-                                <ExternalLink className="h-4 w-4" />
-                                Open in New Tab
-                            </Button>
-                        </div>
-
-                        <Alert className="mt-6 text-left">
-                            <AlertDescription>
-                                <strong>Alternative booking options:</strong><br />
-                                • Call us directly: (555) 123-4567<br />
-                                • Email: bookings@staydirectly.com<br />
-                                • Try opening the booking page in a new tab
-                            </AlertDescription>
-                        </Alert>
-                    </div>
-                </div>
-            )}
-
+            
             {/* Booking Iframe */}
-            <iframe
-                ref={iframeRef}
-                id={`booking-iframe-${propertyId}`}
-                src={url}
-                title={`Book ${propertyName}`}
-                className="w-full h-full border-0 rounded-lg"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation allow-popups"
-                scrolling="no"
-                onLoad={handleIframeLoad}
-                onError={handleIframeError}
-                style={{
-                    minHeight: '700px',
-                    height: '100%',
-                }}
-            />
+            <iframe 
+              id="booking-iframe" 
+              sandbox="allow-top-navigation allow-scripts allow-same-origin" 
+              style={{ width: '100%', height: '900px' }} 
+              frameBorder="0" 
+              src="https://booking.hospitable.com/widget/55ea1cea-3c99-40f7-b98b-3de392f74a36/1080590">
+            </iframe>
+
 
             {/* Widget Attribution */}
             {loadingState === 'loaded' && (
