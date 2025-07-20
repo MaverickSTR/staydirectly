@@ -9,13 +9,13 @@
     "isolatedModules": true,
     "paths": {
       // Client-specific paths (more specific than base)
-      "@/*": ["./client/src/*"],
-      "@/components/*": ["./client/src/components/*"],
-      "@/pages/*": ["./client/src/pages/*"],
-      "@/hooks/*": ["./client/src/hooks/*"],
-      "@/lib/*": ["./client/src/lib/*"],
-      "@/types": ["./client/src/types"],
-      "@/ui/*": ["./client/src/components/ui/*"],
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/pages/*": ["./src/pages/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/types": ["./src/types"],
+      "@/ui/*": ["./src/components/ui/*"],
       
       // Shared (still accessible from client)
       "@shared/*": ["./shared/*"],
@@ -24,7 +24,7 @@
     }
   },
   "include": [
-    "client/src/**/*",
+    "src/**/*",
     "shared/**/*",
     "vite.config.ts"
   ],

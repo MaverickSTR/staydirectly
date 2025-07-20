@@ -26,29 +26,13 @@ export default defineConfig(async ({ mode }) => {
     resolve: {
       alias: {
         // Client paths - matching TypeScript paths
-        "@": path.resolve(import.meta.dirname, "client", "src"),
-        "@/components": path.resolve(
-          import.meta.dirname,
-          "client",
-          "src",
-          "components"
-        ),
-        "@/pages": path.resolve(import.meta.dirname, "client", "src", "pages"),
-        "@/hooks": path.resolve(import.meta.dirname, "client", "src", "hooks"),
-        "@/lib": path.resolve(import.meta.dirname, "client", "src", "lib"),
-        "@/types": path.resolve(
-          import.meta.dirname,
-          "client",
-          "src",
-          "types.ts"
-        ),
-        "@/ui": path.resolve(
-          import.meta.dirname,
-          "client",
-          "src",
-          "components",
-          "ui"
-        ),
+        "@": path.resolve(import.meta.dirname, "src"),
+        "@/components": path.resolve(import.meta.dirname, "src", "components"),
+        "@/pages": path.resolve(import.meta.dirname, "src", "pages"),
+        "@/hooks": path.resolve(import.meta.dirname, "src", "hooks"),
+        "@/lib": path.resolve(import.meta.dirname, "src", "lib"),
+        "@/types": path.resolve(import.meta.dirname, "src", "types.ts"),
+        "@/ui": path.resolve(import.meta.dirname, "src", "components", "ui"),
 
         // Shared paths
         "@shared": path.resolve(import.meta.dirname, "shared"),
@@ -67,10 +51,10 @@ export default defineConfig(async ({ mode }) => {
         "@assets": path.resolve(import.meta.dirname, "attached_assets"),
       },
     },
-    // Set root to client directory for proper path resolution
-    root: path.resolve(import.meta.dirname, "client"),
+    // Set root to current directory for proper path resolution
+    root: path.resolve(import.meta.dirname),
     // Set public directory relative to root
-    publicDir: path.resolve(import.meta.dirname, "client", "public"),
+    publicDir: path.resolve(import.meta.dirname, "public"),
     build: {
       outDir: path.resolve(import.meta.dirname, "dist/public"),
       emptyOutDir: true,

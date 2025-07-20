@@ -17,13 +17,13 @@
     "types": ["node", "vite/client"],
     "paths": {
       // Client paths
-      "@/*": ["./client/src/*"],
-      "@/components/*": ["./client/src/components/*"],
-      "@/pages/*": ["./client/src/pages/*"],
-      "@/hooks/*": ["./client/src/hooks/*"],
-      "@/lib/*": ["./client/src/lib/*"],
-      "@/types": ["./client/src/types"],
-      "@/ui/*": ["./client/src/components/ui/*"],
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/pages/*": ["src/pages/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/types": ["src/types"],
+      "@/ui/*": ["src/components/ui/*"],
       
       // Server paths  
       "@server/*": ["./server/*"],
@@ -41,6 +41,6 @@
       "@assets/*": ["./attached_assets/*"]
     }
   },
-  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
+  "include": ["src/**/*", "shared/**/*", "server/**/*"],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"]
 }
