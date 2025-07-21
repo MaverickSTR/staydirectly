@@ -103,8 +103,8 @@ const PropertyDetail: React.FC = () => {
         <div className="mb-8">
           <PropertyGallery
             propertyName={property.name}
+            propertyId={property.id}
             platformId={property.platformId || property.hospitablePlatformId}
-            defaultCustomerId="24RZHJ"
             imageUrl={property.imageUrl}
             additionalImages={property.additionalImages || []}
           />

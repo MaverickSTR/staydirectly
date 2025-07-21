@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/dialog';
 import { ChevronRight, ChevronLeft, X, Grid, Loader2, ZoomIn, ZoomOut, ImagePlus } from 'lucide-react';
 import { usePropertyImages } from '@/hooks/use-property-images';
-import { extractPropertyIds } from '@/lib/hospitable/property-utils';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import RefreshImagesButton from './RefreshImagesButton';
+import { useLocation } from 'wouter';
+import { slugify, getPropertyImgUrl } from '@/lib/slugify';
 
 interface PropertyGalleryProps {
   images?: string[];
@@ -19,15 +19,17 @@ interface PropertyGalleryProps {
   defaultCustomerId?: string;
   imageUrl?: string;        // For when we have a stored main image
   additionalImages?: string[]; // For when we have stored additional images
+  propertyId?: number;
 }
 
-const PropertyGallery: React.FC<PropertyGalleryProps> = ({ 
-  images: providedImages, 
-  propertyName, 
-  platformId, 
+const PropertyGallery: React.FC<PropertyGalleryProps> = ({
+  images: providedImages,
+  propertyName,
+  platformId,
   defaultCustomerId,
   imageUrl,
-  additionalImages
+  additionalImages,
+  propertyId,
 }) => {
   // Start with an initial image to prevent infinite loops
   const initialImage = imageUrl || (providedImages && providedImages.length > 0 ? providedImages[0] : null);
@@ -35,181 +37,59 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
   const [fullScreen, setFullScreen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [imagesProcessed, setImagesProcessed] = useState(false);
   const [failedImages, setFailedImages] = useState<Record<number, boolean>>({});
-  const [apiRetryLimits, setApiRetryLimits] = useState<Record<number, number>>({});
-  
-  // Check if the device is mobile
+  const [location, setLocation] = useLocation();
+
+  // Debounced mobile check
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    let timeout: NodeJS.Timeout | null = null;
+    const handleResize = () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(checkMobile, 100);
     };
-    
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('resize', handleResize);
+      if (timeout) clearTimeout(timeout);
     };
   }, []);
-  
-  // Create a wrapper for stored database images
-  const storedDbImages = React.useMemo(() => {
-    // Check if we have any stored images from the database
+
+  // Memoize stored database images
+  const storedDbImages = useMemo(() => {
     if (imageUrl || (additionalImages && additionalImages.length > 0)) {
-      console.log(`Using database images: main=${!!imageUrl}, additional=${additionalImages?.length || 0}`);
       return {
         mainImage: imageUrl,
         additionalImages: additionalImages || []
       };
     }
-    console.log('No stored database images available');
     return undefined;
   }, [imageUrl, additionalImages]);
-  
+
   // Fetch images from Hospitable API if we have platformId
-  const { 
-    data: propertyImages, 
+  const {
+    data: propertyImages,
     isLoading: loadingImages,
-    isError: imagesError 
+    isError: imagesError
   } = usePropertyImages(
-    // Ensure platformId is only string or null, not undefined
-    platformId || null, 
-    defaultCustomerId, 
+    platformId || null,
+    defaultCustomerId,
     storedDbImages
   );
-  
-  // Removed getDirectApiImageUrl - was using broken endpoint that returned JSON instead of images
-  
-  // Handle image load errors with smart fallback logic
-  const handleImageLoadError = useCallback((index: number, imageUrl: string) => {
-    console.log(`Image at position ${index} failed to load: ${imageUrl}`);
-    
-    // Mark this image position as failed
-    setFailedImages(prev => ({
-      ...prev,
-      [index]: true
-    }));
-    
-    // Track retry attempts for this position
-    setApiRetryLimits(prev => ({
-      ...prev,
-      [index]: (prev[index] || 0) + 1
-    }));
-    
-    // Get fallback URL if this is a direct muscache URL that failed
-    if (imageUrl.includes('muscache.com')) {
-      // Only retry with API if we have platformId
-      if (platformId) {
-        const { customerId, listingId } = extractPropertyIds(platformId);
-        if (customerId && listingId) {
-          return true;
-        }
-      }
-    }
-    
-    return false;
-  }, [platformId]);
-  
-  // Process images in this order: API images > DB images > provided static images > placeholder
-  useEffect(() => {
-    // Skip this effect if we've already processed images (prevents infinite loop)
-    if (imagesProcessed || (displayImages.length > 1)) {
-      return;
-    }
 
-    console.log('Image source selection effect triggered');
-    
-    // First check - do we have database-stored images?
-    const hasStoredImages = !!(imageUrl || (additionalImages && additionalImages.length > 0));
-    const hasCompleteStoredImages = !!(imageUrl && additionalImages && additionalImages.length > 0);
-    
-    // Function to create high-quality image URLs from the database
-    const createDbImageUrls = () => {
-      // Add a cache-busting parameter
-      const cacheBuster = `&cb=${Date.now()}`;
-      const urls: string[] = [];
-      
-      // Add main image first if it exists
-      if (imageUrl) {
-        // Process the main image URL
-        let mainUrl = imageUrl;
-        if (mainUrl.includes('muscache.com/im/')) {
-          mainUrl = mainUrl.replace(/\?aki_policy=[^&]+/, '?aki_policy=large&pos=0');
-          if (!mainUrl.includes('aki_policy=')) {
-            mainUrl += (mainUrl.includes('?') ? '&' : '?') + 'aki_policy=large&pos=0';
-          }
-          mainUrl += cacheBuster;
-        }
-        urls.push(mainUrl);
-      }
-      
-      // Then add additional images if they exist
-      if (additionalImages && additionalImages.length > 0) {
-        additionalImages.forEach((url, idx) => {
-          if (!url) return; // Skip empty URLs
-          
-          // Process additional image URL
-          let processedUrl = url;
-          if (processedUrl.includes('muscache.com/im/')) {
-            processedUrl = processedUrl.replace(/\?aki_policy=[^&]+/, `?aki_policy=large&pos=${idx+1}`);
-            if (!processedUrl.includes('aki_policy=')) {
-              processedUrl += (processedUrl.includes('?') ? '&' : '?') + `aki_policy=large&pos=${idx+1}`;
-            }
-            processedUrl += cacheBuster;
-          }
-          urls.push(processedUrl);
-        }); 
-      } 
-      
-      // Don't duplicate images - if we only have one image, that's all we'll show
-      // We'll display an "update images" button instead of duplicate images
-      if (urls.length === 1 && platformId && (!additionalImages || additionalImages.length === 0)) {
-        console.log('Only one image available - not duplicating');
-        return urls;
-      }
-      
-      return urls;
-    };
-    
-    // Function for direct API URLs with staggered loading (as fallback)
-    const createStaggeredApiUrls = (length: number) => {
-      // If we have a main image already, use it but with unique params for each position
-      if (imageUrl && length > 1) {
-        return Array.from({ length }, (_, idx) => {
-          // Add unique parameters to each URL to force image uniqueness
-          const uniqueParams = `&variant=${idx}&t=${Date.now() + idx}`;
-          if (imageUrl.includes('muscache.com')) {
-            return imageUrl.includes('?') ? 
-              `${imageUrl}&idx=${idx}${uniqueParams}` : 
-              `${imageUrl}?idx=${idx}${uniqueParams}`;
-          }
-          return imageUrl + (imageUrl.includes('?') ? '&' : '?') + `idx=${idx}${uniqueParams}`;
-        });
-      }
-      
-      return Array.from({ length }, (_, idx) => {
-        // Use placeholder for all fallback images since the API endpoint was broken
-        return '/placeholder-property.jpg';
-      });
-    };
-    
-    // Process API-sourced images
-    const processApiImages = () => {
-      if (!propertyImages || propertyImages.length === 0) return null;
-      
-      console.log('Processing API-sourced images:', propertyImages.length);
-      
-      // Sort images by position to ensure correct order
+  // Centralized image processing logic
+  const processedImages = useMemo(() => {
+    let newImages: string[] = [];
+    if (propertyImages && propertyImages.length > 0) {
+      // Sort and deduplicate
       const sortedImages = [...propertyImages].sort((a, b) => {
         const aPos = a.order !== undefined ? a.order : a.position;
         const bPos = b.order !== undefined ? b.order : b.position;
         return aPos - bPos;
       });
-      
-      // Make sure we have distinct images (no duplicates)
       const distinctUrls = new Set<string>();
-      return sortedImages
+      newImages = sortedImages
         .filter(img => img.url && img.url.trim() !== '')
         .filter(img => {
           if (distinctUrls.has(img.url)) return false;
@@ -217,7 +97,6 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           return true;
         })
         .map((img, index) => {
-          // Process muscache.com URLs for high quality
           if (img.url && img.url.includes('muscache.com/im/')) {
             const processed = img.url.replace(/\?aki_policy=[^&]+/, `?aki_policy=large&pos=${index}`);
             if (!processed.includes('aki_policy=')) {
@@ -227,40 +106,34 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           }
           return img.url;
         });
-    };
-    
-    let newImages: string[] = [];
-    
-    // OPTION 1: Use API images if they're available (prioritize over database)
-    const apiImages = processApiImages();
-    if (apiImages && apiImages.length > 0) {
-      console.log(`Using ${apiImages.length} images from API`);
-      
-      // Add random variations to each URL to prevent browser caching the same image multiple times
-      newImages = apiImages.map((url, idx) => {
-        // Add uniqueness parameters to each URL
-        const uniqueSuffix = `&uniq=${idx}_${Math.random().toString(36).substring(2, 8)}_${Date.now()}`;
-        return url + (url.includes('?') ? uniqueSuffix : `?${uniqueSuffix.substring(1)}`);
-      });
-    }
-    
-    // OPTION 2: Use database-stored images if API didn't return images
-    else if (hasStoredImages && newImages.length === 0) {
-      console.log('Falling back to stored database images');
-      const dbImageUrls = createDbImageUrls();
-      
-      if (dbImageUrls.length > 0) {
-        console.log(`Created ${dbImageUrls.length} URLs from database`, dbImageUrls);
-        newImages = dbImageUrls;
+    } else if ((imageUrl || (additionalImages && additionalImages.length > 0))) {
+      const urls: string[] = [];
+      if (imageUrl) {
+        let mainUrl = imageUrl;
+        if (mainUrl.includes('muscache.com/im/')) {
+          mainUrl = mainUrl.replace(/\?aki_policy=[^&]+/, '?aki_policy=large&pos=0');
+          if (!mainUrl.includes('aki_policy=')) {
+            mainUrl += (mainUrl.includes('?') ? '&' : '?') + 'aki_policy=large&pos=0';
+          }
+        }
+        urls.push(mainUrl);
       }
-    }
-    
-    // We already checked for API images as our first option
-    
-    // OPTION 3: Use provided images array if passed directly
-    if (newImages.length === 0 && providedImages && providedImages.length > 0) {
-      console.log(`Using ${providedImages.length} provided static images`);
-      const transformedImages = providedImages.map((url, index) => {
+      if (additionalImages && additionalImages.length > 0) {
+        additionalImages.forEach((url, idx) => {
+          if (!url) return;
+          let processedUrl = url;
+          if (processedUrl.includes('muscache.com/im/')) {
+            processedUrl = processedUrl.replace(/\?aki_policy=[^&]+/, `?aki_policy=large&pos=${idx + 1}`);
+            if (!processedUrl.includes('aki_policy=')) {
+              processedUrl += (processedUrl.includes('?') ? '&' : '?') + `aki_policy=large&pos=${idx + 1}`;
+            }
+          }
+          urls.push(processedUrl);
+        });
+      }
+      if (urls.length > 0) newImages = urls;
+    } else if (providedImages && providedImages.length > 0) {
+      newImages = providedImages.map((url, index) => {
         if (url && url.includes('muscache.com/im/')) {
           const processed = url.replace(/\?aki_policy=[^&]+/, `?aki_policy=large&pos=${index}`);
           if (!processed.includes('aki_policy=')) {
@@ -270,93 +143,114 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
         }
         return url;
       });
-      
-      newImages = transformedImages;
-    }
-    
-    // OPTION 4: Fall back to direct API URLs as last resort
-    if (newImages.length === 0 && platformId) {
-      console.log('Falling back to direct API image URLs');
-      const directUrls = createStaggeredApiUrls(3); // Use 3 images max to reduce rate limits
-      newImages = directUrls;
-    }
-    
-    // OPTION 5: Ultimate fallback - placeholder
-    if (newImages.length === 0) {
-      console.log('No image sources available, using placeholder');
+    } else {
       newImages = ['/placeholder-property.jpg'];
     }
-    
-    if (newImages.length > 0) {
-      setDisplayImages(newImages);
-      setImagesProcessed(true);
+    return newImages;
+  }, [propertyImages, providedImages, imageUrl, additionalImages, platformId]);
+
+  // Only update displayImages if processedImages changed
+  useEffect(() => {
+    if (JSON.stringify(displayImages) !== JSON.stringify(processedImages)) {
+      setDisplayImages(processedImages);
+      setCurrentIndex(0); // Reset index if images change
     }
-  }, [
-    imagesProcessed, 
-    displayImages.length, 
-    propertyImages, 
-    providedImages, 
-    imageUrl, 
-    additionalImages, 
-    platformId
-  ]);
-  
+  }, [processedImages]);
+
   // Navigation handlers
   const goToNext = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % displayImages.length);
   }, [displayImages.length]);
-  
+
   const goToPrevious = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + displayImages.length) % displayImages.length);
   }, [displayImages.length]);
-  
-  const handleThumbnailClick = (index: number) => {
-    setCurrentIndex(index);
-  };
-  
-  // Simple touch handler for mobile horizontal swiping
+
+  const handleThumbnailClick = (index: number) => setCurrentIndex(index);
+
+  // Touch and mouse drag handlers (cleaned up)
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  
-  // Minimum swipe distance
+  const [mouseStart, setMouseStart] = useState<number | null>(null);
+  const [mouseEnd, setMouseEnd] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const minSwipeDistance = 50;
-  
+
   const onTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
-    console.log('Touch start:', e.targetTouches[0].clientX);
   };
-  
-  const onTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    setTouchEnd(e.targetTouches[0].clientX);
-    console.log('Touch move:', e.targetTouches[0].clientX);
-  };
-  
+  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
+    if (touchStart === null || touchEnd === null) return;
     const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-    
-    console.log('Touch end - distance:', distance, 'left:', isLeftSwipe, 'right:', isRightSwipe);
-    
-    if (isLeftSwipe && displayImages.length > 1) {
-      console.log('Left swipe detected - going to next');
-      goToNext();
-    }
-    
-    if (isRightSwipe && displayImages.length > 1) {
-      console.log('Right swipe detected - going to previous');
-      goToPrevious();
-    }
-    
+    if (distance > minSwipeDistance && displayImages.length > 1) goToNext();
+    if (distance < -minSwipeDistance && displayImages.length > 1) goToPrevious();
     setTouchStart(null);
     setTouchEnd(null);
   };
-  
+  const onMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setMouseEnd(null);
+    setMouseStart(e.clientX);
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setMouseEnd(e.clientX);
+  };
+  const onMouseUp = () => {
+    if (mouseStart === null || mouseEnd === null || !isDragging) return;
+    const distance = mouseStart - mouseEnd;
+    if (distance > minSwipeDistance && displayImages.length > 1) goToNext();
+    if (distance < -minSwipeDistance && displayImages.length > 1) goToPrevious();
+    setIsDragging(false);
+    setMouseStart(null);
+    setMouseEnd(null);
+  };
+  const onMouseLeave = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      setMouseStart(null);
+      setMouseEnd(null);
+    }
+  };
+
+  // Optimized image URL function
+  const getOptimizedImageUrl = useCallback((originalUrl: string, size: 'small' | 'medium' | 'large' | 'xlarge' = 'medium') => {
+    if (!originalUrl) return '/placeholder-property.jpg';
+    if (originalUrl.includes('muscache.com/im/')) {
+      const sizeParams = {
+        small: 'aki_policy=small&pos=0',
+        medium: 'aki_policy=medium&pos=0',
+        large: 'aki_policy=large&pos=0',
+        xlarge: 'aki_policy=xlarge&pos=0'
+      };
+      let optimizedUrl = originalUrl.replace(/\?aki_policy=[^&]+/, `?${sizeParams[size]}`);
+      if (!optimizedUrl.includes('aki_policy=')) {
+        optimizedUrl += (optimizedUrl.includes('?') ? '&' : '?') + sizeParams[size];
+      }
+      return optimizedUrl;
+    }
+    return originalUrl;
+  }, []);
+
+  const getImageUrl = useCallback((image: string, index: number) => {
+    const size = isMobile ? 'small' : 'medium';
+    return getOptimizedImageUrl(image, size);
+  }, [isMobile, getOptimizedImageUrl]);
+
+  // Centralized error handler
+  const handleImageError = useCallback((index: number, fallbackUrl: string) => {
+    setFailedImages(prev => ({ ...prev, [index]: true }));
+    return fallbackUrl;
+  }, []);
+
+  // Helper to route to all-images page
+  const goToAllImagesPage = useCallback(() => {
+    if (!propertyId || !propertyName) return;
+    setLocation(getPropertyImgUrl(propertyId, propertyName));
+  }, [propertyId, propertyName, setLocation]);
+
   // If we're loading images from API, show a loading state
   if (platformId && loadingImages && displayImages.length <= 1) {
     return (
@@ -368,7 +262,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
       </div>
     );
   }
-  
+
   // If there are no images available, show an empty state
   if (displayImages.length === 0) {
     return (
@@ -379,58 +273,42 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
       </div>
     );
   }
-  
+
   return (
     <>
       {/* Desktop gallery grid */}
       <div className="hidden md:grid grid-cols-4 gap-2 h-[500px] mb-8">
         {/* Main large image (first column span 2 rows) */}
-        <div className="col-span-2 row-span-2 relative rounded-tl-lg rounded-bl-lg overflow-hidden h-full">
-          <img 
-            src={displayImages[0]} 
+        <div
+          className="col-span-2 row-span-2 relative rounded-tl-lg rounded-bl-lg overflow-hidden h-full"
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
+        >
+          <img
+            src={getImageUrl(displayImages[0], 0)}
             alt={`${propertyName} - main view`}
-            className="w-full h-full object-cover cursor-pointer"
-            onClick={() => setFullScreen(true)}
+            className="w-full h-full object-cover cursor-pointer gallery-image"
+            loading="eager"
+            onClick={goToAllImagesPage}
             onError={(e) => {
-              // Try to fetch from Hospitable API if image fails to load
-              handleImageLoadError(0, e.currentTarget.src);
-              
-              // Check for rate limits before retrying
-              const retryAttempts = apiRetryLimits[0] || 0;
-              
-              if (retryAttempts < 2 && platformId) {
-                console.log(`Image load error, attempting to fetch from API using platformId: ${platformId}`);
-                const { customerId, listingId } = extractPropertyIds(platformId);
-                if (customerId && listingId) {
-                  console.log(`Fetching from API: customerId=${customerId}, listingId=${listingId}`);
-                  // Add backoff delay based on retry attempts (exponential backoff)
-                  const backoffDelay = Math.pow(2, retryAttempts) * 1000;
-                  const cacheParam = `&cb=${Date.now()}&retry=${retryAttempts}&backoff=${backoffDelay}`;
-                  
-                  setTimeout(() => {
-                    if (e.currentTarget) {
-                      e.currentTarget.src = `/api/hospitable/property-images/${customerId}/${listingId}?pos=0${cacheParam}`;
-                    }
-                  }, backoffDelay);
-                }
-              } else {
-                // After multiple failures or no platformId, use placeholder
-                e.currentTarget.src = '/placeholder-property.jpg';
-              }
+              e.currentTarget.src = handleImageError(0, '/placeholder-property.jpg');
             }}
           />
         </div>
-        
+
         {Array.from({ length: 4 }).map((_, index) => {
           // Calculate actual image index (add 1 to skip main image)
           const imageIndex = index + 1;
           // Check if we have this image in our array
           const hasImage = displayImages.length > imageIndex;
-          
+
           // Always use the first image instead of making API calls
           // This prevents hitting rate limits
           let imageUrl: string;
-          
+
           if (hasImage) {
             // Use the image we have from our display images array
             imageUrl = displayImages[imageIndex];
@@ -441,37 +319,24 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
             // If no images available, use placeholder
             imageUrl = '/placeholder-property.jpg';
           }
-              
+
           return (
-            <div 
-              key={`gallery-thumb-${index}`} 
+            <div
+              key={`gallery-thumb-${index}`}
               className={`h-full ${index === 3 ? 'relative' : ''} ${index === 0 ? 'rounded-tr-lg' : ''} ${index === 3 ? 'rounded-br-lg' : ''}`}
             >
-              <img 
-                src={imageUrl} 
+              <img
+                src={getImageUrl(imageUrl, imageIndex)}
                 alt={`${propertyName} - view ${index + 2}`}
                 className={`w-full h-full object-cover cursor-pointer ${index === 0 ? 'rounded-tr-lg' : ''} ${index === 3 ? 'rounded-br-lg' : ''}`}
-                onClick={() => {
-                  // Set the image we want to show in fullscreen
-                  setCurrentIndex(imageIndex);
-                  setFullScreen(true);
-                }}
+                loading="lazy"
+                onClick={goToAllImagesPage}
                 onError={(e) => {
                   console.log(`Thumbnail ${index} failed to load`);
-                  // Try one more time with a direct API call with a specific position
-                  if (platformId) {
-                    const { customerId, listingId } = extractPropertyIds(platformId);
-                    if (customerId && listingId) {
-                      console.log(`Retrying thumbnail ${index} with direct API call and position=${imageIndex}`);
-                      e.currentTarget.src = `/api/hospitable/property-images/${customerId}/${listingId}?pos=${imageIndex}&refresh=true&t=${Date.now()}`;
-                    } else if (displayImages[0] && displayImages[0] !== imageUrl) {
-                      // If still failing and we have a main image, use that
-                      console.log(`Using main image for thumbnail ${index}`);
-                      e.currentTarget.src = displayImages[0];
-                    } else {
-                      // Fallback to placeholder
-                      e.currentTarget.src = '/placeholder-property.jpg';
-                    }
+                  if (displayImages[0] && displayImages[0] !== imageUrl) {
+                    // If we have a main image, use that
+                    console.log(`Using main image for thumbnail ${index}`);
+                    e.currentTarget.src = displayImages[0];
                   } else {
                     // Fallback to placeholder
                     e.currentTarget.src = '/placeholder-property.jpg';
@@ -479,11 +344,11 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
                 }}
               />
               {index === 3 && displayImages.length > 5 && (
-                <Button 
+                <Button
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setFullScreen(true);
+                    goToAllImagesPage();
                   }}
                   className="absolute right-4 bottom-4 bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 px-4 py-2 rounded-lg shadow-sm transition-all"
                 >
@@ -494,69 +359,75 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           );
         })}
       </div>
-      
+
       {/* Mobile-specific horizontal swipe carousel */}
       <div className="md:hidden relative mb-4">
-        <div 
-          className={`relative h-[300px] w-full overflow-hidden rounded-lg swipe-area ${touchStart || touchEnd ? 'swiping' : ''}`} 
-          style={{ 
+        <div
+          className={`relative h-[300px] w-full overflow-hidden rounded-lg swipe-area ${touchStart || touchEnd || isDragging ? 'swiping' : ''}`}
+          style={{
             touchAction: 'none',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            cursor: isDragging ? 'grabbing' : 'grab',
+            height: '300px', // Ensure fixed height for mobile carousel
+            width: '100%',
+            maxWidth: '100vw',
           }}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
         >
           {/* Touch navigation overlay for mobile */}
-          <div 
+          <div
             className="absolute inset-0 z-20"
             style={{ touchAction: 'none' }}
           />
-          
+
           {/* Horizontal image carousel */}
-          <div 
+          <div
             className="flex h-full carousel-container"
-            style={{ 
+            style={{
               transform: `translateX(-${currentIndex * 100}%)`,
-              width: `${displayImages.length * 100}%`
+              width: `${displayImages.length * 100}%`,
+              height: '300px', // Ensure fixed height for carousel
+              maxWidth: '100vw',
             }}
           >
             {displayImages.map((image, index) => (
-              <div 
+              <div
                 key={index}
                 className="relative flex-shrink-0 w-full h-full"
-                style={{ width: `${100 / displayImages.length}%` }}
+                style={{ width: '100%', height: '300px', maxWidth: '100vw' }}
               >
-                <img 
-                  src={image} 
+                <img
+                  src={getImageUrl(image, index)}
                   alt={`${propertyName} - view ${index + 1}`}
                   className="w-full h-full object-cover cursor-pointer"
-                  style={{ pointerEvents: 'none' }}
-                  onClick={() => setFullScreen(true)}
+                  style={{
+                    pointerEvents: 'none',
+                    imageRendering: 'auto',
+                    backfaceVisibility: 'hidden',
+                    perspective: '1000px',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    maxWidth: '100vw',
+                  }}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  onClick={goToAllImagesPage}
+                  onLoad={() => {
+                    console.log(`Mobile carousel image ${index} loaded successfully:`, image);
+                  }}
                   onError={(e) => {
-                    // Try to fetch from Hospitable API if image fails to load
-                    handleImageLoadError(index, e.currentTarget.src);
-                    
-                    // Check for rate limits before retrying
-                    const retryAttempts = apiRetryLimits[index] || 0;
-                    
-                    if (retryAttempts < 2 && platformId) {
-                      console.log(`Image load error, attempting to fetch from API using platformId: ${platformId}`);
-                      const { customerId, listingId } = extractPropertyIds(platformId);
-                      if (customerId && listingId) {
-                        console.log(`Fetching from API: customerId=${customerId}, listingId=${listingId}`);
-                        // Add backoff delay based on retry attempts (exponential backoff)
-                        const backoffDelay = Math.pow(2, retryAttempts) * 1000;
-                        const cacheParam = `&cb=${Date.now()}&retry=${retryAttempts}&backoff=${backoffDelay}`;
-                        
-                        setTimeout(() => {
-                          if (e.currentTarget) {
-                            e.currentTarget.src = `/api/hospitable/property-images/${customerId}/${listingId}?pos=${index}${cacheParam}`;
-                          }
-                        }, backoffDelay);
-                      }
+                    console.log(`Mobile carousel image ${index} failed to load:`, image);
+                    if (displayImages[0] && displayImages[0] !== image) {
+                      // Use the primary image if available
+                      e.currentTarget.src = getImageUrl(displayImages[0], 0);
                     } else {
-                      // After multiple failures or no platformId, use placeholder
+                      // Final fallback
                       e.currentTarget.src = '/placeholder-property.jpg';
                     }
                   }}
@@ -564,39 +435,30 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
               </div>
             ))}
           </div>
-          
+
           {displayImages.length > 1 && (
             <>
               {/* Photo counter indicator */}
               <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm z-30">
                 {currentIndex + 1} / {displayImages.length}
               </div>
-              
+
               {/* Show all photos button */}
-              <Button 
+              <Button
                 variant="ghost"
-                onClick={() => setFullScreen(true)}
+                onClick={goToAllImagesPage}
                 className="absolute right-4 bottom-4 bg-white/90 hover:bg-white text-gray-800 px-3 py-1 rounded-full text-sm shadow-sm z-30"
               >
                 <Grid className="h-3.5 w-3.5 mr-1" /> All photos
               </Button>
-              
-              {/* Touch debug indicator */}
-              <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs z-40">
-                Touch: {touchStart ? 'Active' : 'None'}
-              </div>
-              
-              {/* Subtle swipe hint */}
-              <div className={`absolute inset-0 pointer-events-none bg-gradient-to-r from-black/5 via-transparent to-black/5 opacity-0 transition-opacity duration-300 ${touchStart ? 'opacity-30' : ''}`}></div>
-              
+
               {/* Image dots indicator */}
               <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
                 {displayImages.map((_, index) => (
                   <div
                     key={index}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentIndex ? 'bg-white' : 'bg-white/50'
-                    }`}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-white' : 'bg-white/50'
+                      }`}
                   />
                 ))}
               </div>
@@ -604,16 +466,23 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           )}
         </div>
       </div>
-      
-      {/* Removed refresh button to prevent rate limiting */}
 
       {/* Full-screen gallery with zoom capabilities */}
       <Dialog open={fullScreen} onOpenChange={setFullScreen}>
-        <DialogContent className="max-w-6xl w-[95vw] h-[95vh] p-0">
+        <DialogContent
+          className="w-full h-full p-0 flex items-center justify-center"
+          style={{
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            width: '100vw',
+            height: '100vh',
+            padding: 0,
+          }}
+        >
           <DialogHeader className="absolute top-0 left-0 right-0 z-50 p-4 flex justify-between items-center">
             <DialogTitle className="text-white drop-shadow-md">{propertyName}</DialogTitle>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={() => setFullScreen(false)}
               className="text-white hover:bg-black/20"
@@ -621,133 +490,196 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
               <X className="h-6 w-6" />
             </Button>
           </DialogHeader>
-          
-          <div className="relative h-full flex flex-col">
-            {/* Main image area with pinch zoom */}
-            <div 
-              className={`flex-1 relative flex items-center justify-center bg-black swipe-area ${touchStart ? 'swiping' : ''}`}
-            >
-              {/* Swipe direction indicators */}
-              <div className="gallery-indicator left">
-                <ChevronLeft className="h-6 w-6 text-white" />
-              </div>
-              <div className="gallery-indicator right">
-                <ChevronRight className="h-6 w-6 text-white" />
-              </div>
-              
-              {/* Touch navigation overlay for mobile */}
-              {isMobile && (
-                <div 
-                  className="absolute inset-0 z-30"
-                />
-              )}
-              
-              <TransformWrapper
-                initialScale={1}
-                minScale={0.5}
-                maxScale={3}
-                centerOnInit={true}
-                wheel={{ step: 0.05 }}
-                doubleClick={{ mode: "reset" }}
-                panning={{ disabled: isMobile, velocityDisabled: true }}
-                limitToBounds={true}
-                smooth={true}
+
+          <div
+            className="relative h-full w-full flex flex-col items-center justify-center"
+            style={{
+              height: '100%',
+              width: '100%',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+            }}
+          >
+            {/* Main image area: mobile = horizontal scroll, desktop = zoom/pan */}
+            {isMobile ? (
+              <div
+                className="flex-1 w-full h-full overflow-x-auto flex snap-x snap-mandatory"
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  height: '100vh',
+                  width: '100vw',
+                }}
               >
-                {({ zoomIn, zoomOut, resetTransform }) => (
-                  <>
-                    <div className="absolute top-4 right-4 flex gap-2 z-40">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => zoomIn()}
-                        className="bg-black/30 text-white hover:bg-black/50 rounded-full p-2"
-                      >
-                        <ZoomIn className="h-5 w-5" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => zoomOut()}
-                        className="bg-black/30 text-white hover:bg-black/50 rounded-full p-2"
-                      >
-                        <ZoomOut className="h-5 w-5" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => resetTransform()}
-                        className="bg-black/30 text-white hover:bg-black/50 rounded-full p-2"
-                      >
-                        <span className="text-xs font-medium">Reset</span>
-                      </Button>
-                    </div>
-                    <TransformComponent
-                      wrapperStyle={{ width: "100%", height: "100%" }}
-                      contentStyle={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
-                    >
-                      <img 
-                        src={
-                          // If we have the image in our array, use it
-                          displayImages[currentIndex] || 
-                          // Otherwise use the main image if we have it to prevent unnecessary API calls
-                          (displayImages.length > 0 ? displayImages[0] : '/placeholder-property.jpg')
-                        } 
-                        alt={`${propertyName} - gallery view ${currentIndex + 1}`}
-                        className="max-h-full max-w-full object-contain"
-                        onError={(e) => {
-                          console.log(`Fullscreen image ${currentIndex} failed to load`);
-                          
-                          // Use the primary image if available instead of making API calls
-                          if (currentIndex > 0 && displayImages[0]) {
-                            console.log(`Using primary image for fullscreen view index ${currentIndex}`);
-                            e.currentTarget.src = displayImages[0];
-                          } else {
-                            // Final fallback
-                            e.currentTarget.src = '/placeholder-property.jpg';
-                          }
+                {displayImages.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-shrink-0 w-full h-full flex items-center justify-center snap-center"
+                    style={{ width: '100vw', height: '100vh', scrollSnapAlign: 'center' }}
+                  >
+                    <img
+                      src={getOptimizedImageUrl(img, isMobile ? 'small' : 'large')}
+                      alt={`${propertyName} - gallery view ${idx + 1}`}
+                      className="object-contain"
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                      onError={(e) => {
+                        if (displayImages[0] && displayImages[0] !== img) {
+                          e.currentTarget.src = displayImages[0];
+                        } else {
+                          e.currentTarget.src = '/placeholder-property.jpg';
+                        }
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Desktop: keep zoom/pan
+              <div
+                className={`flex-1 relative flex items-center justify-center bg-black swipe-area ${touchStart || touchEnd || isDragging ? 'swiping' : ''}`}
+                style={{
+                  cursor: isDragging ? 'grabbing' : 'grab',
+                  height: '100%',
+                  width: '100%',
+                  maxHeight: '90vh',
+                  maxWidth: '90vw',
+                }}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseLeave}
+              >
+                {/* Swipe direction indicators */}
+                <div className="gallery-indicator left">
+                  <ChevronLeft className="h-6 w-6 text-white" />
+                </div>
+                <div className="gallery-indicator right">
+                  <ChevronRight className="h-6 w-6 text-white" />
+                </div>
+                <TransformWrapper
+                  key={currentIndex}
+                  initialScale={1}
+                  minScale={0.5}
+                  maxScale={3}
+                  centerOnInit={true}
+                  wheel={{ step: 0.05 }}
+                  doubleClick={{ mode: "reset" }}
+                  panning={{ disabled: false, velocityDisabled: true }}
+                  limitToBounds={true}
+                  smooth={true}
+                >
+                  {({ zoomIn, zoomOut, resetTransform }) => (
+                    <>
+                      <div className="absolute top-4 right-4 flex gap-2 z-40">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => zoomIn()}
+                          className="bg-black/30 text-white hover:bg-black/50 rounded-full p-2"
+                        >
+                          <ZoomIn className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => zoomOut()}
+                          className="bg-black/30 text-white hover:bg-black/50 rounded-full p-2"
+                        >
+                          <ZoomOut className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => resetTransform()}
+                          className="bg-black/30 text-white hover:bg-black/50 rounded-full p-2"
+                        >
+                          <span className="text-xs font-medium">Reset</span>
+                        </Button>
+                      </div>
+                      <TransformComponent
+                        wrapperStyle={{
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: '90vw',
+                          maxHeight: '90vh',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                         }}
-                      />
-                    </TransformComponent>
-                  </>
-                )}
-              </TransformWrapper>
-              
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={goToPrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 text-white hover:bg-black/50 rounded-full p-2 z-40"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-              
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={goToNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 text-white hover:bg-black/50 rounded-full p-2 z-40"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-              
-              {/* Mobile image counter */}
-              <div className="md:hidden absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm z-40">
-                {currentIndex + 1} / {displayImages.length}
+                        contentStyle={{
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: '90vw',
+                          maxHeight: '90vh',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <img
+                          src={getOptimizedImageUrl(
+                            displayImages[currentIndex] ||
+                            (displayImages.length > 0 ? displayImages[0] : '/placeholder-property.jpg'),
+                            'large'
+                          )}
+                          alt={`${propertyName} - gallery view ${currentIndex + 1}`}
+                          className="object-contain"
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: 'auto',
+                            height: 'auto',
+                            display: 'block',
+                            margin: 'auto',
+                          }}
+                          loading="eager"
+                          onError={(e) => {
+                            if (currentIndex > 0 && displayImages[0]) {
+                              e.currentTarget.src = displayImages[0];
+                            } else {
+                              e.currentTarget.src = '/placeholder-property.jpg';
+                            }
+                          }}
+                        />
+                      </TransformComponent>
+                    </>
+                  )}
+                </TransformWrapper>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={goToPrevious}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 text-white hover:bg-black/50 rounded-full p-2 z-40"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={goToNext}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 text-white hover:bg-black/50 rounded-full p-2 z-40"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+                <div className="md:hidden absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm z-40">
+                  {currentIndex + 1} / {displayImages.length}
+                </div>
               </div>
-            </div>
-            
+            )}
+
             {/* Thumbnails */}
             <div className="h-20 bg-black py-2 px-4 flex gap-2 overflow-x-auto">
               {displayImages.map((img, idx) => (
-                <div 
+                <div
                   key={idx}
                   className={`h-16 w-24 flex-shrink-0 cursor-pointer border-2 ${idx === currentIndex ? 'border-white' : 'border-transparent opacity-70 hover:opacity-100'}`}
                   onClick={() => handleThumbnailClick(idx)}
                 >
-                  <img 
-                    src={img} 
+                  <img
+                    src={getImageUrl(img, idx)}
                     alt={`${propertyName} thumbnail ${idx + 1}`}
                     className="h-full w-full object-cover"
+                    loading="lazy"
                     onError={(e) => {
                       // For thumbnails, just use the primary image if available, otherwise placeholder
                       if (idx > 0 && displayImages[0]) {
@@ -763,8 +695,9 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           </div>
         </DialogContent>
       </Dialog>
-      
-      <style dangerouslySetInnerHTML={{ __html: `
+
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .swipe-area:hover .gallery-indicator {
           opacity: 1;
         }
@@ -834,6 +767,34 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
         /* Smooth image transitions */
         .carousel-image {
           transition: opacity 0.3s ease;
+        }
+        
+        /* Image optimization styles */
+        .gallery-image {
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: crisp-edges;
+          backface-visibility: hidden;
+          transform: translateZ(0);
+          will-change: transform;
+        }
+        
+        /* Lazy loading placeholder */
+        .image-placeholder {
+          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+          background-size: 200% 100%;
+          animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        
+        /* Optimize for mobile */
+        @media (max-width: 768px) {
+          .gallery-image {
+            image-rendering: auto;
+          }
         }
       `}} />
     </>

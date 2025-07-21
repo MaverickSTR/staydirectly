@@ -2,30 +2,30 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  DropdownMenu, 
+import {
+  DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger 
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetTrigger 
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger
 } from '@/components/ui/sheet';
-import { 
-  Menu, 
-  User, 
-  Home, 
-  MapPin, 
-  Heart, 
-  LogIn, 
-  Building, 
-  ChevronDown, 
-  Link as LinkIcon, 
-  ListChecks, 
+import {
+  Menu,
+  User,
+  Home,
+  MapPin,
+  Heart,
+  LogIn,
+  Building,
+  ChevronDown,
+  Link as LinkIcon,
+  ListChecks,
   Globe,
   LayoutDashboard
 } from 'lucide-react';
@@ -34,9 +34,12 @@ const Navbar: React.FC = () => {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const isHomePage = location === '/';
+  const widthClass = !isHomePage
+    ? " w-[85%] mx-auto"
+    : "w-[95%]";
 
   return (
-    <header className="headerGlass fixed top-0 left-1/2 transform -translate-x-1/2 z-50  shadow-sm w-[95%] rounded-md mt-2">
+    <header className={`headerGlass fixed top-0 left-1/2 transform -translate-x-1/2 z-50  shadow-sm  rounded-md mt-2 ${widthClass}`}>
       <div className="container mx-auto px-4 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -74,7 +77,7 @@ const Navbar: React.FC = () => {
                 <span className="absolute left-0 bottom-[-4px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
               </span>
             </Link>
-            
+
             {/* Markets Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -110,7 +113,7 @@ const Navbar: React.FC = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
+
 
             {/* User Menu Dropdown - temporarily hidden
             <DropdownMenu>
@@ -145,7 +148,7 @@ const Navbar: React.FC = () => {
             </DropdownMenu>
             */}
           </nav>
-          
+
           {/* Mobile menu button */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -162,7 +165,7 @@ const Navbar: React.FC = () => {
                   <Link to="/search" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
                     Book Your Stay
                   </Link>
-                  
+
                   <Link to="/featured" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
                     Featured
                   </Link>
@@ -172,7 +175,7 @@ const Navbar: React.FC = () => {
                   <Link to="/properties" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
                     Properties
                   </Link>
-                  
+
                   {/* Mobile Markets Section */}
                   <div className="block py-2 px-4">
                     <div className="font-medium mb-2 flex items-center">
@@ -198,7 +201,7 @@ const Navbar: React.FC = () => {
                       </Link>
                     </div>
                   </div>
-                  
+
 
                   {/* Sign in link hidden for now
                   <Link href="#" className="block py-2 px-4 hover:bg-gray-100 rounded-md">
@@ -210,7 +213,7 @@ const Navbar: React.FC = () => {
             </SheetContent>
           </Sheet>
         </div>
-        
+
         {/* No mobile search bar - using hero search instead */}
       </div>
     </header>

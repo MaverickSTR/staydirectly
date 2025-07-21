@@ -7,15 +7,14 @@ import { Meta } from '@/lib/seo';
 const Home: React.FC = () => {
   return (
     <>
-      <Meta 
+      <Meta
         title="StayDirectly - Book Unique Accommodations Directly"
         description="Find and book unique accommodations directly from hosts - no fees, no middlemen, just authentic stays."
         canonical="/"
       />
-
       <HeroSection />
-      <FeaturedDestinations />
       <FeaturedProperties />
+      <FeaturedDestinations />
       <TestimonialsSection />
       <FAQ />
     </>

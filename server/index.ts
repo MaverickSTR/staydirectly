@@ -37,16 +37,6 @@ if (appConfig.isProduction) {
 }
 
 const app = express();
-
-// Debug environment detection
-console.log("🔍 Environment detection:");
-console.log("   - NODE_ENV:", process.env.NODE_ENV);
-console.log("   - appConfig.isDevelopment:", appConfig.isDevelopment);
-console.log("   - appConfig.isProduction:", appConfig.isProduction);
-console.log("   - app.get('env'):", app.get("env"));
-
-// Security configuration already loaded as appConfig
-
 // Configure trusted proxies first
 app.use(configureTrustedProxies());
 
@@ -275,60 +265,31 @@ app.use((req, res, next) => {
       log("Running in production mode - serving static files", "server");
       serveStatic(app);
     }
-
-    // ALWAYS serve the app on port 5000
-    // this serves both the API and the client.
-    // It is the only port that is not firewalled.
     const port = parseInt(process.env.PORT || "5000", 10);
 
     server
-      .listen(
-        {
-          port,
-          host: "0.0.0.0",
-          // reusePort: true,
-        },
-        () => {
-          log(`🚀 Server running on port ${port}`);
-          log(
-            `🔒 Security features enabled: ${
-              !appConfig.isDevelopment ? "PRODUCTION" : "DEVELOPMENT"
-            } mode`
-          );
-          log(`🌐 CORS origins: ${appConfig.cors.origins.join(", ")}`);
-          log(
-            `📁 Static files will be served from: ${path.resolve(
-              import.meta.dirname,
-              "..",
-              "dist",
-              "public"
-            )}`
-          );
-        }
-      )
+      .listen({
+        port,
+        host: "0.0.0.0",
+        // reusePort: true,
+      })
       .on("error", (err) => {
         console.error(
           `❌ Failed to start server on port ${port}:`,
           err.message
         );
         console.error(err);
-        console.error(
-          "💥 Server startup failed - this might cause the deployment platform to serve static files instead"
-        );
         process.exit(1);
       });
 
     // Graceful shutdown handling
     process.on("SIGTERM", () => {
-      console.log("🛑 SIGTERM received, shutting down gracefully");
       server.close(() => {
-        console.log("💤 Process terminated");
         process.exit(0);
       });
     });
 
     process.on("SIGINT", () => {
-      console.log("🛑 SIGINT received, shutting down gracefully");
       server.close(() => {
         console.log("💤 Process terminated");
         process.exit(0);
@@ -337,7 +298,6 @@ app.use((req, res, next) => {
 
     // Handle uncaught exceptions
     process.on("uncaughtException", (err) => {
-      console.error("💥 Uncaught Exception:", err);
       process.exit(1);
     });
 

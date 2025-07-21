@@ -1116,14 +1116,3 @@ function normalizeBedroomDetails(details: any): {
     beds: Object.values(detail.beds),
   }));
 }
-
-// // Import the database storage implementation
-// import { DatabaseStorage } from "./database-storage";
-
-// // Choose the storage implementation to use
-// const useDatabase = process.env.DATABASE_URL ? true : false;
-
-// // Export the database storage implementation
-// export const storage = new DatabaseStorage();
-
-// console.log(`Using ${useDatabase ? 'database' : 'memory'} storage`);

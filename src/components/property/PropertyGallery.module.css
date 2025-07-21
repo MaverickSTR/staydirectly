@@ -1,0 +1,92 @@
+/* PropertyGallery.module.css */
+
+.swipeArea {
+  touch-action: pan-y pinch-zoom;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.swipeArea img {
+  pointer-events: none;
+}
+
+.swipeArea .galleryIndicator {
+  pointer-events: none;
+}
+
+.galleryIndicator {
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.2s ease;
+}
+
+.swipeArea:hover .galleryIndicator {
+  opacity: 1;
+}
+
+.mobileTapArea {
+  pointer-events: auto;
+}
+
+.carouselContainer {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.swipingLeft {
+  transform: translateX(-10px);
+  transition: transform 0.1s ease;
+}
+
+.swipingRight {
+  transform: translateX(10px);
+  transition: transform 0.1s ease;
+}
+
+.swipeArea * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.carouselDots {
+  transition: all 0.3s ease;
+}
+
+.carouselDots .dot {
+  transition: all 0.3s ease;
+}
+
+.carouselImage {
+  transition: opacity 0.3s ease;
+}
+
+.galleryImage {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.imagePlaceholder {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 768px) {
+  .galleryImage {
+    image-rendering: auto;
+  }
+} 

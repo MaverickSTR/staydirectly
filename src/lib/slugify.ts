@@ -6,15 +6,15 @@
 export function slugify(text: string): string {
   return text
     .toString()
-    .normalize('NFKD') // Split accented characters into their base characters and diacritical marks
-    .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
+    .normalize("NFKD") // Split accented characters into their base characters and diacritical marks
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritical marks
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/[^\w-]+/g, '') // Remove all non-word characters except hyphens
-    .replace(/--+/g, '-') // Replace multiple - with single -
-    .replace(/^-+/, '') // Trim - from start of text
-    .replace(/-+$/, ''); // Trim - from end of text
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\w-]+/g, "") // Remove all non-word characters except hyphens
+    .replace(/--+/g, "-") // Replace multiple - with single -
+    .replace(/^-+/, "") // Trim - from start of text
+    .replace(/-+$/, ""); // Trim - from end of text
 }
 
 /**
@@ -25,6 +25,10 @@ export function slugify(text: string): string {
  */
 export function getPropertyUrl(id: number, title: string): string {
   return `/property/${id}-${slugify(title)}`;
+}
+
+export function getPropertyImgUrl(id: number, title: string): string {
+  return `/property/images/${id}-${slugify(title)}`;
 }
 
 /**
@@ -53,5 +57,5 @@ export function getCityUrl(name: string): string {
  */
 export function prepareNextJsPath(path: string): string {
   // Convert /property/:id to /property/[id]
-  return path.replace(/:(\w+)/g, '[$1]');
+  return path.replace(/:(\w+)/g, "[$1]");
 }

@@ -25,6 +25,7 @@ import { usePrefetchCommonData } from "@/lib/api";
 import { cacheWarmers } from "@/lib/queryClient";
 import { useEffect } from "react";
 import { Layout } from "./components/layout";
+import PropertyImagesPage from "@/pages/PropertyImagesPage";
 
 function Router() {
   const { prefetchFeaturedData } = usePrefetchCommonData();
@@ -61,7 +62,7 @@ function Router() {
   const isHomePage = location === "/";
   const mainClasses = isHomePage 
     ? "flex-grow " 
-    : "flex-grow w-[95%] mx-auto py-20";
+    : "flex-grow w-[85%] mx-auto py-20";
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -69,6 +70,7 @@ function Router() {
       <main className={mainClasses}>
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/property/images/:slug" component={PropertyImagesPage} />
           <Route path="/property/:slug" component={PropertyDetail} />
           <Route path="/search" component={SearchResults} />
           <Route path="/city/:name" component={CityPage} />
