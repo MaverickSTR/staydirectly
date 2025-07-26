@@ -11,6 +11,7 @@ import { usePropertyImages } from '@/hooks/use-property-images';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useLocation } from 'wouter';
 import { slugify, getPropertyImgUrl } from '@/lib/slugify';
+import styles from './PropertyGallery.module.css';
 
 interface PropertyGalleryProps {
   images?: string[];
@@ -277,10 +278,10 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
   return (
     <>
       {/* Desktop gallery grid */}
-      <div className="hidden md:grid grid-cols-4 gap-2 h-[500px] mb-8">
+      <div className="hidden md:grid grid-cols-4 gap-2 h-[400px] mb-8 relative bg-blue-50/30 p-4 rounded-xl">
         {/* Main large image (first column span 2 rows) */}
         <div
-          className="col-span-2 row-span-2 relative rounded-tl-lg rounded-bl-lg overflow-hidden h-full"
+          className="col-span-2 row-span-2 relative rounded-xl overflow-hidden h-full"
           style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
@@ -323,12 +324,12 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           return (
             <div
               key={`gallery-thumb-${index}`}
-              className={`h-full ${index === 3 ? 'relative' : ''} ${index === 0 ? 'rounded-tr-lg' : ''} ${index === 3 ? 'rounded-br-lg' : ''}`}
+              className={`h-full rounded-xl `}
             >
               <img
                 src={getImageUrl(imageUrl, imageIndex)}
                 alt={`${propertyName} - view ${index + 2}`}
-                className={`w-full h-full object-cover cursor-pointer ${index === 0 ? 'rounded-tr-lg' : ''} ${index === 3 ? 'rounded-br-lg' : ''}`}
+                className={`w-full h-full object-cover cursor-pointer rounded-xl `}
                 loading="lazy"
                 onClick={goToAllImagesPage}
                 onError={(e) => {
@@ -695,108 +696,6 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .swipe-area:hover .gallery-indicator {
-          opacity: 1;
-        }
-        
-        .gallery-indicator {
-          background-color: rgba(0, 0, 0, 0.3);
-          transition: opacity 0.2s ease;
-        }
-        
-        .swipe-area {
-          touch-action: pan-y pinch-zoom;
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          -khtml-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
-        
-        .swipe-area img {
-          pointer-events: none;
-        }
-        
-        .swipe-area .gallery-indicator {
-          pointer-events: none;
-        }
-        
-        .mobile-tap-area {
-          pointer-events: auto;
-        }
-        
-        /* Horizontal carousel transitions */
-        .carousel-container {
-          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* Swipe direction visual feedback */
-        .swiping-left {
-          transform: translateX(-10px);
-          transition: transform 0.1s ease;
-        }
-        
-        .swiping-right {
-          transform: translateX(10px);
-          transition: transform 0.1s ease;
-        }
-        
-        /* Prevent text selection during swipes */
-        .swipe-area * {
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          -khtml-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
-        
-        /* Image dots indicator */
-        .carousel-dots {
-          transition: all 0.3s ease;
-        }
-        
-        .carousel-dots .dot {
-          transition: all 0.3s ease;
-        }
-        
-        /* Smooth image transitions */
-        .carousel-image {
-          transition: opacity 0.3s ease;
-        }
-        
-        /* Image optimization styles */
-        .gallery-image {
-          image-rendering: -webkit-optimize-contrast;
-          image-rendering: crisp-edges;
-          backface-visibility: hidden;
-          transform: translateZ(0);
-          will-change: transform;
-        }
-        
-        /* Lazy loading placeholder */
-        .image-placeholder {
-          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-          background-size: 200% 100%;
-          animation: loading 1.5s infinite;
-        }
-        
-        @keyframes loading {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        
-        /* Optimize for mobile */
-        @media (max-width: 768px) {
-          .gallery-image {
-            image-rendering: auto;
-          }
-        }
-      `}} />
     </>
   );
 };

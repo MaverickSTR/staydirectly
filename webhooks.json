@@ -1,0 +1,1877 @@
+{
+    "openapi": "3.1.0",
+    "x-stoplight": {
+        "id": "tqe6exd1qxiu1"
+    },
+    "info": {
+        "title": "Webhooks",
+        "version": "2023-07-11",
+        "summary": "Hospitable Connect provides a seamless integration with your application and a number of OTAs.",
+        "description": "",
+        "contact": {
+            "email": "team-connect@hospitable.com",
+            "name": "The Connect team"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://connect.hospitable.com/api/v1",
+            "description": "Production"
+        }
+    ],
+    "webhooks": {
+        "channel.activated": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: channel.activated",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookChannel"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "listing.created": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: listing.created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookListing"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "listing.changed": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: listing.changed",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookListing"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "listing.deactivated": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: listing.deactivated",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookListing"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "listing.reactivated": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: listing.reactivated",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookListing"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "listing.deleted": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: listing.deleted",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookListing"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "reservation.created": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: reservation.created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReservation"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "reservation.changed": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: reservation.changed",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReservation"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "review.created": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: review.created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReview"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "review.submitted": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: review.submitted",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReview"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "review.published": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: review.published",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReview"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "review.expired": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: review.expired",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReview"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "review.changed": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: review.changed",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReview"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "review.response_submitted": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: review.response_submitted",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookReview"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "transaction.created": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: transaction.created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookTransaction"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "transaction.changed": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: transaction.changed",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookTransaction"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "payout.created": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: payout.created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookPayout"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        },
+        "payout.changed": {
+            "post": {
+                "requestBody": {
+                    "description": "Action: payout.changed",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookPayout"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a 200 status to indicate that the data was received successfully"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Channel": {
+                "type": "object",
+                "x-examples": {
+                    "Example 1": {
+                        "id": "f74b6293-56a0-4ca0-8325-fa8b94a7d880",
+                        "platform": "airbnb",
+                        "platform_id": "4868066",
+                        "name": "Emily & Bram",
+                        "picture": "https://a0.muscache.com/im/pictures/user/7cf8af38-d08d-48d0-9134-9ea66166ebc3.jpg?aki_policy=profile_x_medium",
+                        "location": "Tucker, GA",
+                        "description": "When I'm not wrangling 3 kids with my husband of 8 years, I'm only kind of trying not to drink another cup of coffee while hosting guests at our log cabin in Cherry Log, GA.",
+                        "first_connected_at": "2023-03-16T14:15:47Z"
+                    }
+                },
+                "description": "A channel represents an established connection with an OTA",
+                "title": "Channel",
+                "examples": [],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "f74b6293-56a0-4ca0-8325-fa8b94a7d880",
+                        "format": "uuid"
+                    },
+                    "platform": {
+                        "type": "string",
+                        "enum": [
+                            "airbnb"
+                        ],
+                        "example": "airbnb"
+                    },
+                    "platform_id": {
+                        "type": "string",
+                        "example": "HM186806143"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "picture": {
+                        "type": "string",
+                        "example": "https://image.com/image.png",
+                        "format": "uri"
+                    },
+                    "location": {
+                        "type": "string",
+                        "example": "Savannah, GA"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Me and my family welcome you to stay at our lodge"
+                    },
+                    "first_connected_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-03-16T14:15:47Z"
+                    }
+                },
+                "x-stoplight": {
+                    "id": "5562afm0yvure"
+                }
+            },
+            "Customer": {
+                "type": "object",
+                "x-examples": {
+                    "Example 1": {
+                        "id": "test-01",
+                        "email": "johny@hospitable.com",
+                        "name": "John Doe",
+                        "phone": "+15555555555",
+                        "ip_address": null,
+                        "timezone": "UTC"
+                    }
+                },
+                "description": "A Customer represents a single user of your own application. The customer is used to create Channels i.e. OTA platform connections. These channels are used to aggregate the properties and accompanying data from the customer.\n\nFor convenience you can identify each of your Customers with an identifier of your own liking, during the creation of a customer you're asked to provide an id field in which you can enter said identifier.",
+                "title": "Customer",
+                "examples": [],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "23fead63-7475-4fc8-b3a8-b4bf8f43dc92"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "john.doe@example.com",
+                        "format": "email"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+15555555555"
+                    },
+                    "ip_address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "ipv4"
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "example": "UTC"
+                    }
+                },
+                "x-stoplight": {
+                    "id": "itlzxu86rrbye"
+                }
+            },
+            "Financial": {
+                "type": "object",
+                "x-examples": {
+                    "Example 1": {
+                        "amount": 35502,
+                        "formatted": "$355.02",
+                        "currency": "USD",
+                        "label": null
+                    }
+                },
+                "title": "Financial",
+                "properties": {
+                    "amount": {
+                        "type": "integer",
+                        "example": 35502
+                    },
+                    "formatted": {
+                        "type": "string",
+                        "example": "$355.02"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "label": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "Accommodation Tax"
+                    }
+                },
+                "examples": [],
+                "description": "",
+                "x-stoplight": {
+                    "id": "yhxsoed1u8ni0"
+                }
+            },
+            "Guest": {
+                "type": "object",
+                "x-examples": {
+                    "Example 1": {
+                        "email": "",
+                        "phone_numbers": [
+                            "+31623456780"
+                        ],
+                        "first_name": "Sarah",
+                        "last_name": "Hancock",
+                        "locale": "en"
+                    }
+                },
+                "title": "Guest",
+                "examples": [],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "hm8tpk@guest.airbnb.com",
+                        "format": "email"
+                    },
+                    "phone_numbers": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "31623456780"
+                        }
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Jane"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "locale": {
+                        "type": "string",
+                        "example": "en"
+                    }
+                },
+                "x-stoplight": {
+                    "id": "q15y7y68vezl5"
+                }
+            },
+            "Listing": {
+                "type": "object",
+                "x-examples": {
+                    "Example 1": {
+                        "id": "3f80e20e-d409-475c-b504-eb74e993bdbd",
+                        "platform": "airbnb",
+                        "platform_id": "641292503357103267",
+                        "public_name": "Secluded Getaway w/ Mountain Views & Hot Tub",
+                        "private_name": "Snail Trail",
+                        "summary": "The perfect summer getaway.",
+                        "description": "This house is located in the downtown of Seattle where you will have a view of Mount Rainier.",
+                        "room_type": "private_room",
+                        "property_type": "apartment",
+                        "house_rules": "small pets allowed",
+                        "picture": "https://a0.muscache.com/im/pictures/miso/Hosting-641292503357103267/original/d509ef58-326e-4576-90a6-f3f125449ff3.jpeg?aki_policy=x_small",
+                        "address": {
+                            "street": "471 Butler Creek Road",
+                            "zipcode": "30522",
+                            "city": "Cherry Log",
+                            "state": "GA",
+                            "apt": "",
+                            "country_code": "US",
+                            "latitude": 34.7361806,
+                            "longitude": -84.2900217
+                        },
+                        "bathrooms": 1,
+                        "bedrooms": 2,
+                        "available": 1
+                    }
+                },
+                "title": "Listing",
+                "examples": [],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "3f80e20e-d409-475c-b504-eb74e993bdbd"
+                    },
+                    "platform": {
+                        "type": "string",
+                        "enum": [
+                            "airbnb"
+                        ],
+                        "example": "airbnb"
+                    },
+                    "platform_id": {
+                        "type": "string",
+                        "example": "641292303357103267"
+                    },
+                    "public_name": {
+                        "type": "string",
+                        "example": "The Cabin at Snail Trail | Hot Tub | Amazing Views"
+                    },
+                    "private_name": {
+                        "type": "string",
+                        "example": "Snail Trail"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "example": "The perfect summer getaway."
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "This house is located in the downtown of Seattle where you will have a view of Mount Rainier."
+                    },
+                    "room_type": {
+                        "type": "string",
+                        "example": "private_room"
+                    },
+                    "property_type": {
+                        "type": "string",
+                        "example": "apartment"
+                    },
+                    "house_rules": {
+                        "type": "string",
+                        "example": "small pets allowed"
+                    },
+                    "picture": {
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://a0.muscache.com/im/pictures/miso/Hosting-641292503357103267/original/d509ef58-326e-4576-90a6-f3f125449ff3.jpeg?aki_policy=x_small"
+                    },
+                    "address": {
+                        "type": "object",
+                        "properties": {
+                            "street": {
+                                "type": "string",
+                                "example": "489 Arizona Creek Road"
+                            },
+                            "zipcode": {
+                                "type": "string",
+                                "example": "33522"
+                            },
+                            "city": {
+                                "type": "string",
+                                "example": "Cherry Log"
+                            },
+                            "state": {
+                                "type": "string",
+                                "example": "GA"
+                            },
+                            "apt": {
+                                "type": "string"
+                            },
+                            "country_code": {
+                                "type": "string",
+                                "example": "US"
+                            },
+                            "latitude": {
+                                "type": "number",
+                                "example": 32.7361806
+                            },
+                            "longitude": {
+                                "type": "number",
+                                "example": -83.2200217
+                            }
+                        }
+                    },
+                    "capacity": {
+                        "$ref": "#/components/schemas/ListingCapacity"
+                    },
+                    "room_details": {
+                        "$ref": "#/components/schemas/RoomDetails"
+                    },
+                    "bathrooms": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "bedrooms": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "available": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "channel": {
+                        "$ref": "#/components/schemas/Channel",
+                        "description": "Primary channel of the Listing"
+                    },
+                    "channels": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Channel"
+                        }
+                    }
+                },
+                "x-stoplight": {
+                    "id": "0toiic8jwwrgj"
+                }
+            },
+            "Reservation": {
+                "$ref": "./Reservation-2.json",
+                "x-examples": {
+                    "Example 1": {
+                        "id": "13fa62f8-6a9d-4792-b43f-90dc25d959cc",
+                        "platform": "airbnb",
+                        "platform_id": "HM3T44APZB",
+                        "booking_date": "2022-10-01T17:49:42Z",
+                        "arrival_date": "2022-10-01T16:00:00Z",
+                        "departure_date": "2022-10-03T10:00:00Z",
+                        "status": "accept",
+                        "status_history": [
+                            {
+                                "category": "booking_request",
+                                "status": "pending",
+                                "created_at": "2022-09-28T17:49:42Z"
+                            },
+                            {
+                                "category": "accepted",
+                                "status": "accept",
+                                "created_at": "2022-09-29T17:49:42Z"
+                            }
+                        ],
+                        "guests": {
+                            "total": 3,
+                            "adult_count": 2,
+                            "child_count": 1,
+                            "infant_count": 0,
+                            "pet_count": 0
+                        },
+                        "guest": {
+                            "email": "",
+                            "phone_numbers": [
+                                "+31623456780"
+                            ],
+                            "first_name": "Sarah",
+                            "last_name": "Hancock",
+                            "locale": "en"
+                        },
+                        "financials": {
+                            "guest": {
+                                "accommodation": {
+                                    "amount": 23600,
+                                    "formatted": "$236.00",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "cleaning_fee": {
+                                    "amount": 13000,
+                                    "formatted": "$130.00",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "service_fee": {
+                                    "amount": 5167,
+                                    "formatted": "$51.67",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "taxes": [
+                                    {
+                                        "amount": 520,
+                                        "formatted": "$5.20",
+                                        "currency": "USD",
+                                        "label": "General Sales and Use Tax (Georgia)"
+                                    },
+                                    {
+                                        "amount": 1000,
+                                        "formatted": "$10.00",
+                                        "currency": "USD",
+                                        "label": "Hotel Daily Fee (Georgia)"
+                                    },
+                                    {
+                                        "amount": 390,
+                                        "formatted": "$3.90",
+                                        "currency": "USD",
+                                        "label": "General Sales and Use Tax (Gilmer)"
+                                    },
+                                    {
+                                        "amount": 1888,
+                                        "formatted": "$18.88",
+                                        "currency": "USD",
+                                        "label": "Accommodations Tax (Gilmer)"
+                                    },
+                                    {
+                                        "amount": 708,
+                                        "formatted": "$7.08",
+                                        "currency": "USD",
+                                        "label": "General Sales and Use Tax (Gilmer)"
+                                    },
+                                    {
+                                        "amount": 1040,
+                                        "formatted": "$10.40",
+                                        "currency": "USD",
+                                        "label": "Accommodations Tax (Gilmer)"
+                                    },
+                                    {
+                                        "amount": 944,
+                                        "formatted": "$9.44",
+                                        "currency": "USD",
+                                        "label": "General Sales and Use Tax (Georgia)"
+                                    }
+                                ],
+                                "fees": [
+                                    {
+                                        "amount": 13000,
+                                        "formatted": "$130.00",
+                                        "currency": "USD",
+                                        "label": "PASS_THROUGH_CLEANING_FEE"
+                                    },
+                                    {
+                                        "amount": 5167,
+                                        "formatted": "$51.67",
+                                        "currency": "USD",
+                                        "label": "PASS_THROUGH_SERVICE_FEE"
+                                    },
+                                    {
+                                        "amount": 5000,
+                                        "formatted": "$50.00",
+                                        "currency": "USD",
+                                        "label": "PASS_THROUGH_PET_FEE"
+                                    },
+                                    {
+                                        "amount": 1500,
+                                        "formatted": "$15.00",
+                                        "currency": "USD",
+                                        "label": "PASS_THROUGH_LINEN_FEE"
+                                    }
+                                ],
+                                "total_fees": {
+                                    "amount": 24667,
+                                    "formatted": "$246.67",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "discounts": [
+                                    {
+                                        "amount": 15000,
+                                        "formatted": "$15.00",
+                                        "currency": "USD",
+                                        "label": "promotion"
+                                    }
+                                ],
+                                "subtotal": {
+                                    "amount": 36600,
+                                    "formatted": "$366.00",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "total_price": {
+                                    "amount": 48257,
+                                    "formatted": "$482.57",
+                                    "currency": "USD",
+                                    "label": null
+                                }
+                            },
+                            "host": {
+                                "accommodation": {
+                                    "amount": 23600,
+                                    "formatted": "$236.00",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "cleaning_fee": {
+                                    "amount": 13000,
+                                    "formatted": "$130.00",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "service_fee": {
+                                    "amount": 1098,
+                                    "formatted": "$10.98",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "taxes": [],
+                                "fees": [
+                                    {
+                                        "amount": -10000,
+                                        "formatted": "-$100.00",
+                                        "currency": "USD",
+                                        "label": "PASS_THROUGH_SERVICE_FEE"
+                                    },
+                                    {
+                                        "amount": 12345,
+                                        "formatted": "$123.45",
+                                        "currency": "USD",
+                                        "label": "PASS_THROUGH_PET_FEE"
+                                    },
+                                    {
+                                        "amount": 10000,
+                                        "formatted": "$100.00",
+                                        "currency": "USD",
+                                        "label": "PASS_THROUGH_LINEN_FEE"
+                                    }
+                                ],
+                                "total_fees": {
+                                    "amount": 12345,
+                                    "formatted": "$123.45",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "discounts": [
+                                    {
+                                        "amount": 15000,
+                                        "formatted": "$15.00",
+                                        "currency": "USD",
+                                        "label": "promotion"
+                                    }
+                                ],
+                                "subtotal": {
+                                    "amount": 36600,
+                                    "formatted": "$366.00",
+                                    "currency": "USD",
+                                    "label": null
+                                },
+                                "payout": {
+                                    "amount": 35502,
+                                    "formatted": "$355.02",
+                                    "currency": "USD",
+                                    "label": null
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-stoplight": {
+                    "id": "pjs9yhqmp61gn"
+                }
+            },
+            "WebhookPayload": {
+                "title": "Webhook Payload",
+                "x-stoplight": {
+                    "id": "csy6noc7t8qo8"
+                },
+                "type": "object",
+                "examples": [],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "ulid",
+                        "example": "01H3MB0FPSBMMYGWK1JW8G8W3G"
+                    },
+                    "created": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "action": {
+                        "type": "string"
+                    },
+                    "version": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-03-02"
+                    }
+                }
+            },
+            "WebhookChannel": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookPayload"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Channel"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "customer": {
+                                                "$ref": "#/components/schemas/Customer"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "title": "Channel Webhook Payload",
+                "x-stoplight": {
+                    "id": "xnl7aq2s7i6bk"
+                }
+            },
+            "WebhookReview": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookPayload"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Review"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "channel": {
+                                                "$ref": "#/components/schemas/Channel"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "examples": [
+                    {
+                        "id": "01H3MB0FPSBMMYGWK1JW8G8W3G",
+                        "created": "2019-08-24T14:15:22Z",
+                        "action": "review.created|review.submitted|review.published|review.expired|review.changed|review.response_submitted",
+                        "version": "2023-03-02",
+                        "data": {
+                            "id": "322a0714-e48c-482e-b8ef-f3835d4a36e3",
+                            "platform": "airbnb",
+                            "platform_id": "794964903755962248",
+                            "reservation_platform_id": "HMKS3BHWDW",
+                            "listing_platform_id": null,
+                            "guest_platform_id": "9640096",
+                            "reviewer_role": "host",
+                            "rating": null,
+                            "detailed_ratings": [
+                                {
+                                    "rating": 1,
+                                    "comment": null,
+                                    "category": "cleanliness"
+                                },
+                                {
+                                    "rating": 3,
+                                    "comment": null,
+                                    "category": "communication"
+                                },
+                                {
+                                    "rating": 2,
+                                    "comment": null,
+                                    "category": "respect_house_rules"
+                                }
+                            ],
+                            "visible": true,
+                            "public_text": "Guest made a reservation for 1 person but had unauthorized guests and dogs at the property without adding the guests to the reservation or paying a pet fee.",
+                            "private_text": null,
+                            "response_text": null,
+                            "expires_at": "2023-01-15T20:13:21Z",
+                            "first_completed_at": "2023-01-15T20:13:01Z",
+                            "submitted_at": "2023-01-15T20:13:01Z",
+                            "responded_at": null,
+                            "channel": {
+                                "id": "f74b6293-56a0-4ca0-8325-fa8b94a7d880",
+                                "platform": "airbnb",
+                                "platform_id": "4868066",
+                                "name": "Emily & Bram",
+                                "picture": "https://a0.muscache.com/im/pictures/user/7cf8af38-d08d-48d0-9134-9ea66166ebc3.jpg?aki_policy=profile_x_medium",
+                                "location": "Tucker, GA",
+                                "description": "When I'm not wrangling 3 kids with my husband of 8 years, I'm only kind of trying not to drink another cup of coffee while hosting guests at our log cabin in Cherry Log, GA.",
+                                "first_connected_at": "2023-03-16T14:15:47Z"
+                            }
+                        }
+                    }
+                ],
+                "x-stoplight": {
+                    "id": "njg66gg9dn5fx"
+                }
+            },
+            "WebhookPayout": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookPayload"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Payout"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "channel": {
+                                                "$ref": "#/components/schemas/Channel"
+                                            },
+                                            "transactions": {
+                                                "type": "array",
+                                                "x-stoplight": {
+                                                    "id": "t4tvpipum84ug"
+                                                },
+                                                "items": {
+                                                    "$ref": "#/components/schemas/Transaction",
+                                                    "x-stoplight": {
+                                                        "id": "mzorrksrly5si"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "examples": [
+                    {
+                        "id": "01HNA65R5A9JVW2EG6GQ1YPP2F",
+                        "action": "payout.created|payout.changed",
+                        "created": "2024-01-29T08:43:02Z",
+                        "version": "2023-07-11",
+                        "data": {
+                            "id": "0aa4085f-f54b-474c-91a4-4e6cc537ebdd",
+                            "date": null,
+                            "amount": {
+                                "label": "repudiandae",
+                                "amount": 62615418,
+                                "currency": "USD",
+                                "formatted": "$626,154.18"
+                            },
+                            "channel": {
+                                "id": "55b3e384-864f-34a9-9eb1-dfb1ae56a620",
+                                "name": null,
+                                "picture": null,
+                                "location": null,
+                                "platform": "airbnb",
+                                "description": null,
+                                "platform_id": "3bcfe0d5-04e1-3279-93f0-f448aac6e298",
+                                "first_connected_at": "2024-01-24T06:39:27Z"
+                            },
+                            "platform": "airbnb",
+                            "reference": "string",
+                            "platform_id": "string",
+                            "bank_account": "string",
+                            "transactions": [
+                                {
+                                    "id": "e870448d-f732-467e-b203-5505f307fcab",
+                                    "date": "2024-01-29T08:43:02Z",
+                                    "type": "Payout",
+                                    "amount": {
+                                        "label": "harum",
+                                        "amount": 602460,
+                                        "currency": "USD",
+                                        "formatted": "$6,024.60"
+                                    },
+                                    "details": "harum",
+                                    "currency": "USD",
+                                    "platform": "airbnb",
+                                    "reference": "tempore",
+                                    "start_date": "2024-01-29"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "x-stoplight": {
+                    "id": "nrzfp4etsn727"
+                }
+            },
+            "WebhookTransaction": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookPayload"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Transaction"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "channel": {
+                                                "$ref": "#/components/schemas/Channel"
+                                            },
+                                            "payout": {
+                                                "$ref": "#/components/schemas/Payout",
+                                                "x-stoplight": {
+                                                    "id": "6doad7l48msnm"
+                                                }
+                                            },
+                                            "reservation": {
+                                                "$ref": "#/components/schemas/Reservation",
+                                                "x-stoplight": {
+                                                    "id": "86us04968hmit"
+                                                }
+                                            },
+                                            "listing": {
+                                                "$ref": "#/components/schemas/Listing",
+                                                "x-stoplight": {
+                                                    "id": "m55i76qmhnlq2"
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "x-stoplight": {
+                    "id": "jcaun5r23klv6"
+                },
+                "examples": [
+                    {
+                        "id": "01HNA6F6NKM9YR2M93DC33EF0P",
+                        "action": "transaction.created",
+                        "created": "2024-01-29T08:48:12Z",
+                        "version": "2023-05-03",
+                        "data": {
+                            "id": "f61e405c-b800-4ee0-aee7-bb4fac1e37b8",
+                            "date": "2024-01-29T08:48:12Z",
+                            "type": "Reservation",
+                            "amount": {
+                                "label": "at",
+                                "amount": 5487876,
+                                "currency": "USD",
+                                "formatted": "$54,878.76"
+                            },
+                            "payout": {
+                                "id": "0406afbf-be8d-4094-883c-fa6fca3edd56",
+                                "date": null,
+                                "amount": {
+                                    "label": "harum",
+                                    "amount": 94929314,
+                                    "currency": "USD",
+                                    "formatted": "$949,293.14"
+                                },
+                                "platform": "airbnb",
+                                "reference": "harum",
+                                "platform_id": "minima",
+                                "bank_account": "non"
+                            },
+                            "channel": {
+                                "id": "c43ab089-f909-3814-aa8b-fb221389cfdc",
+                                "name": null,
+                                "picture": null,
+                                "location": null,
+                                "platform": "airbnb",
+                                "description": null,
+                                "platform_id": "acba3b84-7920-3a10-a72b-5f47e4e2ac04",
+                                "first_connected_at": "2024-01-20T14:29:03Z"
+                            },
+                            "details": "at",
+                            "listing": {
+                                "id": "cb024e7e-6756-38e7-b9f2-a56f0cfd8a96",
+                                "address": {
+                                    "apt": null,
+                                    "city": null,
+                                    "state": null,
+                                    "street": null,
+                                    "zipcode": null,
+                                    "latitude": 12.604069,
+                                    "longitude": 93.461913,
+                                    "country_code": null
+                                },
+                                "picture": null,
+                                "pricing": [],
+                                "bedrooms": null,
+                                "platform": "airbnb",
+                                "available": null,
+                                "bathrooms": null,
+                                "platform_id": "80b1377d-c248-389f-a5ef-014df362fee8",
+                                "public_name": null,
+                                "availability": [],
+                                "private_name": null,
+                                "platform_settings": []
+                            },
+                            "currency": "USD",
+                            "platform": "airbnb",
+                            "reference": "vel",
+                            "start_date": "2024-01-29",
+                            "reservation": {
+                                "id": "d8e40610-3f0d-35b1-bcba-59019b7ef79c",
+                                "guests": {
+                                    "total": null,
+                                    "pet_count": null,
+                                    "adult_count": null,
+                                    "child_count": null,
+                                    "infant_count": null
+                                },
+                                "status": null,
+                                "platform": "airbnb",
+                                "platform_id": "5ff157ed-fc2a-39a8-a77b-8553de5ac432",
+                                "arrival_date": "2023-12-28",
+                                "booking_date": null,
+                                "departure_date": "2023-08-14"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WebhookListing": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookPayload"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Listing"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "channel": {
+                                                "allOf": [
+                                                    {
+                                                        "$ref": "#/components/schemas/Channel"
+                                                    },
+                                                    {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "customer": {
+                                                                "$ref": "#/components/schemas/Customer"
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "title": "Listing Webhook Payload",
+                "x-stoplight": {
+                    "id": "1r5d949xps22x"
+                }
+            },
+            "WebhookReservation": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookPayload"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/Reservation"
+                            }
+                        }
+                    }
+                ],
+                "title": "Reservation Webhook Payload",
+                "x-stoplight": {
+                    "id": "auia0nuzuncnl"
+                }
+            },
+            "Review": {
+                "type": "object",
+                "x-stoplight": {
+                    "id": "k2o8v5wzyh2yl"
+                },
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "platform": {
+                        "type": "string",
+                        "enum": [
+                            "airbnb"
+                        ]
+                    },
+                    "platform_id": {
+                        "type": "string"
+                    },
+                    "reservation_platform_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "listing_platform_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "guest_platform_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "guest_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "John Doe"
+                    },
+                    "reviewer_role": {
+                        "type": "string",
+                        "x-stoplight": {
+                            "id": "2j16oin8b1r3d"
+                        },
+                        "enum": [
+                            "guest",
+                            "host"
+                        ],
+                        "example": "guest"
+                    },
+                    "rating": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 5
+                    },
+                    "detailed_ratings": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "rating": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 5
+                                },
+                                "comment": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "category": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "visible": {
+                        "type": "boolean"
+                    },
+                    "public_text": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "private_text": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "response_text": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "expires_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "first_completed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "submitted_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "responded_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "channel": {
+                        "$ref": "#/components/schemas/Channel"
+                    }
+                },
+                "description": ""
+            },
+            "Payout": {
+                "type": "object",
+                "x-examples": {
+                    "Example 1": {
+                        "id": "e738670d-212d-4854-be03-d17c707b1ea2",
+                        "platform": "airbnb",
+                        "platform_id": "et",
+                        "bank_account": "sed",
+                        "reference": "dolorem",
+                        "amount": {
+                            "amount": 7402807,
+                            "currency": "USD",
+                            "formatted": "$74,028.07",
+                            "label": "dolorem"
+                        },
+                        "date": null,
+                        "channel": {
+                            "id": "de6faff7-b2d5-3ad0-9b68-2e646a02e0ac",
+                            "platform": "airbnb",
+                            "platform_id": "1ddd54fd-6e17-3391-a13c-ffa5b42fad9c",
+                            "name": null,
+                            "picture": null,
+                            "location": null,
+                            "description": null,
+                            "first_connected_at": "2023-12-24T23:54:12Z"
+                        },
+                        "transactions": [
+                            {
+                                "id": "7280c085-d287-49fe-b9bb-414198d7b03f",
+                                "type": "Reservation",
+                                "details": "magni",
+                                "reference": "tempora",
+                                "currency": "USD",
+                                "amount": {
+                                    "amount": 4718757,
+                                    "currency": "USD",
+                                    "formatted": "$47,187.57",
+                                    "label": "magni"
+                                },
+                                "date": "2024-01-01T09:41:07Z",
+                                "start_date": "2024-01-01"
+                            },
+                            {
+                                "id": "b8ccb7b6-3fad-426c-a996-79c5c4f22b7e",
+                                "type": "Reservation",
+                                "details": "magni",
+                                "reference": "voluptas",
+                                "currency": "USD",
+                                "amount": {
+                                    "amount": 9572,
+                                    "currency": "USD",
+                                    "formatted": "$95.72",
+                                    "label": "magni"
+                                },
+                                "date": "2024-01-01T09:41:07Z",
+                                "start_date": "2024-01-01"
+                            }
+                        ]
+                    }
+                },
+                "title": "Payout",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "platform": {
+                        "type": "string"
+                    },
+                    "platform_id": {
+                        "type": "string"
+                    },
+                    "bank_account": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "amount": {
+                        "$ref": "#/components/schemas/Financial"
+                    },
+                    "date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "channel": {
+                        "$ref": "#/components/schemas/Channel"
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Transaction"
+                        }
+                    }
+                },
+                "x-stoplight": {
+                    "id": "hevt2qqvfhb4t"
+                }
+            },
+            "Transaction": {
+                "type": "object",
+                "x-stoplight": {
+                    "id": "rrku0ln5qyglk"
+                },
+                "x-examples": {
+                    "Example 1": {
+                        "id": "7280c085-d287-49fe-b9bb-414198d7b03f",
+                        "type": "Reservation",
+                        "details": "magni",
+                        "reference": "tempora",
+                        "currency": "USD",
+                        "amount": {
+                            "amount": 4718757,
+                            "currency": "USD",
+                            "formatted": "$47,187.57",
+                            "label": "magni"
+                        },
+                        "date": "2024-01-01T09:41:07Z",
+                        "start_date": "2024-01-01"
+                    }
+                },
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "details": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "$ref": "#/components/schemas/Financial"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "title": "Transaction",
+                "description": ""
+            },
+            "Resolution": {
+                "type": "object",
+                "x-stoplight": {
+                    "id": "4qaun48691w3x"
+                },
+                "x-examples": {
+                    "Example 1": {
+                        "id": "bc95d75b-9786-4b6e-91bf-98560a8fe911",
+                        "platform": "airbnb",
+                        "platform_id": "quo",
+                        "initiator_platform_id": "autem",
+                        "initiator_name": "Sandra Schmeler",
+                        "responder_platform_id": "ab",
+                        "responder_name": "Noemi Pfeffer",
+                        "reservation_platform_id": "iusto",
+                        "reason_name": "Art Bashirian",
+                        "status": "CLOSED",
+                        "status_text": "Tempora nulla cum et veritatis est fugiat. Nihil porro et ut esse. Voluptate quis accusantium repellendus veritatis aut nostrum.",
+                        "currency": "EUR",
+                        "amount_requested": {
+                            "amount": 9619,
+                            "currency": "EUR",
+                            "formatted": "€96.19",
+                            "label": "Resolution amount requestedquo"
+                        },
+                        "amount_paid": {
+                            "amount": 5102,
+                            "currency": "EUR",
+                            "formatted": "€51.02",
+                            "label": "Resolution amount paid quo"
+                        },
+                        "amount_charged": {
+                            "amount": 4679,
+                            "currency": "EUR",
+                            "formatted": "€46.79",
+                            "label": "Resolution amount chargedquo"
+                        },
+                        "date": "2024-01-16T23:39:50Z",
+                        "is_cx_initiated": false,
+                        "detail_link": "blanditiis"
+                    }
+                },
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "platform": {
+                        "type": "string"
+                    },
+                    "platform_id": {
+                        "type": "string"
+                    },
+                    "initiator_platform_id": {
+                        "type": "string"
+                    },
+                    "initiator_name": {
+                        "type": "string"
+                    },
+                    "responder_platform_id": {
+                        "type": "string"
+                    },
+                    "responder_name": {
+                        "type": "string"
+                    },
+                    "reservation_platform_id": {
+                        "type": "string"
+                    },
+                    "reason_name": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "status_text": {
+                        "type": "string"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "amount_requested": {
+                        "$ref": "#/components/schemas/Financial"
+                    },
+                    "amount_paid": {
+                        "$ref": "#/components/schemas/Financial"
+                    },
+                    "amount_charged": {
+                        "$ref": "#/components/schemas/Financial"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "is_cx_initiated": {
+                        "type": "boolean"
+                    },
+                    "detail_link": {
+                        "type": "string"
+                    }
+                }
+            },
+            "RoomDetails": {
+                "type": "array",
+                "x-examples": {
+                    "Example 1": [
+                        {
+                            "beds": [
+                                {
+                                    "type": "king_bed",
+                                    "quantity": 1
+                                },
+                                {
+                                    "type": "single",
+                                    "quantity": 1
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "beds": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "quantity": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-stoplight": {
+                    "id": "jod954idjml1w"
+                }
+            },
+            "ListingCapacity": {
+                "type": "object",
+                "x-examples": {
+                    "Example 1": {
+                        "max": 3,
+                        "bedrooms": 2,
+                        "beds": 2,
+                        "bathrooms": 1
+                    }
+                },
+                "properties": {
+                    "max": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "bedrooms": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "beds": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "bathrooms": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    }
+                },
+                "x-stoplight": {
+                    "id": "5ns81woo5so10"
+                }
+            }
+        },
+        "securitySchemes": {
+            "Bearer-Authorization": {
+                "type": "http",
+                "scheme": "bearer",
+                "description": "Enter the token with the `Bearer ` prefix, e.g. `Bearer abcde12345`"
+            }
+        }
+    },
+    "security": [
+        {
+            "Bearer-Authorization": []
+        }
+    ]
+}

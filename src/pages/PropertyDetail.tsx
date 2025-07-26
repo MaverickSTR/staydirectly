@@ -92,29 +92,31 @@ const PropertyDetail: React.FC = () => {
           <Breadcrumb items={breadcrumbItems} />
         </nav>
 
-        {/* Property Header */}
-        <PropertyHeader
-          property={property}
-          isHeartFilled={isHeartFilled}
-          onHeartToggle={toggleHeart}
-        />
+
 
         {/* Property Gallery */}
-        <div className="mb-8">
-          <PropertyGallery
-            propertyName={property.name}
-            propertyId={property.id}
-            platformId={property.platformId || property.hospitablePlatformId}
-            imageUrl={property.imageUrl}
-            additionalImages={property.additionalImages || []}
-          />
-        </div>
+
 
         {/* Main content grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left column for property details */}
           <div className="lg:col-span-2">
+            <div className="mb-8">
+              <PropertyGallery
+                propertyName={property.name}
+                propertyId={property.id}
+                platformId={property.platformId || property.hospitablePlatformId}
+                imageUrl={property.imageUrl}
+                additionalImages={property.additionalImages || []}
+              />
+            </div>
             {/* Property Basic Info */}
+            {/* Property Header */}
+            <PropertyHeader
+              property={property}
+              isHeartFilled={isHeartFilled}
+              onHeartToggle={toggleHeart}
+            />
             <PropertyBasicInfo
               property={property}
               capacityData={capacityData}
@@ -304,7 +306,7 @@ const PropertyDetail: React.FC = () => {
           </div>
 
           {/* Booking Column */}
-          <div className="sticky top-24 h-fit">
+          <div className="sticky top-24 h-fit flex  items-center justify-center">
             <iframe
               id="booking-iframe"
               sandbox="allow-top-navigation allow-scripts allow-same-origin allow-forms"

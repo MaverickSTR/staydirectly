@@ -1,6 +1,15 @@
 /* PropertyGallery.module.css */
 
-.swipeArea {
+.swipe-area:hover .gallery-indicator {
+  opacity: 1;
+}
+
+.gallery-indicator {
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.2s ease;
+}
+
+.swipe-area {
   touch-action: pan-y pinch-zoom;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -10,42 +19,36 @@
   user-select: none;
 }
 
-.swipeArea img {
+.swipe-area img {
   pointer-events: none;
 }
 
-.swipeArea .galleryIndicator {
+.swipe-area .gallery-indicator {
   pointer-events: none;
 }
 
-.galleryIndicator {
-  background-color: rgba(0, 0, 0, 0.3);
-  transition: opacity 0.2s ease;
-}
-
-.swipeArea:hover .galleryIndicator {
-  opacity: 1;
-}
-
-.mobileTapArea {
+.mobile-tap-area {
   pointer-events: auto;
 }
 
-.carouselContainer {
+/* Horizontal carousel transitions */
+.carousel-container {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.swipingLeft {
+/* Swipe direction visual feedback */
+.swiping-left {
   transform: translateX(-10px);
   transition: transform 0.1s ease;
 }
 
-.swipingRight {
+.swiping-right {
   transform: translateX(10px);
   transition: transform 0.1s ease;
 }
 
-.swipeArea * {
+/* Prevent text selection during swipes */
+.swipe-area * {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -54,19 +57,22 @@
   user-select: none;
 }
 
-.carouselDots {
+/* Image dots indicator */
+.carousel-dots {
   transition: all 0.3s ease;
 }
 
-.carouselDots .dot {
+.carousel-dots .dot {
   transition: all 0.3s ease;
 }
 
-.carouselImage {
+/* Smooth image transitions */
+.carousel-image {
   transition: opacity 0.3s ease;
 }
 
-.galleryImage {
+/* Image optimization styles */
+.gallery-image {
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   backface-visibility: hidden;
@@ -74,7 +80,8 @@
   will-change: transform;
 }
 
-.imagePlaceholder {
+/* Lazy loading placeholder */
+.image-placeholder {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
@@ -85,8 +92,9 @@
   100% { background-position: -200% 0; }
 }
 
+/* Optimize for mobile */
 @media (max-width: 768px) {
-  .galleryImage {
+  .gallery-image {
     image-rendering: auto;
   }
 } 

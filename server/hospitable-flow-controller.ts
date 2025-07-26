@@ -245,9 +245,8 @@ export async function importCustomerListings(
             });
             return name || code; // fallback to code if name is undefined
           })(),
-          location: `${prop.address?.city || ""}, ${
-            prop.address?.state || ""
-          }, ${prop.address?.country_code || ""}`
+          location: `${prop.address?.city || ""}, ${prop.address?.state || ""
+            }, ${prop.address?.country_code || ""}`
             .replace(/, ,/g, ",")
             .replace(/^, /, "")
             .replace(/, $/, ""),
@@ -266,27 +265,27 @@ export async function importCustomerListings(
           // Store the detailed capacity object from the Hospitable API
           capacity: prop.capacity
             ? {
-                max: prop.capacity.max
-                  ? Number(prop.capacity.max)
-                  : prop.max_guests
+              max: prop.capacity.max
+                ? Number(prop.capacity.max)
+                : prop.max_guests
                   ? Number(prop.max_guests)
                   : 2,
-                beds: prop.capacity.beds
-                  ? Number(prop.capacity.beds)
-                  : prop.beds
+              beds: prop.capacity.beds
+                ? Number(prop.capacity.beds)
+                : prop.beds
                   ? Number(prop.beds)
                   : 1,
-                bedrooms: prop.capacity.bedrooms
-                  ? Number(prop.capacity.bedrooms)
-                  : prop.bedrooms
+              bedrooms: prop.capacity.bedrooms
+                ? Number(prop.capacity.bedrooms)
+                : prop.bedrooms
                   ? Number(prop.bedrooms)
                   : 1,
-                bathrooms: prop.capacity.bathrooms
-                  ? Number(prop.capacity.bathrooms)
-                  : prop.bathrooms
+              bathrooms: prop.capacity.bathrooms
+                ? Number(prop.capacity.bathrooms)
+                : prop.bathrooms
                   ? Number(prop.bathrooms)
                   : 1,
-              }
+            }
             : null,
 
           // Store amenities
@@ -316,11 +315,11 @@ export async function importCustomerListings(
         propertyData.additionalImages = existingProperty?.additionalImages
           ?.length
           ? existingProperty.additionalImages.map((url: string) =>
-              url.replace(/\/im(?=\/)/g, "")
-            )
+            url.replace(/\/im(?=\/)/g, "")
+          )
           : prop.photos
-              ?.slice(1)
-              .map((p: any) => p.url.replace(/\/im(?=\/)/g, "")) || [];
+            ?.slice(1)
+            .map((p: any) => p.url.replace(/\/im(?=\/)/g, "")) || [];
 
         if (existingProperty) {
           // Update existing property
@@ -543,9 +542,8 @@ export async function markPropertiesForPublishing(
               });
               return name || code;
             })(),
-            location: `${prop.address?.city || ""}, ${
-              prop.address?.state || ""
-            }, ${prop.address?.country_code || ""}`
+            location: `${prop.address?.city || ""}, ${prop.address?.state || ""
+              }, ${prop.address?.country_code || ""}`
               .replace(/, ,/g, ",")
               .replace(/^, /, "")
               .replace(/, $/, ""),
@@ -561,27 +559,27 @@ export async function markPropertiesForPublishing(
             type: prop.property_type || "Apartment",
             capacity: prop.capacity
               ? {
-                  max: prop.capacity.max
-                    ? Number(prop.capacity.max)
-                    : prop.max_guests
+                max: prop.capacity.max
+                  ? Number(prop.capacity.max)
+                  : prop.max_guests
                     ? Number(prop.max_guests)
                     : 2,
-                  beds: prop.capacity.beds
-                    ? Number(prop.capacity.beds)
-                    : prop.beds
+                beds: prop.capacity.beds
+                  ? Number(prop.capacity.beds)
+                  : prop.beds
                     ? Number(prop.beds)
                     : 1,
-                  bedrooms: prop.capacity.bedrooms
-                    ? Number(prop.capacity.bedrooms)
-                    : prop.bedrooms
+                bedrooms: prop.capacity.bedrooms
+                  ? Number(prop.capacity.bedrooms)
+                  : prop.bedrooms
                     ? Number(prop.bedrooms)
                     : 1,
-                  bathrooms: prop.capacity.bathrooms
-                    ? Number(prop.capacity.bathrooms)
-                    : prop.bathrooms
+                bathrooms: prop.capacity.bathrooms
+                  ? Number(prop.capacity.bathrooms)
+                  : prop.bathrooms
                     ? Number(prop.bathrooms)
                     : 1,
-                }
+              }
               : null,
             amenities: prop.amenities || [],
             featuredAmenities:
@@ -642,6 +640,7 @@ export async function markPropertiesForPublishing(
 /**
  * Establish connection with Hospitable
  */
+// done 
 export async function connectHospitable(
   req: Request,
   res: Response

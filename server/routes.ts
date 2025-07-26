@@ -67,30 +67,25 @@ Sitemap: https://staydirectly.com/sitemap.xml
   registerHospitableAuthRoutes(authRouter);
 
   // Hospitable flow routes
-  app.post(
-    "/api/hospitable/connect",
+  app.post("/api/hospitable/connect",
     userRateLimiter,
     hospitable_controller.connectHospitable
   );
-  app.post(
-    "/api/hospitable/import-listings",
+  app.post("/api/hospitable/import-listings",
     userRateLimiter,
     hospitable_controller.importCustomerListings
   );
-  app.post(
-    "/api/hospitable/fetch-property-images",
+  app.post("/api/hospitable/fetch-property-images",
     userRateLimiter,
     hospitable_controller.fetchPropertyImages
   );
-  app.post(
-    "/api/hospitable/publish-properties",
+  app.post("/api/hospitable/publish-properties",
     strictRateLimiter,
     hospitable_controller.markPropertiesForPublishing
   );
 
   // Get all customers from Hospitable
-  app.get(
-    "/api/hospitable/customers",
+  app.get("/api/hospitable/customers",
     generalRateLimiter,
     async (req: Request, res: Response) => {
       try {
@@ -108,8 +103,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
   );
 
   // Get listings for a specific customer from Hospitable
-  app.get(
-    "/api/hospitable/customers/:customerId/listings",
+  app.get("/api/hospitable/customers/:customerId/listings",
     generalRateLimiter,
     async (req: Request, res: Response) => {
       try {
@@ -209,8 +203,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
   app.use("/api", authRouter);
 
   // Properties API
-  app.get(
-    "/api/properties",
+  app.get("/api/properties",
     generalRateLimiter,
     async (req: Request, res: Response) => {
       try {
@@ -261,14 +254,12 @@ Sitemap: https://staydirectly.com/sitemap.xml
     }
   });
 
-  app.get(
-    "/api/properties/search",
+  app.get("/api/properties/search",
     customSearchLimiter,
     async (req: Request, res: Response) => {
       try {
         console.log(
-          `[API Route] Full URL: ${req.protocol}://${req.get("host")}${
-            req.originalUrl
+          `[API Route] Full URL: ${req.protocol}://${req.get("host")}${req.originalUrl
           }`
         );
         console.log(`[API Route] Query = ${req.query.q}`);
@@ -288,8 +279,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
     }
   );
 
-  app.get(
-    "/api/properties/:id",
+  app.get("/api/properties/:id",
     generalRateLimiter,
     async (req: Request, res: Response) => {
       try {
@@ -307,8 +297,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
     }
   );
 
-  app.post(
-    "/api/properties",
+  app.post("/api/properties",
     strictRateLimiter,
     async (req: Request, res: Response) => {
       try {
@@ -445,8 +434,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
     }
   });
 
-  app.get(
-    "/api/cities/:name/properties",
+  app.get("/api/cities/:name/properties",
     async (req: Request, res: Response) => {
       try {
         const limit = req.query.limit
@@ -468,8 +456,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
   );
 
   // Neighborhoods API
-  app.get(
-    "/api/cities/:id/neighborhoods",
+  app.get("/api/cities/:id/neighborhoods",
     async (req: Request, res: Response) => {
       try {
         const cityId = parseInt(req.params.id);
@@ -482,8 +469,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
   );
 
   // Reviews API
-  app.get(
-    "/api/properties/:id/reviews",
+  app.get("/api/properties/:id/reviews",
     async (req: Request, res: Response) => {
       try {
         const propertyId = parseInt(req.params.id);
@@ -511,8 +497,7 @@ Sitemap: https://staydirectly.com/sitemap.xml
   });
 
   // Favorites API
-  app.get(
-    "/api/users/:userId/favorites",
+  app.get("/api/users/:userId/favorites",
     async (req: Request, res: Response) => {
       try {
         const userId = parseInt(req.params.userId);

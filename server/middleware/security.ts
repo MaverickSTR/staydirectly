@@ -24,14 +24,7 @@ const getSecurityConfig = (): SecurityConfig => {
 
   return {
     isDevelopment,
-    allowedOrigins: isDevelopment
-      ? [
-          "http://localhost:5173",
-          "http://localhost:5000",
-          "http://127.0.0.1:5173",
-          "http://127.0.0.1:5000",
-        ]
-      : ["https://staydirectly.com", "https://www.staydirectly.com"],
+    allowedOrigins: ["*"],
     trustedProxies: ["127.0.0.1", "::1"], // Add your proxy IPs here
     csrfSecret:
       process.env.CSRF_SECRET || crypto.randomBytes(32).toString("hex"),
@@ -131,22 +124,15 @@ export const corsConfig = () => {
 
   return cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      // Allow all origins in development
+      if (config.isDevelopment) {
+        return callback(null, true);
+      }
+      // Production: check allowed origins
       if (!origin) return callback(null, true);
-
-      // Check if origin is in allowed list
       if (config.allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-
-      // In development, be more permissive
-      if (
-        config.isDevelopment &&
-        (origin.includes("localhost") || origin.includes("127.0.0.1"))
-      ) {
-        return callback(null, true);
-      }
-
       return callback(new Error("Not allowed by CORS policy"), false);
     },
     credentials: true,

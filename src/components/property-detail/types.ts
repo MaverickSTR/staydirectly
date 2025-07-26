@@ -27,11 +27,45 @@ export interface Property {
   };
   amenities?: string[];
   featuredAmenities?: string[];
-  bedroomDetails?: BedroomDetail[];
+  bedroomDetails?: BedroomDetail[] | null;
   bookingWidgetUrl?: string;
   reviewWidgetCode?: string;
   platformId?: string;
   hospitablePlatformId?: string;
+  createdAt?: string | Date;
+  zipCode?: string;
+  neighborhood?: string | null;
+  weekendPrice?: number | null;
+  weeklyPrice?: number | null;
+  monthlyPrice?: number | null;
+  cleaningFee?: number | null;
+  serviceFee?: number | null;
+  taxRate?: number | null;
+  minStay?: number;
+  maxStay?: number | null;
+  type?: string;
+  propertySize?: number | null;
+  yearBuilt?: number | null;
+  videoUrl?: string | null;
+  virtualTourUrl?: string | null;
+  imagesStoredAt?: string | Date;
+  hostId?: number;
+  calendarSyncUrl?: string | null;
+  propertyManagementSystemId?: string | null;
+  channelManagerId?: string | null;
+  externalId?: string;
+  externalSource?: string;
+  lastSyncedAt?: string | Date | null;
+  slug?: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  canonicalUrl?: string | null;
+  keywords?: string | null;
+  isFeatured?: boolean;
+  isActive?: boolean;
+  isVerified?: boolean;
+  status?: string;
+  publishedAt?: string | Date | null;
 }
 
 export interface BedroomDetail {

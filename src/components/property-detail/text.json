@@ -1,0 +1,662 @@
+{
+    "data": [
+        {
+            "id": "e55d57ad-c9cc-4be4-bc12-ea7f5bd9c0c0",
+            "platform": "airbnb",
+            "platform_id": "1424049704871123675",
+            "reservation_platform_id": "HMETAA3BAR",
+            "listing_platform_id": null,
+            "guest_platform_id": "137170413",
+            "guest_name": "Chase Swanson",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Chase and his group were fantastic. Very responsive and were a pleasure to host. Would recommend!",
+            "private_text": "Hope you had an amazing time!",
+            "response_text": null,
+            "expires_at": "2025-06-01T19:32:33Z",
+            "first_completed_at": "2025-05-18T19:34:12Z",
+            "submitted_at": "2025-05-18T19:35:26Z",
+            "responded_at": null
+        },
+        {
+            "id": "ba965daf-c0a6-4123-a9ad-43d592c085aa",
+            "platform": "airbnb",
+            "platform_id": "1424049704923239329",
+            "reservation_platform_id": "HMETAA3BAR",
+            "listing_platform_id": "1371048723133622394",
+            "guest_platform_id": "137170413",
+            "guest_name": "Chase Swanson",
+            "reviewer_role": "guest",
+            "rating": 5,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "accuracy"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "checkin"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "location"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "value"
+                }
+            ],
+            "visible": true,
+            "public_text": "Chase was a great host! He was responsive and flexible with check in. The place was extremely clean and was exactly as described! I’d highly recommend this spot for anyone looking to bring a big group to Nashville!",
+            "private_text": "Thank you! Truly appreciate all of your accommodations!",
+            "response_text": "Thank you, Chase—hosting you and your crew at our house was a pleasure. I’m glad the check-in worked smoothly and you found everything sparkling clean. You’re welcome back anytime!",
+            "expires_at": "2025-06-01T19:32:33Z",
+            "first_completed_at": "2025-05-18T19:36:23Z",
+            "submitted_at": "2025-05-18T19:38:48Z",
+            "responded_at": "2025-06-10T20:00:14Z"
+        },
+        {
+            "id": "0f8459e7-5520-43fd-b422-cddb7b90c910",
+            "platform": "airbnb",
+            "platform_id": "1427011489015329903",
+            "reservation_platform_id": "HM8MW89CYR",
+            "listing_platform_id": null,
+            "guest_platform_id": "64993663",
+            "guest_name": "Sarah Brooks",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Sarah was such a pleasure to host. She was so kind and responsive. Would highly recommend!",
+            "private_text": "Hope they won! Come visit us again soon! I manage 4 other properties in Nashville and 5 others in various places!",
+            "response_text": null,
+            "expires_at": "2025-06-05T21:37:05Z",
+            "first_completed_at": "2025-05-23T01:55:54Z",
+            "submitted_at": "2025-05-23T12:55:13Z",
+            "responded_at": null
+        },
+        {
+            "id": "6c2ba7de-7163-4cd4-958d-f1f103824928",
+            "platform": "airbnb",
+            "platform_id": "1427011489061305829",
+            "reservation_platform_id": "HM8MW89CYR",
+            "listing_platform_id": "1371048723133622394",
+            "guest_platform_id": "64993663",
+            "guest_name": "Sarah Brooks",
+            "reviewer_role": "guest",
+            "rating": 5,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "accuracy"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "checkin"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "location"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "value"
+                }
+            ],
+            "visible": true,
+            "public_text": "What a great space!! Our soccer boys and coaches had the BEST time and felt right at home with all of the accommodations.  Chase was fantastic and easy to communicate with! It was the perfect way to relax and enjoy quality time together in between our games.  Thank you, Chase, for such a wonderful experience!! We will be back 🎉",
+            "private_text": null,
+            "response_text": "Thank you for sharing your experience, Sarah! I’m glad our house provided a comfy spot for your team to relax between games and that communication was smooth. Looking forward to hosting you all again whenever you’re back in Nashville.",
+            "expires_at": "2025-06-05T21:37:05Z",
+            "first_completed_at": "2025-05-23T15:10:56Z",
+            "submitted_at": "2025-05-23T15:18:18Z",
+            "responded_at": "2025-06-10T19:57:27Z"
+        },
+        {
+            "id": "15ff3ebb-bfab-4460-90f7-ca6b763ddf1c",
+            "platform": "airbnb",
+            "platform_id": "1429119691687826977",
+            "reservation_platform_id": "HM3QRWS3JE",
+            "listing_platform_id": null,
+            "guest_platform_id": "413973917",
+            "guest_name": "Jesse Haynes-Lewis",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Jesse was an incredible guest. Communicated very well and was super helpful. Would highly recommend!",
+            "private_text": "Hope you had a blast! Come stay with us again here or any of our other properties!",
+            "response_text": null,
+            "expires_at": "2025-06-08T19:25:43Z",
+            "first_completed_at": "2025-05-25T19:37:47Z",
+            "submitted_at": "2025-05-25T19:38:34Z",
+            "responded_at": null
+        },
+        {
+            "id": "d81f043b-e4f8-483a-bfda-ed3900d20fef",
+            "platform": "airbnb",
+            "platform_id": "1429119691747846002",
+            "reservation_platform_id": "HM3QRWS3JE",
+            "listing_platform_id": "1371048723133622394",
+            "guest_platform_id": "413973917",
+            "guest_name": "Jesse Haynes-Lewis",
+            "reviewer_role": "guest",
+            "rating": 5,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "accuracy"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "checkin"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "location"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "value"
+                }
+            ],
+            "visible": true,
+            "public_text": ".",
+            "private_text": null,
+            "response_text": "😊, Thank you for staying and choosing our house. Looking forward to welcoming you back next time.",
+            "expires_at": "2025-06-08T19:25:43Z",
+            "first_completed_at": "2025-05-27T12:00:19Z",
+            "submitted_at": "2025-05-27T12:01:26Z",
+            "responded_at": "2025-06-10T19:55:50Z"
+        },
+        {
+            "id": "241acdb8-7db1-42f5-87ee-d8e8f6c39aab",
+            "platform": "airbnb",
+            "platform_id": "1434173864066753315",
+            "reservation_platform_id": "HMSPBZ3NQF",
+            "listing_platform_id": null,
+            "guest_platform_id": "383243859",
+            "guest_name": "Tanner Hoard",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Tanner was a good guest. Communicated well!",
+            "private_text": "I appreciate you wrangling in your friends after I reached out! No damage was found and house was left in pretty good shape. The only thing was the hot tubs. It appears somebody puked in the water in one as there were chunks of food and the water was filthy and that one had to be drained, sanitized and refilled today. Only reason I bring it up is because we just serviced them right before your stay so they were brand new fresh start. We are pretty good about letting things slide as cost of doing business but in this case we will need to recoup what the cleaners will charge me for that. Hope that’s alright and you can pass that expense on to whoever owns up. Didn’t want to blast them in the group chat. It will be $100, what they charge me. Hope you can understand. Thank you!",
+            "response_text": null,
+            "expires_at": "2025-06-15T18:47:27Z",
+            "first_completed_at": "2025-06-01T21:55:21Z",
+            "submitted_at": "2025-06-01T22:11:57Z",
+            "responded_at": null
+        },
+        {
+            "id": "9723184a-edf7-4840-a2a1-486b4d97babd",
+            "platform": "airbnb",
+            "platform_id": "1434173864118071139",
+            "reservation_platform_id": "HMSPBZ3NQF",
+            "listing_platform_id": "1371048723133622394",
+            "guest_platform_id": "383243859",
+            "guest_name": "Tanner Hoard",
+            "reviewer_role": "guest",
+            "rating": 5,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "accuracy"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "checkin"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "location"
+                },
+                {
+                    "rating": 4,
+                    "comment": null,
+                    "category": "value"
+                }
+            ],
+            "visible": true,
+            "public_text": "We were able to sleep 19 adult males and had plenty of space. The property is 2 separate houses that do not conjoin at all, and must exit one house to enter the other so it works well for larger groups with the benefit of a little more privacy.\nRide-shares are also pretty fair to Broadway for the night out!",
+            "private_text": null,
+            "response_text": "Thanks for sharing your experience, Tanner. I’m glad our house suited your group so well and that ride-shares to Broadway were a breeze – you’re welcome back anytime!",
+            "expires_at": "2025-06-15T18:47:27Z",
+            "first_completed_at": "2025-06-01T21:47:13Z",
+            "submitted_at": "2025-06-01T21:54:11Z",
+            "responded_at": "2025-06-10T19:53:06Z"
+        },
+        {
+            "id": "d162845e-edae-40ae-bcd6-63c538ee02f8",
+            "platform": "airbnb",
+            "platform_id": "1439985082397956495",
+            "reservation_platform_id": "HM3CNT9XC4",
+            "listing_platform_id": null,
+            "guest_platform_id": "447976422",
+            "guest_name": "Jessica Sell",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Jessica and her group were great. Very respectful of the house and left it in great shape. Highly recommend!",
+            "private_text": "Come stay with us again!",
+            "response_text": null,
+            "expires_at": "2025-06-23T19:13:18Z",
+            "first_completed_at": "2025-06-09T20:22:54Z",
+            "submitted_at": "2025-06-09T20:23:42Z",
+            "responded_at": null
+        },
+        {
+            "id": "bd17ed7c-1bd6-4150-9e46-1cf98d494d6b",
+            "platform": "airbnb",
+            "platform_id": "1439985082436435485",
+            "reservation_platform_id": "HM3CNT9XC4",
+            "listing_platform_id": "1371048723133622394",
+            "guest_platform_id": "447976422",
+            "guest_name": "Jessica Sell",
+            "reviewer_role": "guest",
+            "rating": 5,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "accuracy"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "checkin"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "location"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "value"
+                }
+            ],
+            "visible": true,
+            "public_text": "My team recently stayed at these Nashville homes for work, and they had a great experience. The location was convenient, just a short drive from downtown. The house was clean, well-equipped, and beautifully decorated. The hosts were friendly and responsive. Would recommend!",
+            "private_text": "Thank you! We’ll reach out about next year.",
+            "response_text": "Thanks so much, Jessica! I’m glad you and your team found our house clean, comfortable, and a convenient home base. Would love to welcome you all back to Nashville anytime.",
+            "expires_at": "2025-06-23T19:13:18Z",
+            "first_completed_at": "2025-06-10T00:58:36Z",
+            "submitted_at": "2025-06-10T01:03:47Z",
+            "responded_at": "2025-06-10T19:49:07Z"
+        },
+        {
+            "id": "f9ba0c4c-9d2f-41a0-8b06-418ed72ec511",
+            "platform": "airbnb",
+            "platform_id": "1444307640711462674",
+            "reservation_platform_id": "HMYY3D3E8S",
+            "listing_platform_id": null,
+            "guest_platform_id": "173101497",
+            "guest_name": "Dustin Wingler",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Dustin was great and a pleasure to host! They communicated well and left the house in great condition. Would recommend!",
+            "private_text": null,
+            "response_text": null,
+            "expires_at": "2025-06-29T18:21:27Z",
+            "first_completed_at": "2025-06-16T15:01:09Z",
+            "submitted_at": "2025-06-16T15:01:09Z",
+            "responded_at": null
+        },
+        {
+            "id": "c30d6377-a525-43aa-93f0-2b063859effa",
+            "platform": "airbnb",
+            "platform_id": "1444307640766867181",
+            "reservation_platform_id": "HMYY3D3E8S",
+            "listing_platform_id": "1371048723133622394",
+            "guest_platform_id": "173101497",
+            "guest_name": "Dustin Wingler",
+            "reviewer_role": "guest",
+            "rating": 5,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "accuracy"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "checkin"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "location"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "value"
+                }
+            ],
+            "visible": true,
+            "public_text": "Great spot!",
+            "private_text": null,
+            "response_text": "Really glad you enjoyed our house, Dustin. It was a pleasure hosting you, and we’d love to welcome you back anytime.",
+            "expires_at": "2025-06-29T18:21:27Z",
+            "first_completed_at": "2025-06-16T16:15:06Z",
+            "submitted_at": "2025-06-16T16:15:36Z",
+            "responded_at": "2025-06-17T12:30:46Z"
+        },
+        {
+            "id": "5063137d-a699-402c-940b-bb8365f62cd1",
+            "platform": "airbnb",
+            "platform_id": "1449390282227780616",
+            "reservation_platform_id": "HM3F4MSNHY",
+            "listing_platform_id": null,
+            "guest_platform_id": "660070853",
+            "guest_name": "Kelsi Burns",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Kelsi was great and a pleasure to host! Her and her group communicated well and quick to respond. They left the house in great condition. Would recommend!",
+            "private_text": null,
+            "response_text": null,
+            "expires_at": "2025-07-06T18:39:45Z",
+            "first_completed_at": "2025-06-22T20:28:09Z",
+            "submitted_at": "2025-06-22T20:28:09Z",
+            "responded_at": null
+        },
+        {
+            "id": "0c7f0b0d-7996-44ff-ad4d-8ea7da30042a",
+            "platform": "airbnb",
+            "platform_id": "1449390282278314395",
+            "reservation_platform_id": "HM3F4MSNHY",
+            "listing_platform_id": "1371048723133622394",
+            "guest_platform_id": "660070853",
+            "guest_name": "Kelsi Burns",
+            "reviewer_role": "guest",
+            "rating": 5,
+            "detailed_ratings": [
+                {
+                    "rating": 4,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "accuracy"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "checkin"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 4,
+                    "comment": null,
+                    "category": "location"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "value"
+                }
+            ],
+            "visible": true,
+            "public_text": "House was great and very clean! Chase was very attentive and flexible with our large group. Great location and easy to get an uber to Broadway.",
+            "private_text": "More towels ! And easier way to get toilet paper, paper towels etc with such a large group",
+            "response_text": "It means a lot to hear our house and location worked so well for you and your crew. Glad I could stay flexible and help make your trip enjoyable. Hope to host you all again next time you’re in Nashville!",
+            "expires_at": "2025-07-06T18:39:45Z",
+            "first_completed_at": "2025-06-22T22:27:58Z",
+            "submitted_at": "2025-06-23T21:00:59Z",
+            "responded_at": "2025-06-24T12:01:57Z"
+        },
+        {
+            "id": "b4605f67-11ed-4e35-9e3b-bb54942fe9d4",
+            "platform": "airbnb",
+            "platform_id": "1465340467904539317",
+            "reservation_platform_id": "HMJ53H2H3R",
+            "listing_platform_id": null,
+            "guest_platform_id": "430683943",
+            "guest_name": "Madeline Cenci",
+            "reviewer_role": "host",
+            "rating": null,
+            "detailed_ratings": [
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "cleanliness"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "communication"
+                },
+                {
+                    "rating": 5,
+                    "comment": null,
+                    "category": "respect_house_rules"
+                }
+            ],
+            "visible": true,
+            "public_text": "Madeline was great and a pleasure to host! They communicated well and left the house in great condition. Would recommend!",
+            "private_text": null,
+            "response_text": null,
+            "expires_at": "2025-07-28T18:49:56Z",
+            "first_completed_at": "2025-07-14T20:58:27Z",
+            "submitted_at": "2025-07-14T20:58:27Z",
+            "responded_at": null
+        }
+    ],
+    "links": {
+        "first": "http://connect.hospitable.com/api/v1/channels/d51c9178-47b9-4f72-805d-54668d61f7ea/reviews?page=1",
+        "last": null,
+        "prev": null,
+        "next": "http://connect.hospitable.com/api/v1/channels/d51c9178-47b9-4f72-805d-54668d61f7ea/reviews?page=2"
+    },
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "path": "http://connect.hospitable.com/api/v1/channels/d51c9178-47b9-4f72-805d-54668d61f7ea/reviews",
+        "per_page": 15,
+        "to": 15
+    }
+}F

@@ -64,6 +64,7 @@ import { Link } from 'wouter';
 import { formatDistanceToNow } from 'date-fns';
 import { apiRequest } from '@/lib/queryClient';
 import { useProperties } from '@/lib/api';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Action menu component for property card
 interface PropertyActionMenuProps {
@@ -145,6 +146,7 @@ const PublishedProperties: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/properties'] });
+      queryClient.refetchQueries({ queryKey: ['/api/properties'] });
       toast({
         title: "Success",
         description: "Property updated successfully",
@@ -171,6 +173,7 @@ const PublishedProperties: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/properties'] });
+      queryClient.refetchQueries({ queryKey: ['/api/properties'] });
       toast({
         title: "Success",
         description: "Property deleted successfully",
@@ -325,6 +328,12 @@ const PublishedProperties: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Loader overlay for update/delete actions */}
+      {(updatePropertyMutation.isPending || deletePropertyMutation.isPending) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20">
+          <Skeleton className="w-16 h-16 rounded-full" />
+        </div>
+      )}
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
